@@ -8,7 +8,7 @@
 
 ## AMOS Project
 This project is a student project for the [AMOS SS 2024](https://github.com/amosproj) course with the industry partner [Kubermatic](https://www.kubermatic.com)
-at [Technical University of Berlin](https://www.tu.berlin/en/), under the supervision of [Prof. Riehle](https://oss.cs.fau.de/person/riehle-dirk/) at the [Friedrich-Alexander University of Erlangen-Nuremberg](https://www.fau.de), and contact persons are Mario Fahlandt and Sebastian Scheele of Kubermatic.
+at [Technical University of Berlin](https://www.tu.berlin),[Friedrich-Alexander University of Erlangen-Nuremberg](https://www.fau.de) and [Free University of Berlin](https://www.fu-berlin.de), under the supervision of [Prof. Riehle](https://oss.cs.fau.de/person/riehle-dirk/) at the [Friedrich-Alexander University of Erlangen-Nuremberg](https://www.fau.de) and contact persons are Mario Fahlandt and Sebastian Scheele of Kubermatic.
 
 ## Overview
 
