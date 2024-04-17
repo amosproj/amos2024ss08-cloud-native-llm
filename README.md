@@ -8,24 +8,25 @@
 
 ## AMOS Project
 This project is a student project for the [AMOS SS 2024](https://github.com/amosproj) course with the industry partner [Kubermatic](https://www.kubermatic.com)
-at [Technical University of Berlin](https://www.tu.berlin),[Friedrich-Alexander University of Erlangen-Nuremberg](https://www.fau.de) and [Free University of Berlin](https://www.fu-berlin.de), under the supervision of [Prof. Riehle](https://oss.cs.fau.de/person/riehle-dirk/) at the [Friedrich-Alexander University of Erlangen-Nuremberg](https://www.fau.de) and contact persons are Mario Fahlandt and Sebastian Scheele of Kubermatic.
+at [Technical University of Berlin](https://www.tu.berlin),[Friedrich-Alexander University of Erlangen-Nuremberg](https://www.fau.de) and [Free University of Berlin](https://www.fu-berlin.de), under the supervision of [Prof. Riehle](https://oss.cs.fau.de/person/riehle-dirk/) and contact persons are Mario Fahlandt and Sebastian Scheele of Kubermatic.
 
 ## Overview
 
 Welcome to the Cloud Native LLM Project for the AMOS SS 2024! 
+
 The primary goal focuses on developing a Cloud Native focused fine-tuned Large Language Model (LLM) that capable of answering complex queries about Kubernetes installations.
+
+By providing immediate, context-aware answers and guidance, this project reduces the learning curve and increases productivity in managing Kubernetes installations.
+
+Hence, it will be further developed to create AI assistants that will aid developers in navigating and managing Kubernetes environments.
 
 The project is open sourced and open modeled to be used by the [community](https://www.kubermatic.com/company/community/).
 
-By providing immediate, context-aware answers and guidance, this reduces the learning curve and increases productivity in managing Kubernetes installations.
-
-Hence, this can be used to create AI assistants that will aid developers in navigating and managing Kubernetes environments.
-
 The folder structure is as follows:
 [TBD]
-- ** /First/ **: 1.
-- ** /Second/ **: 2.
-- ** /Third/ **:3.
+- **First** 1.
+- **Second** 2.
+- **Third:** 3.
 
 
 ## Objectives
