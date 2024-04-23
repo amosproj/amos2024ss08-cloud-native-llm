@@ -1,4 +1,6 @@
-<img src="/Deliverables/sprint-01/team-logo.png" height="600">
+<h1 align="center">
+  <img src="/Deliverables/sprint-01/team-logo.svg" alt="ChatCNCF team-logo" />
+</h1>
 
 # Cloud Native LLM Project (AMOS SS 2024)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
