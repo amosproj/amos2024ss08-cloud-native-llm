@@ -1,4 +1,4 @@
-<img src="/Deliverables/sprint-01/team-logo.png" width="100" height="100">
+<img src="/Deliverables/sprint-01/team-logo.png" height="600">
 
 # Cloud Native LLM Project (AMOS SS 2024)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
