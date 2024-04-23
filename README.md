@@ -1,3 +1,5 @@
+![plot](/Deliverables/sprint-01/team-logo.png)
+
 # Cloud Native LLM Project (AMOS SS 2024)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 ![Kubernetes Version](https://img.shields.io/badge/kubernetes-v1.21-blue.svg)
