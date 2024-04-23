@@ -1,5 +1,5 @@
 <h1 align="center">
-  <img src="/Deliverables/sprint-01/team-logo.svg" alt="ChatCNCF team-logo" />
+  <img src="/Deliverables/sprint-01/team-logo.png" alt="ChatCNCF team-logo" height="500"/>
 </h1>
 
 # Cloud Native LLM Project (AMOS SS 2024)
