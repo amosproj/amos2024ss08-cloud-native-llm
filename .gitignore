@@ -37,3 +37,6 @@ bin/
 
 # Conda
 .conda
+
+# sqlite used for caching
+*.sqlite
