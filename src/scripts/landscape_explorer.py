@@ -1,5 +1,4 @@
 from collections import defaultdict
-import sys
 import requests
 import os
 import yaml
@@ -13,7 +12,10 @@ HEADERS = {'Authorization': f'Bearer {TOKEN}',
 BASE_API_URL = 'https://api.github.com'
 BASE_REPO_YAML = 'https://raw.githubusercontent.com/cncf/landscape/master/landscape.yml'
 EXTENSIONS = ["yml", "yaml", "pdf", "md"]
-requests_cache.install_cache('landscape_cache', expire_after=3600)
+
+
+# Cache requests for 7 days
+requests_cache.install_cache('landscape_cache', expire_after=604800)
 
 
 def get_urls(repo_url: str) -> dict:
@@ -32,7 +34,8 @@ def get_urls(repo_url: str) -> dict:
     # get tree response
     url = f'{BASE_API_URL}/repos/{repo_url.split("https://github.com/")[1]}/git/trees/{default_branch}?recursive=1'
     response = requests.get(url, headers=HEADERS).json()
-    # if response.get('truncated'):
+    if response.get('truncated'):
+        print('Response is truncated')
     # TODO: Handle case where response is truncated (more than 100000 registers)
     #
     tree = response.get('tree')  # TODO: Handle case where tree is null
@@ -70,23 +73,23 @@ def get_augmented_yml_with_urls():
 
     content = response.content.decode('utf-8')
     content = yaml.safe_load(content)  # type dict
-    number_files = 5
+    # number_files = 5
     os.makedirs('sources', exist_ok=True)
     for category in tqdm(content.get('landscape')):
         for subcategory in tqdm(category.get('subcategories')):
             for item in tqdm(subcategory.get('items')):
-                if 'repo_url' not in item:
+                if 'repo_url' not in item or not item.get('repo_url'):
                     continue
                 urls = get_urls(item.get('repo_url'))
                 item['download_urls'] = {}
                 for ext, url_list in urls.items():
                     item['download_urls'][ext] = url_list
-                number_files -= 1
-                if not number_files:
-                    with open('sources/landscape_augmented.yml', 'w+') as file:
-                        yaml.dump(content, file, sort_keys=False)
-                    sys.exit(0)
-    with open('../sources/landscape_augmented.yml', 'w+') as file:
+                # number_files -= 1
+                # if not number_files:
+                #     with open('sources/landscape_augmented.yml', 'w+') as file:
+                #         yaml.dump(content, file, sort_keys=False)
+                #     sys.exit(0)
+    with open('sources/landscape_augmented.yml', 'w+') as file:
         yaml.dump(content, file, sort_keys=False)
 
 
