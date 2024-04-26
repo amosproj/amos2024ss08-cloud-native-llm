@@ -40,3 +40,6 @@ bin/
 
 # sqlite used for caching
 *.sqlite
+
+# sources directory
+sources/
