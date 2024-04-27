@@ -18,64 +18,57 @@ EXTENSIONS = ["yml", "yaml", "pdf", "md"]
 requests_cache.install_cache('landscape_cache', expire_after=604800)
 
 
-def get_urls(repo_url: str, default_branch="", tree_sha="", file_path="", res=None) -> None:
+def get_urls(repo_url: str, default_branch: str = "", tree_sha: str = "", file_path: str = "", res: defaultdict = None) -> defaultdict:
     """
-    Retrieves the URLs of files with specified extensions from a GitHub repository.
+    Retrieves the URLs of files with specific extensions from a GitHub repository.
 
     Args:
-        extensions (list): A list of file extensions to filter the URLs.
         repo_url (str): The URL of the GitHub repository.
+        default_branch (str, optional): The default branch of the repository. Defaults to "".
+        tree_sha (str, optional): The SHA of the tree object. Defaults to "".
+        file_path (str, optional): The path to a specific file or directory within the repository. Defaults to "".
+        res (defaultdict, optional): A defaultdict to store the URLs of files with specific extensions. Defaults to None.
 
     Returns:
-        dict: A dictionary where the keys are the file extensions and the values are lists of URLs.
+        defaultdict: A defaultdict containing the URLs of files with specific extensions.
 
     """
-    if tree_sha:
-        print("Getting urls for repo: ", repo_url +
-              " and tree_sha: ", tree_sha)
-
     if res is None:
         res = defaultdict(list)
 
     if not default_branch:
         default_branch = get_default_branch(repo_url)
 
-    if not default_branch:
-        return res
     if not tree_sha:
         tree_sha = default_branch
-    # get tree response
+
     url = f'{BASE_API_URL}/repos/{repo_url.split("https://github.com/")[1]}/git/trees/{tree_sha}?recursive=1'
     response = requests.get(url, headers=HEADERS).json()
+    truncated = False
     if response.get('truncated'):
         print("Truncated response handled")
+        truncated = True
         url = f'{BASE_API_URL}/repos/{repo_url.split("https://github.com/")[1]}/git/trees/{tree_sha}'
         response = requests.get(url, headers=HEADERS).json()
-        tree = response.get('tree')
-        for file in tree:
-            if file.get('type') == 'tree':
-                if not file_path:
-                    get_urls(repo_url, default_branch, file.get(
-                        'sha'), file.get('path'), res)
-                else:
-                    get_urls(repo_url, default_branch, file.get(
-                        'sha'), file_path + "/" + file.get('path'), res)
 
-        return res
-    #
     tree = response.get('tree')
+
     if not tree:
         return res
-    # select of type blob and if the extension is in the list
+
     base_download_url = f'https://raw.githubusercontent.com/{repo_url.split("https://github.com/")[1]}/{default_branch}/'
+
     for file in tree:
         ext = file.get('path').split('.')[-1]
+        new_file_path = file_path + "/" + \
+            file.get('path') if file_path else file.get('path')
         if file.get('type') == 'blob' and ext in EXTENSIONS:
-            if not file_path:
-                res[ext].append(base_download_url + file.get('path'))
-            else:
-                res[ext].append(base_download_url + file_path +
-                                "/" + file.get('path'))
+            res[ext].append(base_download_url + new_file_path)
+
+        if truncated and file.get('type') == 'tree':
+            get_urls(repo_url, default_branch, file.get(
+                'sha'), new_file_path, res)
+
     return res
 
 
