@@ -18,7 +18,7 @@ EXTENSIONS = ["yml", "yaml", "pdf", "md"]
 requests_cache.install_cache('landscape_cache', expire_after=604800)
 
 
-def get_urls(repo_url: str) -> dict:
+def get_urls(repo_url: str, default_branch="", tree_sha="", file_path="", res=None) -> None:
     """
     Retrieves the URLs of files with specified extensions from a GitHub repository.
 
@@ -30,28 +30,42 @@ def get_urls(repo_url: str) -> dict:
         dict: A dictionary where the keys are the file extensions and the values are lists of URLs.
 
     """
-    default_branch = get_default_branch(repo_url)
+    if tree_sha:
+        print("Getting urls for repo: ", repo_url +
+              " and tree_sha: ", tree_sha)
+
+    if not res:
+        res = defaultdict(list)
+
     if not default_branch:
-        return {}
+        default_branch = get_default_branch(repo_url)
+
+    if not default_branch:
+        return res
+    if not tree_sha:
+        tree_sha = default_branch
     # get tree response
-    url = f'{BASE_API_URL}/repos/{repo_url.split("https://github.com/")[1]}/git/trees/{default_branch}?recursive=1'
+    url = f'{BASE_API_URL}/repos/{repo_url.split("https://github.com/")[1]}/git/trees/{tree_sha}?recursive=1'
     response = requests.get(url, headers=HEADERS).json()
     if response.get('truncated'):
         print("Truncated response handled")
         res = defaultdict(list)
-        get_urls_recursive(repo_url, default_branch, default_branch, res)
+        get_urls_recursive(repo_url, default_branch, tree_sha, file_path, res)
         return res
     #
     tree = response.get('tree')
     if not tree:
-        return {}
+        return res
     # select of type blob and if the extension is in the list
-    res = defaultdict(list)
     base_download_url = f'https://raw.githubusercontent.com/{repo_url.split("https://github.com/")[1]}/{default_branch}/'
     for file in tree:
         ext = file.get('path').split('.')[-1]
         if file.get('type') == 'blob' and ext in EXTENSIONS:
-            res[ext].append(base_download_url + file.get('path'))
+            if not file_path:
+                res[ext].append(base_download_url + file.get('path'))
+            else:
+                res[ext].append(base_download_url + file_path +
+                                "/" + file.get('path'))
     return res
 
 
@@ -84,7 +98,7 @@ def get_default_branch(repo_url: str) -> str:
     return response.json().get('default_branch')
 
 
-def get_augmented_yml_with_urls():
+def generate_augmented_yml_with_urls():
     """
     Retrieves the YAML content from BASE_REPO_YAML, augments it with download URLs,
     and saves the augmented content to 'sources/landscape_augmented.yml'.
@@ -110,7 +124,7 @@ def get_augmented_yml_with_urls():
         yaml.dump(content, file, sort_keys=False)
 
 
-def get_urls_recursive(repo_url: str, default_branch: str, tree_sha, res) -> None:
+def get_urls_recursive(repo_url: str, default_branch: str, tree_sha, file_path, res) -> None:
     print("Recursive call with url: ", repo_url,
           " and tree_sha: ", tree_sha)
 
@@ -133,12 +147,21 @@ def get_urls_recursive(repo_url: str, default_branch: str, tree_sha, res) -> Non
     base_download_url = f'https://raw.githubusercontent.com/{repo_url.split("https://github.com/")[1]}/{default_branch}/'
     for file in tree:
         if file.get('type') == 'tree':
-            get_urls_recursive(repo_url, default_branch, file.get('sha'), res)
+            if not file_path:
+                get_urls(repo_url, default_branch, file.get(
+                    'sha'), file.get('path'), res)
+            else:
+                get_urls(repo_url, default_branch, file.get(
+                    'sha'), file_path + "/" + file.get('path'), res)
 
         ext = file.get('path').split('.')[-1]
         if file.get('type') == 'blob' and ext in EXTENSIONS:
-            res[ext].append(base_download_url + file.get('path'))
+            if not file_path:
+                res[ext].append(base_download_url + file.get('path'))
+            else:
+                res[ext].append(base_download_url +
+                                file_path + "/" + file.get('path'))
 
 
 if __name__ == '__main__':
-    get_augmented_yml_with_urls()
+    generate_augmented_yml_with_urls()
