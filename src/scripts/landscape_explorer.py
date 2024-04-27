@@ -34,7 +34,7 @@ def get_urls(repo_url: str, default_branch="", tree_sha="", file_path="", res=No
         print("Getting urls for repo: ", repo_url +
               " and tree_sha: ", tree_sha)
 
-    if not res:
+    if res is None:
         res = defaultdict(list)
 
     if not default_branch:
@@ -49,8 +49,18 @@ def get_urls(repo_url: str, default_branch="", tree_sha="", file_path="", res=No
     response = requests.get(url, headers=HEADERS).json()
     if response.get('truncated'):
         print("Truncated response handled")
-        res = defaultdict(list)
-        get_urls_recursive(repo_url, default_branch, tree_sha, file_path, res)
+        url = f'{BASE_API_URL}/repos/{repo_url.split("https://github.com/")[1]}/git/trees/{tree_sha}'
+        response = requests.get(url, headers=HEADERS).json()
+        tree = response.get('tree')
+        for file in tree:
+            if file.get('type') == 'tree':
+                if not file_path:
+                    get_urls(repo_url, default_branch, file.get(
+                        'sha'), file.get('path'), res)
+                else:
+                    get_urls(repo_url, default_branch, file.get(
+                        'sha'), file_path + "/" + file.get('path'), res)
+
         return res
     #
     tree = response.get('tree')
@@ -122,45 +132,6 @@ def generate_augmented_yml_with_urls():
                     item['download_urls'][ext] = url_list
     with open('sources/landscape_augmented.yml', 'w+') as file:
         yaml.dump(content, file, sort_keys=False)
-
-
-def get_urls_recursive(repo_url: str, default_branch: str, tree_sha, file_path, res) -> None:
-    print("Recursive call with url: ", repo_url,
-          " and tree_sha: ", tree_sha)
-
-    if not default_branch:
-        return
-    url = f'{BASE_API_URL}/repos/{repo_url.split("https://github.com/")[1]}/git/trees/{tree_sha}'
-    try:
-        response = requests.get(url, headers=HEADERS)
-        response = response.json()
-    except Exception as e:
-        print(e)
-        # print("content of response: ", response.content)
-        return
-
-    tree = response.get('tree')
-
-    if not tree:
-        return
-
-    base_download_url = f'https://raw.githubusercontent.com/{repo_url.split("https://github.com/")[1]}/{default_branch}/'
-    for file in tree:
-        if file.get('type') == 'tree':
-            if not file_path:
-                get_urls(repo_url, default_branch, file.get(
-                    'sha'), file.get('path'), res)
-            else:
-                get_urls(repo_url, default_branch, file.get(
-                    'sha'), file_path + "/" + file.get('path'), res)
-
-        ext = file.get('path').split('.')[-1]
-        if file.get('type') == 'blob' and ext in EXTENSIONS:
-            if not file_path:
-                res[ext].append(base_download_url + file.get('path'))
-            else:
-                res[ext].append(base_download_url +
-                                file_path + "/" + file.get('path'))
 
 
 if __name__ == '__main__':
