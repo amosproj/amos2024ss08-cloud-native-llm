@@ -108,7 +108,7 @@ def generate_augmented_yml_with_urls():
 
     content = response.content.decode('utf-8')
     content = yaml.safe_load(content)  # type dict
-    os.makedirs('sources', exist_ok=True)
+    os.makedirs('../../sources', exist_ok=True)
     for category in tqdm(content.get('landscape'), desc="categories"):
         for subcategory in tqdm(category.get('subcategories'), desc="subcategories"):
             for item in tqdm(subcategory.get('items'), desc="sources"):
@@ -118,7 +118,7 @@ def generate_augmented_yml_with_urls():
                 item['download_urls'] = {}
                 for ext, url_list in urls.items():
                     item['download_urls'][ext] = url_list
-    with open('sources/landscape_augmented.yml', 'w+') as file:
+    with open('../../sources/landscape_augmented.yml', 'w+') as file:
         yaml.dump(content, file, sort_keys=False)
 
 
