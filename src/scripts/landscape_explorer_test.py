@@ -7,10 +7,10 @@ from unittest.mock import Mock
 
 def mocked_requests_get(*args, **kwargs):
     class MockResponse:
-        def __init__(self, json_data, status_code):
+        def __init__(self, json_data, status_code, headers={}):
             self.json_data = json_data
             self.status_code = status_code
-            self.headers = {"Content-Type": "application/json"}
+            self.headers = headers
 
         def json(self):
             return self.json_data
@@ -58,6 +58,8 @@ def mocked_requests_get(*args, **kwargs):
                     {"path": "file5.yml", "type": "blob"},
                     {"path": "file6.md", "type": "blob"},
                 ]}, 200)
+        case 'https://api.github.com/repos/org/repo_rate_limit_exceeded':
+            return MockResponse({}, 403, headers={"x-ratelimit-remaining": "0", "x-ratelimit-reset": "2"})
     return MockResponse(None, 404)
 
 
@@ -95,6 +97,16 @@ class LandscapeExplorerTest(unittest.TestCase):
         }
 
         self.assertEqual(result, expected_result)
+
+    @mock.patch('requests.get', side_effect=mocked_requests_get)
+    @mock.patch('time.sleep', return_value=None)
+    def test_make_request_wait(self, mock_sleep, mock_get):
+        landscape_explorer.get_default_branch = Mock(return_value="main")
+        landscape_explorer.make_request(
+            "https://api.github.com/repos/org/repo_rate_limit_exceeded")
+
+        # assert that time.sleep was called with the correct argument
+        landscape_explorer.time.sleep.assert_called_with(2)
 
 
 if __name__ == '__main__':
