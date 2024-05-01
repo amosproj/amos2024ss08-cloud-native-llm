@@ -4,7 +4,8 @@ import os
 import yaml
 from tqdm import tqdm
 import requests_cache
-
+import logging
+import time
 
 TOKEN = os.environ['GITHUBTOKEN']
 HEADERS = {'Authorization': f'Bearer {TOKEN}',
@@ -43,13 +44,15 @@ def get_urls(repo_url: str, default_branch: str = "", tree_sha: str = "", file_p
         tree_sha = default_branch
 
     url = f'{BASE_API_URL}/repos/{repo_url.split("https://github.com/")[1]}/git/trees/{tree_sha}?recursive=1'
-    response = requests.get(url, headers=HEADERS).json()
+    response = make_request(url).json()
     truncated = False
     if response.get('truncated'):
-        print("Truncated response handled")
+        logging_path = file_path if file_path else "root"
+        logging.info(
+            f'request for files in path {logging_path} in repository: {repo_url} got truncated because of file number limit')
         truncated = True
         url = f'{BASE_API_URL}/repos/{repo_url.split("https://github.com/")[1]}/git/trees/{tree_sha}'
-        response = requests.get(url, headers=HEADERS).json()
+        response = make_request(url).json()
 
     tree = response.get('tree')
 
@@ -88,15 +91,7 @@ def get_default_branch(repo_url: str) -> str:
     """
     url = f'{BASE_API_URL}/repos/{repo_url.split("https://github.com/")[1]}'
 
-    try:
-        response = requests.get(
-            url, headers=HEADERS)
-    except requests.exceptions.RequestException as e:
-        print(e)
-
-    if response.status_code != 200:
-        print(f'Error: {response.status_code}')
-        return ""
+    response = make_request(url)
 
     return response.json().get('default_branch')
 
@@ -109,14 +104,14 @@ def generate_augmented_yml_with_urls():
     Returns:
         None
     """
-    response = requests.get(BASE_REPO_YAML)
+    response = make_request(BASE_REPO_YAML)
 
     content = response.content.decode('utf-8')
     content = yaml.safe_load(content)  # type dict
     os.makedirs('sources', exist_ok=True)
-    for category in tqdm(content.get('landscape')):
-        for subcategory in tqdm(category.get('subcategories')):
-            for item in tqdm(subcategory.get('items')):
+    for category in tqdm(content.get('landscape'), desc="categories"):
+        for subcategory in tqdm(category.get('subcategories'), desc="subcategories"):
+            for item in tqdm(subcategory.get('items'), desc="sources"):
                 if 'repo_url' not in item or not item.get('repo_url'):
                     continue
                 urls = get_urls(item.get('repo_url'))
@@ -125,6 +120,22 @@ def generate_augmented_yml_with_urls():
                     item['download_urls'][ext] = url_list
     with open('sources/landscape_augmented.yml', 'w+') as file:
         yaml.dump(content, file, sort_keys=False)
+
+
+def make_request(url):
+    response = requests.get(url, headers=HEADERS)
+    if 'retry_after' in response.headers:
+        logging.warning(
+            f'Rate limit exceeded. Retrying after {response.headers["retry-after"]} seconds')
+        time.sleep(int(response.headers['retry-after']))
+    elif 'x-ratelimit-remaining' in response.headers and int(response.headers['x-ratelimit-remaining']) == 0:
+        logging.warning(
+            f'Rate limit exceeded. Retrying after {response.headers["x-ratelimit-remaining"]} seconds')
+        time.sleep(int(response.headers['x-ratelimit-reset']))
+
+    response = requests.get(url, headers=HEADERS)
+
+    return response
 
 
 if __name__ == '__main__':
