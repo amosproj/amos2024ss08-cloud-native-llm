@@ -34,3 +34,12 @@ bin/
 
 # MacOS
 .DS_Store
+
+# Conda
+.conda
+
+# sqlite used for caching
+*.sqlite
+
+# sources directory
+sources/
