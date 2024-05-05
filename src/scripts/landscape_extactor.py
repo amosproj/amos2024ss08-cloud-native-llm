@@ -1,7 +1,18 @@
 import requests
 import yaml
 import os
+from tqdm import tqdm
+
 def downloader(download_urls, output_directory, tags_dict):
+    """
+    Downloads the files from the URLs provided in the input download_urls in the output_directory. Also, tags each downloaded file with
+    corresponding  Category, Subcategory and Project_name in each file name.
+    Args:
+        download_urls (dict): A dictionary which contains a list of URLs for each file extention.
+        output_directory (str): The path where the downloaded files will be stored.
+        tags_dict(dict): A dictionary containing the tags for each file. For example: Category, Subcategory, Project_name
+        
+    """
     for file_format, urls_list in download_urls.items():
         for url in urls_list:
             try:
@@ -26,6 +37,14 @@ def downloader(download_urls, output_directory, tags_dict):
         
     
 def download_files_from_yaml(yaml_file = "sources/landscape_augmented.yml", output_directory = "sources/raw_files"):
+    """
+    Downloads the files with specific extensions from the URLs provided in yaml_file
+
+    Args:
+        yaml_file (str, optional): The path to the URLs yaml file(default: sources/landscape_augmented.yml).
+        output_directory (str, optional): The path where the downloaded files will be stored(defult: sources/raw_files).
+        
+    """
     # Load URLs from YAML file
     with open(yaml_file, 'r') as f:
         data = yaml.safe_load(f)
@@ -41,7 +60,7 @@ def download_files_from_yaml(yaml_file = "sources/landscape_augmented.yml", outp
         for subcategory in category.get('subcategories', []):
             tags_dict['Subcategory'] = subcategory['name']
             print(f"Subcategory: {tags_dict['Subcategory']}")
-            for item in subcategory.get('items', []):
+            for item in tqdm(subcategory.get('items', [])):
                 tags_dict['Project_name'] = item['name']
                 print(f"Item: {tags_dict['Project_name']}")
                 downloader(item['download_urls'],output_directory, tags_dict)
