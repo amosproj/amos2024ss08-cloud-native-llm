@@ -235,6 +235,8 @@ error_file_list = []
 
 file_paths = "sources/raw_files"
 json_file_path = "sources/unified_files"
+# Create output directory if it doesn't exist
+os.makedirs(json_file_path, exist_ok=True)
 convert_files_to_json(file_paths, json_file_path, processed_files, chunk_size, error_file_list)
 process_error_yaml_file(error_file_list)
 
