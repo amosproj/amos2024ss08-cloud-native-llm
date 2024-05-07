@@ -1,0 +1,18 @@
+Title	URL	Assignees	Status
+Set Up Team Logo and request Team T-shirt	https://github.com/amosproj/amos2024ss08-cloud-native-llm/issues/4	dnsch	Feature Archive
+Identify Repositories for the Kubernetes LLM dataset	https://github.com/amosproj/amos2024ss08-cloud-native-llm/issues/11	julioc-p	Awaiting review
+Create Software architecture draft	https://github.com/amosproj/amos2024ss08-cloud-native-llm/issues/12	dnsch	Awaiting review
+[Epic] Implement Data Collection Automation Pipeline			Product Backlog
+Extract Content from CNCF sources	https://github.com/amosproj/amos2024ss08-cloud-native-llm/issues/7	anosh-ar	In progress
+Monitoring of the ETL process by Logging	https://github.com/amosproj/amos2024ss08-cloud-native-llm/issues/10	julioc-p	In progress
+Transform extracted data into a unified Format	https://github.com/amosproj/amos2024ss08-cloud-native-llm/issues/8	YashodharPansuriya	In progress
+Load data to Hugging Face	https://github.com/amosproj/amos2024ss08-cloud-native-llm/issues/9	christianwielenberg	Sprint Backlog
+Extract the dataset from Hugging Face	https://github.com/amosproj/amos2024ss08-cloud-native-llm/issues/16		Product Backlog
+Enhance Software Architecture Draft - Detail Machine Learning Pipeline	https://github.com/amosproj/amos2024ss08-cloud-native-llm/issues/17		Product Backlog
+Identify Webpages for the Kubernetes LLM dataset	https://github.com/amosproj/amos2024ss08-cloud-native-llm/issues/6		Product Backlog
+[Epic] Enhance Data Collection Tool with Knowledge Extraction Capabilities			Product Backlog
+[Epic] Research and Select an Open LLM for CNCF-related knowledge			Product Backlog
+Research Open-Source LLMs	https://github.com/amosproj/amos2024ss08-cloud-native-llm/issues/18		Product Backlog
+Define Evaluation Criteria for LLM Selection	https://github.com/amosproj/amos2024ss08-cloud-native-llm/issues/19		Product Backlog
+Conduct Benchmark Test of Candidate LLMs	https://github.com/amosproj/amos2024ss08-cloud-native-llm/issues/20		Product Backlog
+Create a Report on LLM Research Findings	https://github.com/amosproj/amos2024ss08-cloud-native-llm/issues/21		Product Backlog
