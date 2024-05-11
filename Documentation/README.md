@@ -15,7 +15,7 @@ pip install -r requirements.txt
 
 To create a yaml file with the CNCF Lanscape follow this instructions:
 
-1. You will need a Github token to access the API. Refer to [Creating a personal access token](https://docs.github.com/en/authentication/keeping-your-account-and-data-secure/managing-your-personal-access-tokens#creating-a-personal-access-token-classic). Store it as an environment variable called GITHUBTOKEN.
+1. You will need a Github token to access the API. Refer to [Creating a personal access token](https://docs.github.com/en/authentication/keeping-your-account-and-data-secure/managing-your-personal-access-tokens#creating-a-personal-access-token-classic). Copy and paste it in the appropiate location in the script landscape_explorer.py replacing "test_token".
 
 1. Go to the folder src/scripts
 
