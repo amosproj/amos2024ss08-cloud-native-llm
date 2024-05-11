@@ -12,12 +12,9 @@ jobs:
     if: github.repository == 'amosproj/amos2024ss08-cloud-native-llm' # Don't do this in forks
     runs-on: ubuntu-latest
     steps:
+      - name: Check out repository code
+        uses: actions/checkout@v4
       - name: Install Python dependencies
         run: pip install -r requirements.txt
       - name: Run tests
         run: python -m unittest discover -p *_test.py
-      - name: Generate SBOM
-        run: |
-          curl -Lo $RUNNER_TEMP/sbom-tool https://github.com/microsoft/sbom-tool/releases/latest/download/sbom-tool-linux-x64
-          chmod +x $RUNNER_TEMP/sbom-tool
-          $RUNNER_TEMP/sbom-tool generate -b ./buildOutput -bc . -pn Test -pv 1.0.0 -ps MyCompany -nsb https://sbom.mycompany.com -V Verbose
