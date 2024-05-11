@@ -7,7 +7,7 @@ import requests_cache
 import logging
 import time
 
-TOKEN = os.environ['GITHUBTOKEN']
+TOKEN = "test_token"  # Replace with your GitHub token
 HEADERS = {'Authorization': f'Bearer {TOKEN}',
            'Accept': 'application/vnd.github+json', 'X-GitHub-Api-Version': '2022-11-28'}
 BASE_API_URL = 'https://api.github.com'
