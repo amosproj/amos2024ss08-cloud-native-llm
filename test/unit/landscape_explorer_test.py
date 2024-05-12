@@ -1,8 +1,7 @@
-import landscape_explorer
 import unittest
 import mock
-import landscape_explorer
 from unittest.mock import Mock
+from src.scripts import landscape_explorer
 
 
 def mocked_requests_get(*args, **kwargs):
