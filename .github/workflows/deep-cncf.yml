@@ -9,12 +9,40 @@ on:
       - main
   workflow_dispatch:
 jobs:
+  license:
+    if: github.repository == 'amosproj/amos2024ss08-cloud-native-llm' # Don't do this in forks
+    name: License check
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout the code
+        uses: actions/checkout@v4
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: "3.11"
+          cache: "pip"
+      - name: Install Python Dependencies
+        run: pip install -r requirements.txt
+      - name: Check copyright
+        id: license_check_report
+        uses: pilosus/action-pip-license-checker@v2
+        with:
+          requirements: "./requirements.txt"
+          fail: "StrongCopyleft,Error"
+      - name: Print copyright report
+        run: echo "${{ steps.license_check_report.outputs.report }}"
   build:
+    needs: license
     if: github.repository == 'amosproj/amos2024ss08-cloud-native-llm' # Don't do this in forks
     runs-on: ubuntu-latest
     steps:
       - name: Check out repository code
         uses: actions/checkout@v4
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: "3.11"
+          cache: "pip"
       - name: Install Python dependencies
         run: pip install -r requirements.txt
       - name: Run tests
