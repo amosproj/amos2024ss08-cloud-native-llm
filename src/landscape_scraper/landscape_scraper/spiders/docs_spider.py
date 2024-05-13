@@ -12,7 +12,7 @@ class QuotesSpider(scrapy.Spider):
 
     def __init__(self):
         self.link_extractor = scrapy.linkextractors.LinkExtractor(
-            allow=".*doc.*")
+            allow=".*docs.*")
 
     def start_requests(self):
         urls = []
@@ -30,6 +30,9 @@ class QuotesSpider(scrapy.Spider):
                     if 'homepage_url' not in item or not item.get('homepage_url'):
                         continue
                     urls.append(item.get('homepage_url'))
+            #         break
+            #     break
+            # break
 
         for url in urls:
             yield scrapy.Request(url=url, callback=self.parse)
@@ -37,5 +40,7 @@ class QuotesSpider(scrapy.Spider):
     def parse(self, response):
         for link in self.link_extractor.extract_links(response):
             yield {
+                "origin_url": response.url,
+                "type": "doc",
                 "doc_url": link.url,
             }

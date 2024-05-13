@@ -43,3 +43,6 @@ bin/
 
 # sources directory
 sources/
+
+# json files
+*.json
