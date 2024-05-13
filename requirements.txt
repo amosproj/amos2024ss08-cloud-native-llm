@@ -3,3 +3,4 @@ Requests==2.31.0
 requests_cache==1.2.0
 tqdm==4.66.2
 mock==5.1.0
+Scrapy==2.11.1
