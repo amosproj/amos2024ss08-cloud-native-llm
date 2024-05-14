@@ -11,12 +11,13 @@ TOKEN = "test_token"  # Replace with your GitHub token to increas github API hou
 HEADERS = {'Authorization': f'Bearer {TOKEN}'}
 def downloader(url, output_directory, tags_dict, semaphore):
     """
-    This function downloads a single file from the url in the input. It is used by downloader_multi_thread() at each thread.
+    This function downloads a single file from the url in the input. It is used by downloader_multi_thread() at each thread. 
+    This function uses a semaphore to control the number of concurrent downloads.
     Args:
         url (str): A single url string.
         output_directory (str): The path where the downloaded files will be stored.
         tags_dict(dict): A dictionary containing the tags for each file. For example: Category, Subcategory, Project_name
-        
+        semaphore (threading.Semaphore): A semaphore object used to limit the number of concurrent downloads.
     """
     with semaphore:
         try:
@@ -77,12 +78,11 @@ def download_files_from_yaml(yaml_file = "sources/landscape_augmented.yml", outp
     os.makedirs(output_directory, exist_ok=True)
     # Initialize a dictionary to save tags corresponding to each file
     tags_dict = {'Category': "", 'Subcategory': "", 'Project_name': ""}
-    # Process the loaded data
+    # Process the loaded data 
     for category in data['landscape']:
-        if category['name'] == "Provisioning" or category['name'] == "Orchestration & Management" \
-            or category['name'] == "Runtime" or category['name'] == "App Definition and Development"\
-            or category['name'] == "Platform" or category['name'] == "Serverless":
-            continue
+    # Use below block if already downloaded a category and you don't want to downloaded it again. 
+    #    if category['name'] == "Provisioning":
+    #        continue
         tags_dict['Category'] = category['name']
         print(f"Category: {tags_dict['Category']}")
         for subcategory in category.get('subcategories', []):
