@@ -49,6 +49,9 @@ def downloader_multi_thread(download_urls, output_directory, tags_dict):
     """
     max_threads = 16
     for file_format in download_urls:
+        # exclude yml and yaml files from downloading
+        if file_format in ["yml","yaml"]:
+            continue
         urls_list = download_urls[file_format]
         semaphore = threading.Semaphore(max_threads)
         threads = []
