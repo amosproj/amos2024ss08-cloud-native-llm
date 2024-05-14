@@ -4,10 +4,9 @@ import os
 from tqdm import tqdm
 import threading
 import shutil
-import time
 
 
-TOKEN = "test_token"  # Replace with your GitHub token to increas github API hourly rate to 5000
+TOKEN = "Replace your token"  # Replace with your GitHub token to increas github API hourly rate to 5000
 HEADERS = {'Authorization': f'Bearer {TOKEN}'}
 def downloader(url, output_directory, tags_dict, semaphore):
     """
@@ -93,9 +92,10 @@ def download_files_from_yaml(yaml_file = "sources/landscape_augmented.yml", outp
                 print(f"Item: {tags_dict['Project_name']}")
                 downloader_multi_thread(item.get('download_urls',[]),output_directory, tags_dict)
         # Adding all the files corresponding to a category to a zip file
-        shutil.make_archive("sources/repos_files/"+ tags_dict['Category'], 'zip', "sources/raw_files/")
+        shutil.make_archive("sources/"+ tags_dict['Category'], 'zip', output_directory+"/")
         # Removing remminig raw files after archiving
         shutil.rmtree(output_directory)
+        # Creat dirrectory for next category
         os.makedirs(output_directory, exist_ok=True)
 
 # Example usage:
