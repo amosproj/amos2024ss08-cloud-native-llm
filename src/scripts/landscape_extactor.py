@@ -4,34 +4,37 @@ import os
 from tqdm import tqdm
 import threading
 import shutil
+import time
 
-def downloader(url, output_directory, tags_dict):
+
+TOKEN = "test_token"  # Replace with your GitHub token to increas github API hourly rate to 5000
+HEADERS = {'Authorization': f'Bearer {TOKEN}'}
+def downloader(url, output_directory, tags_dict, semaphore):
     """
     This function downloads a single file from the url in the input. It is used by downloader_multi_thread() at each thread.
     Args:
         url (str): A single url string.
         output_directory (str): The path where the downloaded files will be stored.
         tags_dict(dict): A dictionary containing the tags for each file. For example: Category, Subcategory, Project_name
+        
     """
-    try:
-        # Send HTTP GET request to download the file
-        response = requests.get(url)
-        response.raise_for_status()  # Raise an exception for HTTP errors
+    with semaphore:
+        try:
+            # Send HTTP GET request to download the file
+            response = requests.get(url, headers=HEADERS)
+            response.raise_for_status()  # Raise an exception for HTTP errors
+            # Extract filename from URL
+            filename = os.path.basename(url)
+            # Add tags to each filename
+            # Seperate tags with "_"
+            filename = tags_dict['Category'] +"_"+ tags_dict['Subcategory'] +"_"+ tags_dict['Project_name'] +"_"+ filename
 
-        # Extract filename from URL
-        filename = os.path.basename(url)
-        # Add tags to each filename
-        # Seperate tags with "_"
-        filename = tags_dict['Category'] +"_"+ tags_dict['Subcategory'] +"_"+ tags_dict['Project_name'] +"_"+ filename
+            # Write downloaded content to file
+            with open(os.path.join(output_directory, filename), 'wb') as f:
+                f.write(response.content)
 
-        # Write downloaded content to file
-        with open(os.path.join(output_directory, filename), 'wb') as f:
-            f.write(response.content)
-
-        #print(f"File {i}/{len(urls)} downloaded successfully: {filename}")
-
-    except Exception as e:
-        print(f"Failed to download file from {url}: {e}")
+        except Exception as e:
+            print(f"Failed to download file from {url}: {e}")
                 
 def downloader_multi_thread(download_urls, output_directory, tags_dict):
     """
@@ -44,11 +47,13 @@ def downloader_multi_thread(download_urls, output_directory, tags_dict):
         tags_dict(dict): A dictionary containing the tags for each file. For example: Category, Subcategory, Project_name
         
     """
+    max_threads = 16
     for file_format in download_urls:
         urls_list = download_urls[file_format]
+        semaphore = threading.Semaphore(max_threads)
         threads = []
         for url in urls_list:
-            thread = threading.Thread(target=downloader, args=(url, output_directory, tags_dict))
+            thread = threading.Thread(target=downloader, args=(url, output_directory, tags_dict, semaphore))
             threads.append(thread)
             thread.start()
         for thread in threads:
@@ -74,6 +79,10 @@ def download_files_from_yaml(yaml_file = "sources/landscape_augmented.yml", outp
     tags_dict = {'Category': "", 'Subcategory': "", 'Project_name': ""}
     # Process the loaded data
     for category in data['landscape']:
+        if category['name'] == "Provisioning" or category['name'] == "Orchestration & Management" \
+            or category['name'] == "Runtime" or category['name'] == "App Definition and Development"\
+            or category['name'] == "Platform" or category['name'] == "Serverless":
+            continue
         tags_dict['Category'] = category['name']
         print(f"Category: {tags_dict['Category']}")
         for subcategory in category.get('subcategories', []):
@@ -83,14 +92,11 @@ def download_files_from_yaml(yaml_file = "sources/landscape_augmented.yml", outp
                 tags_dict['Project_name'] = item['name']
                 print(f"Item: {tags_dict['Project_name']}")
                 downloader_multi_thread(item.get('download_urls',[]),output_directory, tags_dict)
-        shutil.make_archive(tags_dict['Category'], 'zip', "sources/")
+        # Adding all the files corresponding to a category to a zip file
+        shutil.make_archive("sources/repos_files/"+ tags_dict['Category'], 'zip', "sources/raw_files/")
+        # Removing remminig raw files after archiving
         shutil.rmtree(output_directory)
         os.makedirs(output_directory, exist_ok=True)
-            
-
-
-    # Download files from URLs
-    #for i, url in enumerate(urls, start=1):
 
 # Example usage:
 if __name__ == "__main__":
