@@ -1,6 +1,6 @@
 import unittest
 import os
-from src.scripts.landscape_extractor import download_files_from_yaml
+from src.scripts.landscape_extactor import download_files_from_yaml
 import zipfile
 import requests
 
