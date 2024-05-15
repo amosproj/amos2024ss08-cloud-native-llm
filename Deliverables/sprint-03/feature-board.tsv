@@ -1,0 +1,27 @@
+Title	URL	Assignees	Status
+Set Up Team Logo and request Team T-shirt	https://github.com/amosproj/amos2024ss08-cloud-native-llm/issues/4	dnsch	Feature Archive
+Identify Repositories for the Kubernetes LLM dataset	https://github.com/amosproj/amos2024ss08-cloud-native-llm/issues/11	julioc-p	Feature Archive
+Create Software architecture draft	https://github.com/amosproj/amos2024ss08-cloud-native-llm/issues/12	dnsch	Feature Archive
+Transform extracted data into a unified Format	https://github.com/amosproj/amos2024ss08-cloud-native-llm/issues/8	YashodharPansuriya	Feature Archive
+Load data to Hugging Face	https://github.com/amosproj/amos2024ss08-cloud-native-llm/issues/9	christianwielenberg	Feature Archive
+Monitoring of the ETL process by Logging	https://github.com/amosproj/amos2024ss08-cloud-native-llm/issues/10	julioc-p	Feature Archive
+[Epic] Implement Data Collection Automation Pipeline			Product Backlog
+Identify Webpages for the Kubernetes LLM dataset	https://github.com/amosproj/amos2024ss08-cloud-native-llm/issues/6	julioc-p	In progress
+Extract the dataset from Hugging Face	https://github.com/amosproj/amos2024ss08-cloud-native-llm/issues/16	YashodharPansuriya	In progress
+Research Open-Source LLMs	https://github.com/amosproj/amos2024ss08-cloud-native-llm/issues/18	julioc-p	Awaiting review
+CI/CD pipeline for project	https://github.com/amosproj/amos2024ss08-cloud-native-llm/issues/23	julioc-p	Awaiting review
+Conduct Largue Langage Base Model Selection Process	https://github.com/amosproj/amos2024ss08-cloud-native-llm/issues/19	anosh-ar	Awaiting review
+Extract Content from CNCF sources	https://github.com/amosproj/amos2024ss08-cloud-native-llm/issues/7	anosh-ar	Awaiting review
+Create a Report on LLM Research Findings	https://github.com/amosproj/amos2024ss08-cloud-native-llm/issues/21	christianwielenberg	Awaiting review
+Enhance Software Architecture Draft - Detail Machine Learning Pipeline	https://github.com/amosproj/amos2024ss08-cloud-native-llm/issues/17	dnsch	Awaiting review
+Include Stackoverflow Q&As related to CNCF into our raw dataset	https://github.com/amosproj/amos2024ss08-cloud-native-llm/issues/34		Product Backlog
+[Epic] Research and Select an Open LLM for CNCF-related knowledge			Product Backlog
+[Epic] Develop Q&A Pairs Transforming Pipeline			Product Backlog
+Research Q&A Pairs Pipeline	https://github.com/amosproj/amos2024ss08-cloud-native-llm/issues/27		Product Backlog
+Implement an Initial Question Extraction Function	https://github.com/amosproj/amos2024ss08-cloud-native-llm/issues/29		Product Backlog
+Implement an Initial Answer Matching Function	https://github.com/amosproj/amos2024ss08-cloud-native-llm/issues/30		Product Backlog
+Implement an Initial Generator for enriching Q&A Pairs	https://github.com/amosproj/amos2024ss08-cloud-native-llm/issues/31		Product Backlog
+Store Q&As in Hugging Face	https://github.com/amosproj/amos2024ss08-cloud-native-llm/issues/33		Product Backlog
+[Epic] Deploy and Test the LLM on HuggingFace			Product Backlog
+Learn How to Utilise the HPC 	https://github.com/amosproj/amos2024ss08-cloud-native-llm/issues/32		Product Backlog
+[Epic] Fine-Tune the Selected LLM to Specialize in CNCF content			Product Backlog

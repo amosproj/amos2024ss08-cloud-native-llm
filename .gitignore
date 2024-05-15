@@ -37,3 +37,11 @@ bin/
 
 #Temporary Database
 sources/raw_files
+# Conda
+.conda
+
+# sqlite used for caching
+*.sqlite
+
+# sources directory
+sources/

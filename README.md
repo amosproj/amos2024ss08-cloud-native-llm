@@ -18,13 +18,16 @@ at [Technical University of Berlin](https://www.tu.berlin),[Friedrich-Alexander 
 
 Welcome to the Cloud Native LLM Project for the AMOS SS 2024! 
 
-The primary goal focuses on developing a Cloud Native focused fine-tuned Large Language Model (LLM) that capable of answering complex queries about Kubernetes installations.
+This project is dedicated to solving the problem of overload and fragmented information of tremendous and fast-growing projects under the CNCF landscape, while the existing query tools can only provide superficial overviews.
 
-By providing immediate, context-aware answers and guidance, this project reduces the learning curve and increases productivity in managing Kubernetes installations.
+Therefore, our primary goal focuses on developing a Cloud Native-focused fine-tuned Large Language Model (LLM) that can answer queries about Kubernetes installations.
+In the meantime, the project provides a scalable and repeatable process to automatically create a structured dataset from the [CNCF landscape](https://landscape.cncf.io/)
+
+By providing immediate, context-aware answers and guidance, this project reduces the learning curve and increases productivity in managing Kubernetes installations. 
 
 Hence, it will be further developed to create AI assistants that will aid developers in navigating and managing Kubernetes environments.
 
-The project is open sourced and open modeled to be used by the [community](https://www.kubermatic.com/company/community/).
+The development of this project follows an open-source and open-model fashion.
 
 The folder structure is as follows:
 [TBD]
@@ -52,7 +55,7 @@ Potentially work in tandem with the AMOS project on knowledge graph extraction t
 
 ### LLM Fine-Tuning
 
-- **LLM Selection:** Evaluate and select an appropriate open-source/open model LLM based on performance, computational requirements, and licensing.
+- **LLM Selection:** Evaluate and select an appropriate open-source/open-model LLM based on performance, computational requirements, and licensing.
 - **Fine-tuning Procedure:** Use the structured dataset for model training in a repeatable and reproducible manner, ideally using Cloud Native tools like KubeFlow and Kubernetes.
 
 ## Evaluation
