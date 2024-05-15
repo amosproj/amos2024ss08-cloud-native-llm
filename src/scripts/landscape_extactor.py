@@ -21,7 +21,10 @@ def downloader(url, output_directory, tags_dict, semaphore):
     with semaphore:
         try:
             # Send HTTP GET request to download the file
-            response = requests.get(url, headers=HEADERS)
+            if TOKEN == "Replace your token":
+                response = requests.get(url)
+            else: 
+                response = requests.get(url, headers=HEADERS)
             response.raise_for_status()  # Raise an exception for HTTP errors
             # Extract filename from URL
             filename = os.path.basename(url)
