@@ -27,18 +27,26 @@ def generate_augmented_yml_with_scraped_urls():
     with open(AUGMENTED_YAML_REPOS, 'r') as file:
         content = yaml.safe_load(file)
     for category in content.get('landscape'):
-        for subcategory in category.get('subcategories'):
-            for item in subcategory.get('items'):
-                if 'homepage_url' not in item or not item.get('homepage_url'):
-                    continue
-
-                if item['homepage_url'] in website_urls:
-                    item['website'] = defaultdict(list)
-                    for type in website_urls[item['homepage_url']]:
-                        item['website'][type] = website_urls[item['homepage_url']][type]
-
+        process_category(category, website_urls)
     with open(OUTPUT_PATH, 'w+') as file:
         yaml.dump(content, file, sort_keys=False)
+
+def process_category(category, website_urls):
+    for subcategory in category.get('subcategories'):
+        process_subcategory(subcategory, website_urls)
+
+def process_subcategory(subcategory, website_urls):
+    for item in subcategory.get('items'):
+        process_item(item, website_urls)
+
+def process_item(item, website_urls):
+    if 'homepage_url' not in item or not item.get('homepage_url'):
+        return
+
+    if item['homepage_url'] in website_urls:
+        item['website'] = defaultdict(list)
+        for type in website_urls[item['homepage_url']]:
+            item['website'][type] = website_urls[item['homepage_url']][type]
 
 
 if __name__ == '__main__':

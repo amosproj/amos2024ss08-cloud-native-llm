@@ -12,7 +12,7 @@ class QuotesSpider(scrapy.Spider):
 
     def __init__(self):
         self.link_extractor = scrapy.linkextractors.LinkExtractor(
-            allow=[".*docs.*", ".*\.pdf$"])
+            allow=[".*docs.*", ".*\.pdf$", ".*\.md$"])
 
     def start_requests(self):
         urls = []
@@ -42,13 +42,19 @@ class QuotesSpider(scrapy.Spider):
         for link in self.link_extractor.extract_links(response):
             if link.url.endswith('.pdf'):
                 yield {
-                    "url": link.url,
                     "origin_url": response.url,
-                    "type": "pdf",
+                    "type": "pdfs",
+                    "url": link.url,
+                }
+            elif link.url.endswith('.md'):
+                yield {
+                    "origin_url": response.url,
+                    "type": "mds",
+                    "url": link.url,
                 }
             else:
                 yield {
                     "origin_url": response.url,
-                    "type": "doc",
+                    "type": "docs",
                     "url": link.url,
                 }
