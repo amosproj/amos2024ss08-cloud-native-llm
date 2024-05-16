@@ -6,8 +6,9 @@ import ijson
 
 
 yaml.add_representer(collections.defaultdict, Representer.represent_dict)
-AUGMENTED_YAML = '../../sources/landscape_augmented.yml'
+AUGMENTED_YAML_REPOS = '../../sources/landscape_augmented_repos.yml'
 WEBSITE_URLS_PATH = '../landscape_scraper/websites_docs.json'
+OUTPUT_PATH = '../../sources/landscape_augmented_repos_websites.yml'
 
 
 def get_website_urls():
@@ -17,13 +18,13 @@ def get_website_urls():
         for obj in objects:
             if obj['origin_url'] not in urls or obj['type'] not in urls[obj['origin_url']]:
                 urls[obj['origin_url']][obj['type']] = []
-            urls[obj['origin_url']][obj['type']].append(obj['doc_url'])
+            urls[obj['origin_url']][obj['type']].append(obj['url'])
         return urls
 
 
 def generate_augmented_yml_with_scraped_urls():
     website_urls = get_website_urls()
-    with open(AUGMENTED_YAML, 'r') as file:
+    with open(AUGMENTED_YAML_REPOS, 'r') as file:
         content = yaml.safe_load(file)
     for category in content.get('landscape'):
         for subcategory in category.get('subcategories'):
@@ -33,9 +34,10 @@ def generate_augmented_yml_with_scraped_urls():
 
                 if item['homepage_url'] in website_urls:
                     item['website'] = defaultdict(list)
-                    item['website']['docs'] = website_urls[item['homepage_url']]['doc']
+                    for type in website_urls[item['homepage_url']]:
+                        item['website'][type] = website_urls[item['homepage_url']][type]
 
-    with open('../../sources/landscape_augmented.yml', 'w+') as file:
+    with open(OUTPUT_PATH, 'w+') as file:
         yaml.dump(content, file, sort_keys=False)
 
 

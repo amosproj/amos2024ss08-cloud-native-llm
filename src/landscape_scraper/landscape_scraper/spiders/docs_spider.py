@@ -2,7 +2,6 @@ import scrapy.linkextractors
 import yaml
 import requests
 import scrapy
-from scrapy_splash import SplashRequest
 
 
 BASE_REPO_YAML = 'https://raw.githubusercontent.com/cncf/landscape/master/landscape.yml'
@@ -16,15 +15,6 @@ class QuotesSpider(scrapy.Spider):
             allow=[".*docs.*", ".*\.pdf$"])
 
     def start_requests(self):
-        headers = {
-            "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8",
-            "Accept-Encoding": "gzip, deflate",
-            "Accept-Language": "en-US,en;q=0.9",
-            "Cache-Control": "max-age=0",
-            "Connection": "keep-alive",
-            "Upgrade-Insecure-Requests": "1",
-            "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/63.0.3239.132 Safari/537.36"
-        }
         urls = []
         try:
             response = requests.get(BASE_REPO_YAML)
@@ -45,15 +35,20 @@ class QuotesSpider(scrapy.Spider):
             # break
 
         for url in urls:
-            yield SplashRequest(url, self.parse, headers=headers)
+            yield scrapy.Request(url, self.parse)
+        # yield scrapy.Request("https://www.zalando.de/", self.parse)
 
     def parse(self, response):
         for link in self.link_extractor.extract_links(response):
             if link.url.endswith('.pdf'):
                 yield {
-                    "pdf_url": link.url,
+                    "url": link.url,
+                    "origin_url": response.url,
+                    "type": "pdf",
                 }
             else:
                 yield {
-                    "doc_url": link.url,
+                    "origin_url": response.url,
+                    "type": "doc",
+                    "url": link.url,
                 }

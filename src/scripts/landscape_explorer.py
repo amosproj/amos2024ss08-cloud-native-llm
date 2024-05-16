@@ -16,6 +16,7 @@ HEADERS = {'Authorization': f'Bearer {TOKEN}',
 BASE_API_URL = 'https://api.github.com'
 BASE_REPO_YAML = 'https://raw.githubusercontent.com/cncf/landscape/master/landscape.yml'
 EXTENSIONS = ["yml", "yaml", "pdf", "md"]
+OUTPUT_PATH = '../../sources/landscape_augmented_repos.yml'
 
 yaml.add_representer(collections.defaultdict, Representer.represent_dict)
 
@@ -122,7 +123,7 @@ def generate_augmented_yml_with_urls():
                 item['repo'] = defaultdict(defaultdict)
                 for ext, url_list in urls.items():
                     item['repo']['download_urls'][ext] = url_list
-    with open('../../sources/landscape_augmented.yml', 'w+') as file:
+    with open(OUTPUT_PATH, 'w+') as file:
         yaml.dump(content, file, sort_keys=False)
 
 
