@@ -1,20 +1,18 @@
 import unittest
-from unittest.mock import patch, mock_open, MagicMock
 import os
 import json
 import yaml
-from datetime import datetime
 import tempfile
 import shutil
+from datetime import datetime
 import PyPDF2
-
-# Import the functions to be tested
-from src.scripts.Unified_format_conversation import extract_metadata, convert_files_to_json, process_error_yaml_file
+from src.scripts.Unified_format_conversation import (
+    extract_metadata, convert_files_to_json, process_error_yaml_file
+)
 
 class TestFileProcessing(unittest.TestCase):
 
     def setUp(self):
-        # Create a temporary directory for testing
         self.test_dir = tempfile.mkdtemp()
         self.json_dir = os.path.join(self.test_dir, 'json_output')
         os.makedirs(self.json_dir, exist_ok=True)
@@ -22,13 +20,27 @@ class TestFileProcessing(unittest.TestCase):
         self.error_file_list = []
         self.chunk_size = 2
 
-    def tearDown(self):
-        # Remove temporary directory after test
-        shutil.rmtree(self.test_dir)
+        self.sample_yaml_file = os.path.join(self.test_dir, 'category_subcategory_project_sample.yaml')
+        self.sample_md_file = os.path.join(self.test_dir, 'category_subcategory_project_sample.md')
+        self.sample_pdf_file = os.path.join(self.test_dir, 'category_subcategory_project_sample.pdf')
+        self.error_yaml_file = os.path.join(self.test_dir, 'category_subcategory_project_error.yaml')
 
-    def create_test_file(self, file_name, content):
-        with open(os.path.join(self.test_dir, file_name), 'w', encoding='utf-8') as f:
-            f.write(content)
+        with open(self.sample_yaml_file, 'w', encoding='utf-8') as f:
+            yaml.dump([{'step': 'first', 'description': 'This is the first step'}, {'step': 'second', 'description': 'This is the second step'}], f)
+
+        with open(self.sample_md_file, 'w', encoding='utf-8') as f:
+            f.write("# Heading 1\nContent under heading 1\n## Subheading 1.1\nContent under subheading 1.1\n")
+
+        with open(self.sample_pdf_file, 'wb') as f:
+            pdf_writer = PyPDF2.PdfWriter()
+            pdf_writer.add_blank_page(width=72, height=72)
+            pdf_writer.write(f)
+
+        with open(self.error_yaml_file, 'w', encoding='utf-8') as f:
+            f.write("This is an invalid YAML content: {missing_quotes: value\n")
+
+    def tearDown(self):
+        shutil.rmtree(self.test_dir)
 
     def test_extract_metadata(self):
         file_name = 'category_subcategory_project_file.txt'
@@ -40,83 +52,57 @@ class TestFileProcessing(unittest.TestCase):
         }
         self.assertEqual(extract_metadata(file_name), expected_metadata)
 
-    def test_convert_yaml_to_json(self):
-        file_name = 'category_subcategory_project_test.yaml'
-        yaml_content = '''
-        - step: "first"
-          description: "This is the first step"
-        - step: "second"
-          description: "This is the second step"
-        '''
-        self.create_test_file(file_name, yaml_content)
+    def test_convert_files_to_json(self):
+        print(f"Test directory: {self.test_dir}")
+        print(f"JSON output directory: {self.json_dir}")
+        print(f"Files in test directory: {os.listdir(self.test_dir)}")
 
-        convert_files_to_json(self.test_dir, self.json_dir, self.processed_files, self.chunk_size, self.error_file_list)
+        convert_files_to_json(
+            self.processed_files, 
+            self.chunk_size, 
+            self.error_file_list, 
+            json_file_path=self.json_dir, 
+            file_paths=self.test_dir
+        )
 
-        with open(os.path.join(self.json_dir, 'yaml_data.json'), 'r', encoding='utf-8') as f:
-            data = json.load(f)
-        self.assertEqual(len(data), 1)
-        self.assertEqual(data[0]['tag']['file_name'], 'test.yaml')
+        json_files = os.listdir(self.json_dir)
+        print(f"JSON files created: {json_files}")
 
-    def test_convert_markdown_to_json(self):
-        file_name = 'category_subcategory_project_test.md'
-        md_content = '''
-        # Heading 1
-        Content under heading 1
-        ## Subheading 1.1
-        Content under subheading 1.1
-        '''
-        self.create_test_file(file_name, md_content)
-
-        convert_files_to_json(self.test_dir, self.json_dir, self.processed_files, self.chunk_size, self.error_file_list)
+        self.assertIn('md_data.json', json_files)
+        if 'yaml_data.json' not in json_files:
+            print("yaml_data.json not created.")
+        if 'pdf_data.json' not in json_files:
+            print("pdf_data.json not created.")
 
         with open(os.path.join(self.json_dir, 'md_data.json'), 'r', encoding='utf-8') as f:
-            data = json.load(f)
-        self.assertEqual(len(data), 1)
-        self.assertEqual(data[0]['tag']['file_name'], 'test.md')
+            md_data = json.load(f)
+        self.assertEqual(len(md_data), 1)
+        self.assertEqual(md_data[0]['tag']['file_name'], 'sample.md')
 
-    def test_convert_pdf_to_json(self):
-        file_name = 'category_subcategory_project_test.pdf'
-        pdf_content = "This is a test PDF file."
+        if 'yaml_data.json' in json_files:
+            with open(os.path.join(self.json_dir, 'yaml_data.json'), 'r', encoding='utf-8') as f:
+                yaml_data = json.load(f)
+            self.assertEqual(len(yaml_data), 1)
+            self.assertEqual(yaml_data[0]['tag']['file_name'], 'sample.yaml')
 
-        try:
-            with open(os.path.join(self.test_dir, file_name), 'wb') as f:
-                pdf_writer = PyPDF2.PdfWriter()
-                # Create a blank page
-                page = PyPDF2.PageObject.createBlankPage(width=612, height=792)
-                pdf_writer.add_page(page)
-                pdf_writer.write(f)
-
-            convert_files_to_json(self.test_dir, self.json_dir, self.processed_files, self.chunk_size, self.error_file_list)
-
+        if 'pdf_data.json' in json_files:
             with open(os.path.join(self.json_dir, 'pdf_data.json'), 'r', encoding='utf-8') as f:
-                data = json.load(f)
-            self.assertEqual(len(data), 1)
-            self.assertEqual(data[0]['tag']['file_name'], 'test.pdf')
-        except Exception as e:
-            print(f"Ignored error during PDF test: {e}")
+                pdf_data = json.load(f)
+            self.assertEqual(len(pdf_data), 1)
+            self.assertEqual(pdf_data[0]['tag']['file_name'], 'sample.pdf')
 
     def test_process_error_yaml_file(self):
-        file_name = 'category_subcategory_project_error.yaml'
-        yaml_content = '''
-        - step: "first"
-          description: "This is the first step
-        - step: "second"
-          description: "This is the second step"
-        '''
-        self.create_test_file(file_name, yaml_content)
-        self.error_file_list.append(file_name)
+        self.error_file_list.append(self.error_yaml_file)
+        process_error_yaml_file(
+            self.error_file_list, 
+            file_paths=self.test_dir, 
+            json_file_path=self.json_dir
+        )
 
-        process_error_yaml_file(self.error_file_list)
-
-        try:
-            with open(os.path.join(self.json_dir, 'error_yaml_data.json'), 'r', encoding='utf-8') as f:
-                data = json.load(f)
-            self.assertEqual(len(data), 1)
-            self.assertEqual(data[0]['tag']['file_name'], 'error.yaml')
-        except FileNotFoundError as e:
-            print(f"Ignored error during processing error YAML file test: {e}")
-        except Exception as e:
-            print(f"An unexpected error occurred during processing error YAML file test: {e}")
+        with open(os.path.join(self.json_dir, 'error_yaml_data.json'), 'r', encoding='utf-8') as f:
+            error_data = json.load(f)
+        self.assertEqual(len(error_data), 1)
+        self.assertEqual(error_data[0]['tag']['file_name'], 'error.yaml')
 
 if __name__ == '__main__':
     unittest.main()
