@@ -14,3 +14,4 @@ url-normalize==1.4.3
 urllib3==2.2.1
 transformers==4.40.2
 huggingface-hub==0.23.0
+PyPDF2 == 3.0.1
