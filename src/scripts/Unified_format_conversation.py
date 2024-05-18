@@ -184,18 +184,21 @@ def convert_files_to_json(processed_files, chunk_size, error_file_list, json_fil
                             for page in reader.pages:
                                 content += page.extract_text()
 
+                        if content:  # Only process if content is not empty
                             tag_data = extract_metadata(file_name)
                             yaml_data = {"tag": tag_data, "content": content}
                             pdf_data_list.append(yaml_data)
-                    
-                        with open(os.path.join(json_file_path, "pdf_data.json"), 'w', encoding='utf-8') as json_file:
-                            json.dump(pdf_data_list, json_file, indent=4)
+        
+                        # Write to JSON only if there is at least one non-empty PDF
+                        if pdf_data_list:
+                            with open(os.path.join(json_file_path, "pdf_data.json"), 'w', encoding='utf-8') as json_file:
+                                json.dump(pdf_data_list, json_file, indent=4)
                         processed_files.add(file_name)
                         processed_urls_count += 1
                         
             except Exception as e:
-                    print(f"Error converting PDF to JSON: {e}")
-                    error_file_list.append(file_name)
+                    logging.error(f"Error converting PDF to JSON: {e}")
+                   
 
         if processed_urls_count >= total_chunk_size:
                 # print("Chunk size reached. Stopping processing.")
@@ -209,6 +212,10 @@ def process_error_yaml_file(error_file_list: list, file_paths = "sources/raw_fil
     Args:
         error_file_list (list): List of error file names.
     """
+    # Return early if error_file_list is empty
+    if not error_file_list:
+        return
+
     yaml_data_list = []
     for error_file in error_file_list:
         try:
