@@ -4,12 +4,22 @@ import os
 from tqdm import tqdm
 import threading
 import shutil
+import langid
 
 
 # Replace with your GitHub token to increas github API hourly rate to 5000
 TOKEN = "Replace your token"
 HEADERS = {'Authorization': f'Bearer {TOKEN}'}
 
+def isFileEnglish(content):
+    try:
+        decoded_content = content.decode('utf-8')
+        lang, _ = langid.classify(decoded_content)
+        return lang == 'en'
+    except Exception as e:
+        print("Error in isFileEnglish:", e)
+        return False
+    
 
 def downloader(url, output_directory, tags_dict, semaphore):
     """
@@ -35,10 +45,20 @@ def downloader(url, output_directory, tags_dict, semaphore):
             # Seperate tags with "_"
             filename = tags_dict['Category'] + "_" + tags_dict['Subcategory'] + \
                 "_" + tags_dict['Project_name'] + "_" + filename
-
-            # Write downloaded content to file
-            with open(os.path.join(output_directory, filename), 'wb') as f:
-                f.write(response.content)
+            #if the file is in English dowload it
+            if isFileEnglish(response.content):
+                # Write downloaded content to file
+                with open(os.path.join(output_directory, filename), 'wb') as f:
+                    f.write(response.content)
+            else:
+                none_eng_dir = output_directory
+                none_eng_dir = none_eng_dir.split("/")[0]
+                none_eng_dir = none_eng_dir + "non_english_files"
+                # Create the directory if it doesn't exist
+                if not os.path.exists(none_eng_dir):
+                    os.makedirs(none_eng_dir)
+                with open(os.path.join(none_eng_dir, filename), 'wb') as f:
+                    f.write(response.content)
 
         except Exception as e:
             print(f"Failed to download file from {url}: {e}")
@@ -91,9 +111,11 @@ def download_files_from_yaml(yaml_file="../../sources/landscape_augmented_repos_
     tags_dict = {'Category': "", 'Subcategory': "", 'Project_name': ""}
     # Process the loaded data
     for category in data['landscape']:
-        # Use below block if already downloaded a category and you don't want to downloaded it again.
-        #    if category['name'] == "Provisioning":
-        #        continue
+        # It downloads only below defined categories to avoid duplication 
+        category_list = ["App Definition and Development", "Orchestration & Management","Runtime", \
+                         "Provisioning","Observability and Analysis"]
+        if category['name'] not in category_list:
+            continue
         tags_dict['Category'] = category['name']
         print(f"Category: {tags_dict['Category']}")
         for subcategory in category.get('subcategories', []):
