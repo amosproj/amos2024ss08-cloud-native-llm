@@ -7,7 +7,7 @@ import ijson
 
 yaml.add_representer(collections.defaultdict, Representer.represent_dict)
 AUGMENTED_YAML_REPOS = '../../sources/landscape_augmented_repos.yml'
-WEBSITE_URLS_PATH = '../landscape_scraper/websites_docs.json'
+WEBSITE_URLS_PATH = '../landscape_scraper/output.json'
 OUTPUT_PATH = '../../sources/landscape_augmented_repos_websites.yml'
 
 
