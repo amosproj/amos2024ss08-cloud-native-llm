@@ -84,7 +84,7 @@ def download_files_from_yaml(yaml_file="../../sources/landscape_augmented_repos_
     # Load URLs from YAML file
     with open(yaml_file, 'r') as f:
         data = yaml.safe_load(f)
-
+    print(data)
     # Create output directory if it doesn't exist
     os.makedirs(output_directory, exist_ok=True)
     # Initialize a dictionary to save tags corresponding to each file

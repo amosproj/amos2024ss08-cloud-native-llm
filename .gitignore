@@ -45,3 +45,6 @@ sources/raw_files
 
 # sources directory
 sources/
+
+# json files
+*.json
