@@ -17,9 +17,8 @@ def isFileEnglish(content):
         lang, _ = langid.classify(decoded_content)
         return lang == 'en'
     except Exception as e:
-        print("Error in isFileEnglish:", e)
-        return False
-    
+        print("cannot undrestand the language of the file:", e)
+        return True
 
 def downloader(url, output_directory, tags_dict, semaphore):
     """
@@ -38,6 +37,9 @@ def downloader(url, output_directory, tags_dict, semaphore):
                 response = requests.get(url)
             else:
                 response = requests.get(url, headers=HEADERS)
+            # Handel 429 too many request error
+            if response.status_code == 429:
+                time.sleep(int(response.headers["Retry-After"]))
             response.raise_for_status()  # Raise an exception for HTTP errors
             # Extract filename from URL
             filename = os.path.basename(url)
@@ -53,7 +55,7 @@ def downloader(url, output_directory, tags_dict, semaphore):
             else:
                 none_eng_dir = output_directory
                 none_eng_dir = none_eng_dir.split("/")[0]
-                none_eng_dir = none_eng_dir + "non_english_files"
+                none_eng_dir = none_eng_dir + "/non_english_files"
                 # Create the directory if it doesn't exist
                 if not os.path.exists(none_eng_dir):
                     os.makedirs(none_eng_dir)
@@ -92,7 +94,7 @@ def downloader_multi_thread(download_urls, output_directory, tags_dict):
             thread.join()
 
 
-def download_files_from_yaml(yaml_file="../../sources/landscape_augmented_repos_websites.yml", output_directory="sources/raw_files"):
+def download_files_from_yaml(yaml_file="./sources/landscape_augmented_repos_websites.yml", output_directory="sources/raw_files"):
     """
     Downloads the files with specific extensions from the URLs provided in yaml_file
 
@@ -124,9 +126,12 @@ def download_files_from_yaml(yaml_file="../../sources/landscape_augmented_repos_
             for item in tqdm(subcategory.get('items', [])):
                 tags_dict['Project_name'] = item['name']
                 print(f"Item: {tags_dict['Project_name']}")
-                repo = item.get('repo', {})
+                #repo = item.get('repo', {})
+                #print("here"+ str(repo.get('download_urls', [])))
+                #downloader_multi_thread(
+                #    repo.get('download_urls', []), output_directory, tags_dict)
                 downloader_multi_thread(
-                    repo.get('download_urls', []), output_directory, tags_dict)
+                    item.get('download_urls', []), output_directory, tags_dict)
         # Adding all the files corresponding to a category to a zip file
         shutil.make_archive(
             "sources/" + tags_dict['Category'], 'zip', output_directory+"/")

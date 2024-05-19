@@ -37,6 +37,7 @@ bin/
 
 #Temporary Database
 sources/raw_files
+sources/non_english_files
 # Conda
 .conda
 
