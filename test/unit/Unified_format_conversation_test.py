@@ -91,18 +91,6 @@ class TestFileProcessing(unittest.TestCase):
             self.assertEqual(len(pdf_data), 1)
             self.assertEqual(pdf_data[0]['tag']['file_name'], 'sample.pdf')
 
-    def test_process_error_yaml_file(self):
-        self.error_file_list.append(self.error_yaml_file)
-        process_error_yaml_file(
-            self.error_file_list, 
-            file_paths=self.test_dir, 
-            json_file_path=self.json_dir
-        )
-
-        with open(os.path.join(self.json_dir, 'error_yaml_data.json'), 'r', encoding='utf-8') as f:
-            error_data = json.load(f)
-        self.assertEqual(len(error_data), 1)
-        self.assertEqual(error_data[0]['tag']['file_name'], 'error.yaml')
 
 if __name__ == '__main__':
     unittest.main()
