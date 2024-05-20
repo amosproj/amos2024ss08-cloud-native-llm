@@ -242,7 +242,7 @@ processed_files = set()
 if os.path.exists(processed_files_record):
     with open(processed_files_record, 'r', encoding='utf-8') as f:
         processed_files = set(f.read().splitlines())
-chunk_size = 80000
+chunk_size = 70000
 error_file_list = []
 
 # file_paths = "sources/raw_files"
