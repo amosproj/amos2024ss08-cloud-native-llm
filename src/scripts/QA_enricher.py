@@ -1,11 +1,10 @@
 from transformers import T5Tokenizer, T5ForConditionalGeneration
-import torch
 from datasets import load_dataset
 import torch
 dataset = load_dataset('squad')
 
 
-model_name = 't5-small'
+model_name = 'google-t5/t5-small'
 model = T5ForConditionalGeneration.from_pretrained(model_name)
 tokenizer = T5Tokenizer.from_pretrained(model_name)
 
@@ -25,9 +24,8 @@ def paraphrase_questions(questions, model, tokenizer, batch_size=8):
         paraphrased_questions.extend(paraphrased_batch)
     return paraphrased_questions
 
-# Extract questions from the dataset
-questions = [item['question'] for item in dataset['train'][:100]]  # Adjust the range as needed
-
+# Extract questions from the dataset  
+questions = [item for item in dataset['train'][:10]['question']] # Adjust the range as needed
 # Paraphrase the questions
 paraphrased_questions = paraphrase_questions(questions, model, tokenizer)
 
