@@ -12,7 +12,10 @@ def process_chunk(date, chunk, semaphore):
     with semaphore:
         context = f"{chunk['data']}"
         model = q.popleft()
-        qa = model.generate_qa(context)
+        try:
+            qa = model.generate_qa(context)
+        except ValueError:
+            pass
         with open("questions.csv", "a") as f:
             for question, answer in qa:
                 f.write(
@@ -28,7 +31,7 @@ with open("questions.csv", "w") as f:
 
 
 for i in range(MAX_THREADS):
-    q.append(TransformersQG(language="en", model="lmqg/t5-base-squad-qag"))
+    q.append(TransformersQG(language="en", model="lmqg/t5-base-squad-qag",drop_overflow_error_text=True))
 for date in dataset:
     semaphore = threading.Semaphore(MAX_THREADS)
     threads = []
