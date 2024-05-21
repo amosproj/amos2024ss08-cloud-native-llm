@@ -126,12 +126,11 @@ def download_files_from_yaml(yaml_file="./sources/landscape_augmented_repos_webs
             for item in tqdm(subcategory.get('items', [])):
                 tags_dict['Project_name'] = item['name']
                 print(f"Item: {tags_dict['Project_name']}")
-                #repo = item.get('repo', {})
-                #print("here"+ str(repo.get('download_urls', [])))
-                #downloader_multi_thread(
-                #    repo.get('download_urls', []), output_directory, tags_dict)
+                repo = item.get('repo', {})
                 downloader_multi_thread(
-                    item.get('download_urls', []), output_directory, tags_dict)
+                    repo.get('download_urls', []), output_directory, tags_dict)
+                #downloader_multi_thread(
+                #    item.get('download_urls', []), output_directory, tags_dict)
         # Adding all the files corresponding to a category to a zip file
         shutil.make_archive(
             "sources/" + tags_dict['Category'], 'zip', output_directory+"/")
