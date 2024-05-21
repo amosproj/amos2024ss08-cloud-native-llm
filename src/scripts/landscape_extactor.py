@@ -115,7 +115,7 @@ def download_files_from_yaml(yaml_file="./sources/landscape_augmented_repos_webs
     for category in data['landscape']:
         # It downloads only below defined categories to avoid duplication 
         category_list = ["App Definition and Development", "Orchestration & Management","Runtime", \
-                         "Provisioning","Observability and Analysis"]
+                         "Provisioning","Observability and Analysis", "Test_Provisioning"]
         if category['name'] not in category_list:
             continue
         tags_dict['Category'] = category['name']
