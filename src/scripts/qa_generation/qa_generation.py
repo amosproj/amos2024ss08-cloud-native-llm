@@ -15,7 +15,8 @@ def process_chunk(date, chunk, semaphore):
         try:
             qa = model.generate_qa(context)
         except ValueError:
-            pass
+            q.append(model)
+            return
         with open("questions.csv", "a") as f:
             for question, answer in qa:
                 f.write(
