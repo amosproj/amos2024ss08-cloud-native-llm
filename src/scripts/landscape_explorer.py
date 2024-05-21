@@ -1,3 +1,4 @@
+from yaml.representer import Representer
 from collections import defaultdict
 import requests
 import os
@@ -6,14 +7,18 @@ from tqdm import tqdm
 import requests_cache
 import logging
 import time
+import collections
 
-TOKEN = os.environ['GITHUBTOKEN']
+# Replace with your GitHub token
+TOKEN = "test_token"
 HEADERS = {'Authorization': f'Bearer {TOKEN}',
            'Accept': 'application/vnd.github+json', 'X-GitHub-Api-Version': '2022-11-28'}
 BASE_API_URL = 'https://api.github.com'
 BASE_REPO_YAML = 'https://raw.githubusercontent.com/cncf/landscape/master/landscape.yml'
 EXTENSIONS = ["yml", "yaml", "pdf", "md"]
+OUTPUT_PATH = '../../sources/landscape_augmented_repos.yml'
 
+yaml.add_representer(collections.defaultdict, Representer.represent_dict)
 
 # Cache requests for 7 days
 requests_cache.install_cache('landscape_cache', expire_after=604800)
@@ -115,10 +120,10 @@ def generate_augmented_yml_with_urls():
                 if 'repo_url' not in item or not item.get('repo_url'):
                     continue
                 urls = get_urls(item.get('repo_url'))
-                item['download_urls'] = {}
+                item['repo'] = defaultdict(defaultdict)
                 for ext, url_list in urls.items():
-                    item['download_urls'][ext] = url_list
-    with open('../../sources/landscape_augmented.yml', 'w+') as file:
+                    item['repo']['download_urls'][ext] = url_list
+    with open(OUTPUT_PATH, 'w+') as file:
         yaml.dump(content, file, sort_keys=False)
 
 

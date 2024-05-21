@@ -35,6 +35,8 @@ bin/
 # MacOS
 .DS_Store
 
+#Temporary Database
+sources/raw_files
 # Conda
 .conda
 
@@ -43,3 +45,6 @@ bin/
 
 # sources directory
 sources/
+
+# json files
+*.json

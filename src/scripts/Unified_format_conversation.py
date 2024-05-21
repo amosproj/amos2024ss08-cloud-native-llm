@@ -35,7 +35,7 @@ def extract_metadata(file_name: str) -> dict:
     }
 
 
-def convert_files_to_json(file_paths, json_file_path, processed_files, chunk_size, error_file_list) -> None:
+def convert_files_to_json(processed_files, chunk_size, error_file_list, json_file_path = "sources/unified_files", file_paths = "sources/raw_files"):
     """Converts various file types to JSON.
 
     Args:
@@ -45,6 +45,11 @@ def convert_files_to_json(file_paths, json_file_path, processed_files, chunk_siz
         chunk_size (int): Size of processing chunk.
         error_file_list (list): List to store error file names.
     """
+    if not os.path.exists(file_paths):
+        os.makedirs(file_paths)
+    if not os.path.exists(json_file_path):
+        os.makedirs(json_file_path)
+
     files = os.listdir(file_paths)
     yaml_data_list = []
     md_data_list = []
@@ -189,7 +194,7 @@ def remove_links_from_markdown(content: str) -> str:
 
     return content
 
-def process_error_yaml_file(error_file_list: list) -> None:
+def process_error_yaml_file(error_file_list: list, file_paths = "sources/raw_files", json_file_path = "sources/unified_files" ) -> None:
     """Processes error YAML files and stores them in JSON format.
      Some of the YAML files contain special symbols and are not formatted correctly. As a result, these files cannot be loaded properly. Therefore, the problematic files are appended 
      to the list, and their data is converted into strings and stored in the 'content' key.
@@ -197,6 +202,10 @@ def process_error_yaml_file(error_file_list: list) -> None:
     Args:
         error_file_list (list): List of error file names.
     """
+    # Return early if error_file_list is empty
+    if not error_file_list:
+        return
+
     yaml_data_list = []
     for error_file in error_file_list:
         try:
@@ -261,18 +270,16 @@ processed_files = set()
 if os.path.exists(processed_files_record):
     with open(processed_files_record, 'r', encoding='utf-8') as f:
         processed_files = set(f.read().splitlines())
-chunk_size = 8000
+chunk_size = 80000
 error_file_list = []
 
-file_paths = "sources/raw_files"
-json_file_path = "sources/unified_files"
+# file_paths = "sources/raw_files"
+# json_file_path = "sources/unified_files"
 # Create output directory if it doesn't exist
-os.makedirs(json_file_path, exist_ok=True)
-convert_files_to_json(file_paths, json_file_path, processed_files, chunk_size, error_file_list)
+# os.makedirs(exist_ok=True)
+convert_files_to_json(processed_files, chunk_size, error_file_list)
 process_error_yaml_file(error_file_list)
 
 with open(processed_files_record, 'w', encoding='utf-8') as f:
         for file_url in processed_files:
             f.write(file_url + '\n')
-
-
