@@ -1,6 +1,6 @@
 import unittest
 import os
-from src.scripts import landscape_extractor
+from src.scripts import landscape_extactor
 # from landscape_extactor import download_files_from_yaml
 import zipfile
 
@@ -17,7 +17,7 @@ class Testdownload_files_from_yaml(unittest.TestCase):
         os.makedirs(output_directory, exist_ok=True)
         expected_zipFile = "sources/Test_Provisioning.zip"
         # Write downloaded content to file
-        landscape_extractor.download_files_from_yaml(
+        landscape_extactor.download_files_from_yaml(
             yaml_file="test/resources/test_landscape_augmented.yml", output_directory=output_directory)
 
         # Create the extract output_directory if it doesn't exist
