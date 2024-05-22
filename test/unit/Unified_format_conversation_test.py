@@ -18,7 +18,7 @@ class TestFileProcessing(unittest.TestCase):
         os.makedirs(self.json_dir, exist_ok=True)
         self.processed_files = set()
         self.error_file_list = []
-        self.chunk_size = 2
+        self.chunk_size = 4
 
         self.sample_yaml_file = os.path.join(self.test_dir, 'category_subcategory_project_sample.yaml')
         self.sample_md_file = os.path.join(self.test_dir, 'category_subcategory_project_sample.md')

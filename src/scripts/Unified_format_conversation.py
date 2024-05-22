@@ -6,8 +6,10 @@ from tqdm import tqdm
 import PyPDF2
 from datetime import datetime
 import logging
+
 NUMBER_OF_TOKENS = 256
 MIN_NUMBER_OF_TOKENS = 30
+
 
 def extract_metadata(file_name: str) -> dict:
     """Extracts metadata from the file name.
@@ -23,10 +25,10 @@ def extract_metadata(file_name: str) -> dict:
 
     # Extract category, subcategory, project name, and filename
     category = parts[0]
-    subcategory= parts[1]
+    subcategory = parts[1]
     project_name = parts[2]
     filename = '_'.join(parts[3:])
-    
+
     return {
         "category": category,
         "subcategory": subcategory,
@@ -35,7 +37,8 @@ def extract_metadata(file_name: str) -> dict:
     }
 
 
-def convert_files_to_json(processed_files, chunk_size, error_file_list, json_file_path = "sources/unified_files", file_paths = "sources/raw_files"):
+def convert_files_to_json(processed_files, chunk_size, error_file_list, json_file_path="sources/unified_files",
+                          file_paths="sources/raw_files"):
     """Converts various file types to JSON.
 
     Args:
@@ -56,6 +59,7 @@ def convert_files_to_json(processed_files, chunk_size, error_file_list, json_fil
     pdf_data_list = []
     processed_urls_count = len(processed_files)
     total_chunk_size = chunk_size + processed_urls_count
+
     def convert_datetime_to_str(data):
         if isinstance(data, dict):
             return {key: convert_datetime_to_str(value) for key, value in data.items()}
@@ -65,6 +69,7 @@ def convert_files_to_json(processed_files, chunk_size, error_file_list, json_fil
             return data.isoformat()
         else:
             return data
+
     for file_name in tqdm(files):
         if file_name in processed_files:
             continue
@@ -82,9 +87,13 @@ def convert_files_to_json(processed_files, chunk_size, error_file_list, json_fil
                         yaml_data_list.append({"tag": tag_data, "content": cleaned_data})
                 processed_files.add(file_name)
                 processed_urls_count += 1
+
             except yaml.YAMLError as exc:
                 logging.error(f"Error processing YAML file: {exc}: {file_name}")
                 error_file_list.append(file_name)
+                processed_files.add(file_name)
+                processed_urls_count += 1
+                continue
 
         elif lower_file_name.endswith(".md"):
             try:
@@ -112,15 +121,15 @@ def convert_files_to_json(processed_files, chunk_size, error_file_list, json_fil
                             old_index = index
                         else:
                             if old_index - start_index > MIN_NUMBER_OF_TOKENS:
-                                chunk = ' '.join(words[start_index:old_index-1])
+                                chunk = ' '.join(words[start_index:old_index - 1])
                                 data.append({"data": chunk})
                                 start_index = old_index
 
                 if NUMBER_OF_TOKENS >= len(words) - start_index >= MIN_NUMBER_OF_TOKENS:
                     chunk = ' '.join(words[start_index:])
                     data.append({"data": chunk})
-                elif len(words)-start_index > NUMBER_OF_TOKENS:
-                    chunk = ' '.join(words[start_index:start_index+NUMBER_OF_TOKENS])
+                elif len(words) - start_index > NUMBER_OF_TOKENS:
+                    chunk = ' '.join(words[start_index:start_index + NUMBER_OF_TOKENS])
                     data.append({"data": chunk})
 
                 tag_data = extract_metadata(file_name)
@@ -194,7 +203,9 @@ def remove_links_from_markdown(content: str) -> str:
 
     return content
 
-def process_error_yaml_file(error_file_list: list, file_paths = "sources/raw_files", json_file_path = "sources/unified_files" ) -> None:
+
+def process_error_yaml_file(error_file_list: list, file_paths="sources/raw_files",
+                            json_file_path="sources/unified_files") -> None:
     """Processes error YAML files and stores them in JSON format.
      Some of the YAML files contain special symbols and are not formatted correctly. As a result, these files cannot be loaded properly. Therefore, the problematic files are appended 
      to the list, and their data is converted into strings and stored in the 'content' key.
@@ -205,65 +216,50 @@ def process_error_yaml_file(error_file_list: list, file_paths = "sources/raw_fil
     # Return early if error_file_list is empty
     if not error_file_list:
         return
-
     yaml_data_list = []
     for error_file in error_file_list:
         try:
             with open(os.path.join(file_paths, error_file), "r", encoding="utf-8") as yaml_file:
                 documents = yaml_file.read()
-                
                 tag_data = extract_metadata(error_file)
                 yaml_data = {"tag": tag_data, "content": documents}
-
                 yaml_data_list.append(yaml_data)
         except Exception as e:
             logging.error(f"An error occurred while processing {error_file}: {e}")
-
     try:
         with open(os.path.join(json_file_path, "error_yaml_data.json"), "w", encoding='utf-8') as json_file:
             json.dump(yaml_data_list, json_file, indent=4)
-            
     except Exception as e:
-        logging.error(f"An error occurred while writing JSON file: {e}")    
-          
+        logging.error(f"An error occurred while writing JSON file: {e}")
+
+
 def clean_markdown(markdown_text):
     # Remove Markdown headers (lines starting with #)
     markdown_text = re.sub(r'^\s*#.*$', '', markdown_text, flags=re.MULTILINE)
-
     # Remove emphasis (bold and italics)
     markdown_text = re.sub(r'(\*{1,2}|_{1,2})(.*?)\1', r'\2', markdown_text)
-
     # Remove strikethrough
     markdown_text = re.sub(r'~~(.*?)~~', r'\1', markdown_text)
-
     # Remove inline code
     markdown_text = re.sub(r'`(.*?)`', r'\1', markdown_text)
-
     # Remove code blocks
     markdown_text = re.sub(r'```.*?```', '', markdown_text, flags=re.DOTALL)
-
     # Remove blockquotes
     markdown_text = re.sub(r'^>\s?', '', markdown_text, flags=re.MULTILINE)
-
     # Remove links but keep the text
     markdown_text = re.sub(r'\[([^\]]+)\]\([^)]+\)', r'\1', markdown_text)
-
     # Remove images
     markdown_text = re.sub(r'!\[([^\]]*)\]\([^)]+\)', r'\1', markdown_text)
-
     # Remove horizontal rules
     markdown_text = re.sub(r'---', '', markdown_text)
-
     # Remove unordered list markers
     markdown_text = re.sub(r'^\s*[-*+]\s+', '', markdown_text, flags=re.MULTILINE)
-
     # Remove ordered list markers
     markdown_text = re.sub(r'^\s*\d+\.\s+', '', markdown_text, flags=re.MULTILINE)
-
     # Remove extra spaces and newlines
     markdown_text = re.sub(r'\s+', ' ', markdown_text).strip()
-
     return markdown_text
+
 
 processed_files_record = 'sources/processed_files.txt'
 processed_files = set()
@@ -281,5 +277,5 @@ convert_files_to_json(processed_files, chunk_size, error_file_list)
 process_error_yaml_file(error_file_list)
 
 with open(processed_files_record, 'w', encoding='utf-8') as f:
-        for file_url in processed_files:
-            f.write(file_url + '\n')
+    for file_url in processed_files:
+        f.write(file_url + '\n')
