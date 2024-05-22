@@ -44,7 +44,7 @@ def main():
     parser = argparse.ArgumentParser(description="Upload markdown and PDF files to a dataset in Hugging Face Model Hub")
     parser.add_argument("hf_token", type=str, help="Your Hugging Face authentication token")
     parser.add_argument("hf_dataset_id", type=str, help="ID of the dataset you want to upload files to")
-    parser.add_argument("--directory_path", type=str, default = "../../sources", help="Path to the directory containing markdown and PDF files")
+    parser.add_argument("--directory_path", type=str, default = "sources/unified_files", help="Path to the directory containing json files")
     args = parser.parse_args()
 
     upload_to_huggingface(args.directory_path, args.hf_token, args.hf_dataset_id)
