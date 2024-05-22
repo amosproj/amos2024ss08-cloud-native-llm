@@ -4,49 +4,41 @@ from huggingface_hub import HfApi, login
 
 os.environ["HF_HUB_ENABLE_HF_TRANSFER"] = "1"
 
-def upload_QandAs_to_huggingface(directory_path, hf_token, hf_dataset_id):
+def upload_QandA_to_huggingface(file_path, hf_token, hf_dataset_id):
 
     """
-    Uploads CSV files from a specified directory to a Hugging Face dataset repository.
+    Uploads a CSV file to a Hugging Face dataset repository.
 
     Args:
-        directory_path (str): The path to the directory containing the CSV files to be uploaded.
+        file_path (str): The path to the CSV file to be uploaded.
         hf_token (str): The Hugging Face API token for authentication.
-        hf_dataset_id (str): The ID of the Hugging Face dataset repository where the files will be uploaded.
+        hf_dataset_id (str): The ID of the Hugging Face dataset repository where the file will be uploaded.
 
     Returns:
         None
 
     This function performs the following steps:
-    1. Searches for all CSV files in the specified directory and its subdirectories.
-    2. Logs into Hugging Face using the provided API token.
-    3. Uploads each CSV file to the specified Hugging Face dataset repository.
+    1. Logs into Hugging Face using the provided API token.
+    2. Uploads the specified CSV file to the specified Hugging Face dataset repository.
 
-    The progress of the file uploads is displayed using a progress bar.
+    The progress of the file upload is displayed using a progress bar.
 
     Example:
-        upload_QandAs_to_huggingface("directory path", "hf_example_token", "user/dataset_name")
+        upload_QandA_to_huggingface("path/to/file.csv", "hf_example_token", "user/dataset_name")
     """
- 
-    csv_files = []
-    for root, dirs, files in os.walk(directory_path):
-        for file in files:
-            if file.endswith('.csv'):
-                csv_files.append(os.path.join(root, file))
-    
+
     api = HfApi()
     login(token=hf_token)
     
-    # Upload CSV files
-    for csv_file in tqdm(csv_files):
+    # Upload the CSV file
+    with tqdm(total=1, desc="Uploading CSV file") as pbar:
         api.upload_file(
-            path_or_fileobj=csv_file,
-            path_in_repo=os.path.basename(csv_file),
+            path_or_fileobj=file_path,
+            path_in_repo=os.path.basename(file_path),
             repo_id=hf_dataset_id,
             repo_type="dataset",
         )
+        pbar.update(1)
 
-   
 if __name__ == "__main__":
-     upload_QandAs_to_huggingface("directory_path where Q&As files contain", "Your Hugging Face authentication token", "hugging face dataset id")
-
+    upload_QandA_to_huggingface("questions.csv", "Your Hugging Face authentication token", "huggingface dataset id")
