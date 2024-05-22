@@ -37,7 +37,7 @@ def paraphrase_questions(questions, model, tokenizer):
         paraphrased_questions.append(re.search(r'(?<=<start_of_turn>model)(.*)', paraphrased_question, re.DOTALL).group(1))
     return paraphrased_questions
 
-# Function to paraphrase a questions
+# Function to paraphrase a answers
 def paraphrase_answer(answer, model, amount, max_new_tokens):
   chat = [
     { "role": "user", "content": f"Rephrase the following answer {amount} times: '{answer}'" },
@@ -49,7 +49,7 @@ def paraphrase_answer(answer, model, amount, max_new_tokens):
   return paraphrased_answers
 
 
-# Function to paraphrase a batch of questions
+# Function to paraphrase a batch of answers
 def paraphrase_answers(answers, model, tokenizer):
     paraphrased_answers = []
     for answer in answers:
