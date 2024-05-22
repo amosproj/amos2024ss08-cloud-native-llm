@@ -29,7 +29,7 @@ class TestFileProcessing(unittest.TestCase):
             yaml.dump([{'step': 'first', 'description': 'This is the first step'}, {'step': 'second', 'description': 'This is the second step'}], f)
 
         with open(self.sample_md_file, 'w', encoding='utf-8') as f:
-            f.write("# Heading 1\nContent under heading 1\n## Subheading 1.1\nContent under subheading 1.1\n")
+            f.write("# Heading 1\nContent under heading 1\n## Subheading 1.1\nContent under subheading 1.1\n #More Heading\n Content Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et")
 
         with open(self.sample_pdf_file, 'wb') as f:
             pdf_writer = PyPDF2.PdfWriter()
