@@ -9,5 +9,5 @@ requests_cache==1.2.0
 Scrapy==2.11.1
 tqdm==4.66.2
 mock==5.1.0
-numpy == 1.22.1
+numpy == 1.23.2
 langid == 1.1.6
