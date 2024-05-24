@@ -35,17 +35,17 @@ class Testdownload_files_from_yaml(unittest.TestCase):
         error_message = f"File '{file_path}' was not downloaded."
         self.assertTrue(os.path.exists(file_path), error_message)
 
-  #  def tearDown(self):
-  #      # Clean up: remove the output_directory and its contents
-  #      output_directory = "sources/raw_files_test/"
-  #      if os.path.exists(output_directory):
-  #          for filename in os.listdir(output_directory):
-  #              os.remove(os.path.join(output_directory, filename))
-  #          os.rmdir(output_directory)
-  #      if os.path.exists("sources/Test_Provisioning.zip"):
-  #          os.remove("sources/Test_Provisioning.zip")
-  #      if os.path.exists("sources/test_landscape_augumented.yml"):
-  #          os.remove("sources/test_landscape_augumented.yml")
+    def tearDown(self):
+        # Clean up: remove the output_directory and its contents
+        output_directory = "sources/raw_files_test/"
+        if os.path.exists(output_directory):
+            for filename in os.listdir(output_directory):
+                os.remove(os.path.join(output_directory, filename))
+            os.rmdir(output_directory)
+        if os.path.exists("sources/Test_Provisioning.zip"):
+            os.remove("sources/Test_Provisioning.zip")
+        if os.path.exists("sources/test_landscape_augumented.yml"):
+            os.remove("sources/test_landscape_augumented.yml")
 
 
 if __name__ == '__main__':
