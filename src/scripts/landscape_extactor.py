@@ -1,10 +1,10 @@
 import requests
 import yaml
 import os
-from tqdm import tqdm
 import threading
 import shutil
 import langid
+import time
 
 
 # Replace with your GitHub token to increas github API hourly rate to 5000
@@ -123,7 +123,7 @@ def download_files_from_yaml(yaml_file="./sources/landscape_augmented_repos_webs
         for subcategory in category.get('subcategories', []):
             tags_dict['Subcategory'] = subcategory['name']
             print(f"Subcategory: {tags_dict['Subcategory']}")
-            for item in tqdm(subcategory.get('items', [])):
+            for item in subcategory.get('items', []):
                 tags_dict['Project_name'] = item['name']
                 print(f"Item: {tags_dict['Project_name']}")
                 repo = item.get('repo', {})
