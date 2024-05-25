@@ -11,7 +11,7 @@ log() {
 load_env() {
     if [ -f ".env" ]; then
         log "Loading environment variables from .env file..."
-        export $(cat .env | xargs)
+        export $(grep -v '^#' .env | xargs -d '\n')
         log "Environment variables loaded."
     else
         log "No .env file found. Make sure to create one with the required environment variables."
@@ -41,7 +41,7 @@ setup_virtual_environment() {
 run_python_script() {
     local script_name=$1
     log "Running ${script_name}..."
-    if python "$script_name"; then
+    if python3 "$script_name"; then
         log "${script_name} completed successfully."
     else
         log "Error: ${script_name} failed"
@@ -53,10 +53,10 @@ run_etl() {
     log "Starting ETL process..."
 
     etl_scripts=(
-        "landscape_explorer.py"
-        "landscape_extractor.py"
-        "Unified_format_conversation.py"
-        "upload_to_huggingface.py"
+        "src/scripts/landscape_explorer.py"
+        "src/scripts/landscape_extractor.py"
+        "src/scripts/Unified_format_conversation.py"
+        "src/scripts/upload_to_huggingface.py"
     )
 
     for script in "${etl_scripts[@]}"; do
@@ -91,11 +91,8 @@ run_qa() {
     log "Q&A generation process completed."
 }
 
-# Load environment variables
+#setup_virtual_environment
 load_env
-
-# Set up the virtual environment and install dependencies
-setup_virtual_environment
 
 # Parse command-line arguments and run the selected tasks
 if [ $# -eq 0 ]; then
