@@ -49,8 +49,8 @@ def fetch_answers(question_id):
     else:
         print(f"Failed to fetch answers for question {question_id}: {response.status_code}")
         return []
-def qa_exctractor():
-    tag = "kubernetes"
+def qa_exctractor(project_name):
+    tag = project_name
     max_answer_number = 3
     questions = fetch_stackoverflow_questions(tag, pages=2, pagesize=5)
     QA_list = []
@@ -73,7 +73,13 @@ def qa_exctractor():
                     continue
                 QA_list.append({"question" : question['body'], "answer" : answer['body'] })
     return QA_list
-    
+
+def extract_all_projects():
+    #TODO: exctract all project names and exctract Q&As
+    project_names_list = []
+    for project in project_names_list:
+        qas = qa_exctractor(project)
+        
 # Example usage
 if __name__ == "__main__":
-    qa_exctractor()
+    extract_all_projects()
