@@ -40,13 +40,19 @@ setup_virtual_environment() {
 
 run_python_script() {
     local script_name=$1
+    local script_path=${script_name%/*}  # Extract directory from script path
+    local script_basename=${script_name##*/}  # Extract script basename
+
     log "Running ${script_name}..."
-    if python3 "$script_name"; then
-        log "${script_name} completed successfully."
-    else
-        log "Error: ${script_name} failed"
-        exit 1
-    fi
+    (
+        cd "$script_path"  # Change directory
+        if python3 "$script_basename"; then
+            log "${script_name} completed successfully."
+        else
+            log "Error: ${script_name} failed"
+            exit 1
+        fi
+    )
 }
 
 run_etl() {
@@ -91,7 +97,18 @@ run_qa() {
     log "Q&A generation process completed."
 }
 
-#setup_virtual_environment
+# check first if input is valid, check if all arguments are either etl or qa or nothing
+if [ $# -ne 0 ]; then
+    for arg in "$@"; do
+        if [ "$arg" != "etl" ] && [ "$arg" != "qa" ]; then
+            log "Invalid argument: $arg"
+            log "Usage: $0 [etl] [qa]"
+            exit 1
+        fi
+    done
+fi
+
+setup_virtual_environment
 load_env
 
 # Parse command-line arguments and run the selected tasks
@@ -107,11 +124,6 @@ else
                 ;;
             qa)
                 run_qa
-                ;;
-            *)
-                log "Invalid argument: $arg"
-                log "Usage: $0 [etl] [qa]"
-                exit 1
                 ;;
         esac
     done
