@@ -11,6 +11,8 @@ import collections
 
 # Replace with your GitHub token
 TOKEN = os.environ['GITHUB_TOKEN']
+if not TOKEN:
+    TOKEN = "TEST_TOKEN"
 HEADERS = {'Authorization': f'Bearer {TOKEN}',
            'Accept': 'application/vnd.github+json', 'X-GitHub-Api-Version': '2022-11-28'}
 BASE_API_URL = 'https://api.github.com'
