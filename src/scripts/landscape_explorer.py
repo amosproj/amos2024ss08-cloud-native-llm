@@ -1,3 +1,4 @@
+#!/usr/bin/python3
 from yaml.representer import Representer
 from collections import defaultdict
 import requests

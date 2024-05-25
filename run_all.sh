@@ -55,17 +55,40 @@ run_python_script() {
     )
 }
 
+run_scrapy_spider() {
+    log "Running Scrapy spider..."
+    (
+        cd src/landscape_scraper  # Change directory to where the Scrapy project is
+        if scrapy crawl files -O output.json; then
+            log "Scrapy spider completed successfully."
+        else
+            log "Error: Scrapy spider failed"
+            exit 1
+        fi
+    )
+}
+
 run_etl() {
     log "Starting ETL process..."
 
     etl_scripts=(
         "src/scripts/landscape_explorer.py"
+    )
+
+    for script in "${etl_scripts[@]}"; do
+        run_python_script "$script"
+    done
+
+    run_scrapy_spider
+
+    etl_scripts_continued=(
+        "src/scripts/augment_landscape.py"
         "src/scripts/landscape_extractor.py"
         "src/scripts/Unified_format_conversation.py"
         "src/scripts/upload_to_huggingface.py"
     )
 
-    for script in "${etl_scripts[@]}"; do
+    for script in "${etl_scripts_continued[@]}"; do
         run_python_script "$script"
     done
 

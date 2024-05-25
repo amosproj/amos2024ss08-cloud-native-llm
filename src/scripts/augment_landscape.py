@@ -55,7 +55,6 @@ def process_category(category, website_urls):
 
     This function processes each subcategory in the category.
     """
-    print(category)
     for subcategory in category.get('subcategories'):
         process_subcategory(subcategory, website_urls)
 

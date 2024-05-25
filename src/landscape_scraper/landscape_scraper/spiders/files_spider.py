@@ -8,7 +8,7 @@ BASE_REPO_YAML = 'https://raw.githubusercontent.com/cncf/landscape/master/landsc
 
 
 class QuotesSpider(scrapy.Spider):
-    name = "docs"
+    name = "files"
 
     def __init__(self):
         self.link_extractor = scrapy.linkextractors.LinkExtractor(
@@ -30,13 +30,9 @@ class QuotesSpider(scrapy.Spider):
                     if 'homepage_url' not in item or not item.get('homepage_url'):
                         continue
                     urls.append(item.get('homepage_url'))
-            #         break
-            #     break
-            # break
 
         for url in urls:
             yield scrapy.Request(url, self.parse)
-        # yield scrapy.Request("https://www.zalando.de/", self.parse)
 
     def parse(self, response):
         for link in self.link_extractor.extract_links(response):
