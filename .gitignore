@@ -49,3 +49,10 @@ sources/
 
 # json files
 *.json
+
+# env file used to run the entire project
+.env
+
+*.csv
+
+venv/
