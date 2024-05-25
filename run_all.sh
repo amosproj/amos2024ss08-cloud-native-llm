@@ -40,8 +40,8 @@ setup_virtual_environment() {
 
 run_python_script() {
     local script_name=$1
-    local script_path=${script_name%/*}  # Extract directory from script path
-    local script_basename=${script_name##*/}  # Extract script basename
+    local script_path="$(dirname "$script_name")"  # Extract directory from script path
+    local script_basename="$(basename "$script_name")"  # Extract script basename
 
     log "Running ${script_name}..."
     (

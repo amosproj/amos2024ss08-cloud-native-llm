@@ -130,7 +130,9 @@ def generate_augmented_yml_with_urls():
 
 
 def make_request(url):
+    print("making request to url: ", url)
     response = requests.get(url, headers=HEADERS)
+    print(response)
     if 'retry_after' in response.headers:
         logging.warning(
             f'Rate limit exceeded. Retrying after {response.headers["retry-after"]} seconds')
