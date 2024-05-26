@@ -112,8 +112,8 @@ run_qa() {
     log "Starting Q&A generation process..."
 
     qa_scripts=(
-        "QA_enricher.py"
-        "generatefiles.sh"
+        "src/scripts/qa_generation/qa_generation.py"
+        "src/scripts/upload_qa_to_hugging_face.py"
     )
 
     for script in "${qa_scripts[@]}"; do

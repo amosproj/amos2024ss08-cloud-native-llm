@@ -3,9 +3,10 @@ from tqdm import tqdm
 from huggingface_hub import HfApi, login
 
 os.environ["HF_HUB_ENABLE_HF_TRANSFER"] = "1"
+HF_TOKEN = os.getenv("HF_TOKEN", "upload_your_hf_token_here")
 
-def upload_QandA_to_huggingface(file_path, hf_token, hf_dataset_id):
 
+def upload_QandA_to_huggingface(file_path, hf_dataset_id):
     """
     Uploads a CSV file to a Hugging Face dataset repository.
 
@@ -28,8 +29,8 @@ def upload_QandA_to_huggingface(file_path, hf_token, hf_dataset_id):
     """
 
     api = HfApi()
-    login(token=hf_token)
-    
+    login(token=HF_TOKEN)
+
     # Upload the CSV file
     with tqdm(total=1, desc="Uploading CSV file") as pbar:
         api.upload_file(
@@ -40,5 +41,7 @@ def upload_QandA_to_huggingface(file_path, hf_token, hf_dataset_id):
         )
         pbar.update(1)
 
+
 if __name__ == "__main__":
-    upload_QandA_to_huggingface("questions.csv", "Your Hugging Face authentication token", "huggingface dataset id")
+    upload_QandA_to_huggingface(
+        "qa_generation/questions.csv", "Kubermatic/cncf-raw-data-for-llm-training")
