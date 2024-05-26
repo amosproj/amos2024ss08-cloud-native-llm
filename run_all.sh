@@ -46,11 +46,20 @@ run_python_script() {
     log "Running ${script_name}..."
     (
         cd "$script_path"  # Change directory
-        if python3 "$script_basename"; then
-            log "${script_name} completed successfully."
+        if [[ "$script_basename" == "upload_to_huggingface.py" ]]; then
+            if python3 "$script_basename" "$2"; then
+                log "${script_name} completed successfully."
+            else
+                log "Error: ${script_name} failed"
+                exit 1
+            fi
         else
-            log "Error: ${script_name} failed"
-            exit 1
+            if python3 "$script_basename"; then
+                log "${script_name} completed successfully."
+            else
+                log "Error: ${script_name} failed"
+                exit 1
+            fi
         fi
     )
 }
@@ -89,7 +98,11 @@ run_etl() {
     )
 
     for script in "${etl_scripts_continued[@]}"; do
-        run_python_script "$script"
+        if [[ $script == *"upload_to_huggingface.py" ]]; then
+            run_python_script "$script" "$DATA_SET_ID"
+        else
+            run_python_script "$script"
+        fi
     done
 
     log "ETL process completed."
@@ -120,36 +133,61 @@ run_qa() {
     log "Q&A generation process completed."
 }
 
-# check first if input is valid, check if all arguments are either etl or qa or nothing
-if [ $# -ne 0 ]; then
-    for arg in "$@"; do
-        if [ "$arg" != "etl" ] && [ "$arg" != "qa" ]; then
-            log "Invalid argument: $arg"
-            log "Usage: $0 [etl] [qa]"
-            exit 1
-        fi
-    done
+# check first if input is valid, check if all arguments are either etl or qa or dataset id
+if [ $# -eq 0 ]; then
+    log "No arguments provided. Usage: $0 [etl] [qa] <data_set_id>"
+    exit 1
 fi
+
+# Validate and process arguments
+ETL=false
+QA=false
+DATA_SET_ID=""
+
+for arg in "$@"; do
+    case $arg in
+        etl)
+            ETL=true
+            ;;
+        qa)
+            QA=true
+            ;;
+        *)
+            if [[ -z "$DATA_SET_ID" ]]; then
+                DATA_SET_ID="$arg"
+            else
+                log "Invalid argument: $arg"
+                log "Usage: $0 [etl] [qa] <data_set_id>"
+                exit 1
+            fi
+            ;;
+    esac
+done
+
+if [[ -z "$DATA_SET_ID" ]]; then
+    log "Error: Data set ID is required."
+    log "Usage: $0 [etl] [qa] <data_set_id>"
+    exit 1
+fi
+
+log "Data set ID: $DATA_SET_ID"
+
 
 setup_virtual_environment
 load_env
 
-# Parse command-line arguments and run the selected tasks
-if [ $# -eq 0 ]; then
-    log "No arguments provided. Running both ETL and Q&A generation."
+if $ETL; then
+    run_etl
+fi
+
+if $QA; then
+    run_qa
+fi
+
+if ! $ETL && ! $QA; then
+    log "No ETL or QA specified, running both"
     run_etl
     run_qa
-else
-    for arg in "$@"; do
-        case $arg in
-            etl)
-                run_etl
-                ;;
-            qa)
-                run_qa
-                ;;
-        esac
-    done
 fi
 
 log "All selected tasks ran successfully."
