@@ -9,7 +9,8 @@ import time
 
 # Replace with your GitHub token to increas github API hourly rate to 5000
 TOKEN = os.getenv('GITHUB_TOKEN', 'Replace your token')
-HEADERS = {'Authorization': f'Bearer {TOKEN}'}
+HEADERS = {'Authorization': f'Bearer {TOKEN}',
+           'Accept': 'application/vnd.github+json', 'X-GitHub-Api-Version': '2022-11-28'}
 
 
 def isFileEnglish(content):
@@ -37,9 +38,10 @@ def downloader(url, output_directory, tags_dict, semaphore):
             print(f"Downloading file from {url}")
             # Send HTTP GET request to download the file
             if TOKEN == "Replace your token":
-                response = requests.get(url)
+                response = requests.get(url, headers={
+                                        'Accept': 'application/vnd.github+json', 'X-GitHub-Api-Version': '2022-11-28'})
             else:
-                response = requests.get(url, headers=HEADERS)
+                response = requests.get(url, headers=HEADERS, timeout=10)
             # Handel 429 too many request error
             if response.status_code == 429:
                 print("Too many requests, waiting for 60 seconds")

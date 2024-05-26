@@ -47,14 +47,14 @@ run_python_script() {
     (
         cd "$script_path"  # Change directory
         if [[ "$script_basename" == "upload_to_huggingface.py" ]]; then
-            if python3 "$script_basename" "$2"; then
+            if python3 -u "$script_basename" "$2"; then
                 log "${script_name} completed successfully."
             else
                 log "Error: ${script_name} failed"
                 exit 1
             fi
         else
-            if python3 "$script_basename"; then
+            if python3 -u "$script_basename"; then
                 log "${script_name} completed successfully."
             else
                 log "Error: ${script_name} failed"
