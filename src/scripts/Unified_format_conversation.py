@@ -1,4 +1,5 @@
 import os
+from concurrent.futures import ThreadPoolExecutor, as_completed
 import re
 import json
 import yaml
@@ -7,9 +8,19 @@ import PyPDF2
 from datetime import datetime
 import logging
 
-NUMBER_OF_TOKENS = 256
-MIN_NUMBER_OF_TOKENS = 30
+# Constants for processing
+MIN_NUMBER_OF_TOKENS = 50  # Example value, adjust as needed
+NUMBER_OF_TOKENS = 600  # Example value, adjust as needed
 
+def convert_datetime_to_str(data):
+    if isinstance(data, dict):
+        return {key: convert_datetime_to_str(value) for key, value in data.items()}
+    elif isinstance(data, list):
+        return [convert_datetime_to_str(item) for item in data]
+    elif isinstance(data, datetime):
+        return data.isoformat()
+    else:
+        return data
 
 def extract_metadata(file_name: str) -> dict:
     """Extracts metadata from the file name.
@@ -36,9 +47,7 @@ def extract_metadata(file_name: str) -> dict:
         "file_name": filename,
     }
 
-
-def convert_files_to_json(processed_files, chunk_size, error_file_list, json_file_path="sources/unified_files",
-                          file_paths="sources/raw_files"):
+def convert_files_to_json(processed_files, chunk_size, error_file_list, json_file_path="sources/unified_files", file_paths="sources/raw_files"):
     """Converts various file types to JSON.
 
     Args:
@@ -60,19 +69,11 @@ def convert_files_to_json(processed_files, chunk_size, error_file_list, json_fil
     processed_urls_count = len(processed_files)
     total_chunk_size = chunk_size + processed_urls_count
 
-    def convert_datetime_to_str(data):
-        if isinstance(data, dict):
-            return {key: convert_datetime_to_str(value) for key, value in data.items()}
-        elif isinstance(data, list):
-            return [convert_datetime_to_str(item) for item in data]
-        elif isinstance(data, datetime):
-            return data.isoformat()
-        else:
-            return data
+    def process_file(file_name):
+        nonlocal processed_urls_count
 
-    for file_name in tqdm(files):
         if file_name in processed_files:
-            continue
+            return None
 
         file_path = os.path.join(file_paths, file_name)
         lower_file_name = file_name.lower()
@@ -87,13 +88,13 @@ def convert_files_to_json(processed_files, chunk_size, error_file_list, json_fil
                         yaml_data_list.append({"tag": tag_data, "content": cleaned_data})
                 processed_files.add(file_name)
                 processed_urls_count += 1
-
+                return "yaml"
             except yaml.YAMLError as exc:
                 logging.error(f"Error processing YAML file: {exc}: {file_name}")
                 error_file_list.append(file_name)
                 processed_files.add(file_name)
                 processed_urls_count += 1
-                continue
+                return None
 
         elif lower_file_name.endswith(".md"):
             try:
@@ -109,7 +110,7 @@ def convert_files_to_json(processed_files, chunk_size, error_file_list, json_fil
                     processed_files.add(file_name)
                     processed_urls_count += 1
                     print(f"File has less than {MIN_NUMBER_OF_TOKENS} words, skipping file")
-                    continue
+                    return None
 
                 data = []
                 start_index = 0
@@ -136,10 +137,11 @@ def convert_files_to_json(processed_files, chunk_size, error_file_list, json_fil
                 md_data_list.append({"tag": tag_data, "content": data})
                 processed_files.add(file_name)
                 processed_urls_count += 1
-
+                return "md"
             except Exception as e:
                 logging.error(f"Error processing Markdown file: {e}: {file_name}")
                 error_file_list.append(file_name)
+                return None
 
         elif lower_file_name.endswith(".pdf"):
             try:
@@ -153,25 +155,45 @@ def convert_files_to_json(processed_files, chunk_size, error_file_list, json_fil
                 pdf_data_list.append({"tag": tag_data, "content": content})
                 processed_files.add(file_name)
                 processed_urls_count += 1
-
+                return "pdf"
             except Exception as e:
                 logging.error(f"Error converting PDF to JSON: {e}: {file_name}")
                 error_file_list.append(file_name)
+                return None
 
-        if processed_urls_count >= total_chunk_size:
-            break
+        return None
 
-        # Write the accumulated data to JSON files
-    try:
-        with open(os.path.join(json_file_path, "yaml_data.json"), "w", encoding='utf-8') as json_file:
-            json.dump(yaml_data_list, json_file, indent=4, default=str)
-        with open(os.path.join(json_file_path, "md_data.json"), "w", encoding='utf-8') as json_file:
-            json.dump(md_data_list, json_file, indent=4)
-        with open(os.path.join(json_file_path, "pdf_data.json"), "w", encoding='utf-8') as json_file:
-            json.dump(pdf_data_list, json_file, indent=4)
-    except Exception as e:
-        logging.error(f"Error writing JSON data: {e}")
+    def write_json_data():
+        try:
+            with open(os.path.join(json_file_path, "yaml_data.json"), "a", encoding='utf-8') as json_file:
+                json.dump(yaml_data_list, json_file, indent=4, default=str)
+                json_file.write('\n')
+            with open(os.path.join(json_file_path, "md_data.json"), "a", encoding='utf-8') as json_file:
+                json.dump(md_data_list, json_file, indent=4)
+                json_file.write('\n')
+            with open(os.path.join(json_file_path, "pdf_data.json"), "a", encoding='utf-8') as json_file:
+                json.dump(pdf_data_list, json_file, indent=4)
+                json_file.write('\n')
+        except Exception as e:
+            logging.error(f"Error writing JSON data: {e}")
 
+    with ThreadPoolExecutor(max_workers=4) as executor:
+        futures = {executor.submit(process_file, file_name): file_name for file_name in files}
+        for future in tqdm(as_completed(futures)):
+            try:
+                result = future.result()
+                if result:
+                    # Periodically write to JSON files
+                    if processed_urls_count % chunk_size == 0:
+                        write_json_data()
+                        yaml_data_list.clear()
+                        md_data_list.clear()
+                        pdf_data_list.clear()
+            except Exception as exc:
+                logging.error(f'File generated an exception: {exc}')
+
+    # Write any remaining data to JSON files
+    write_json_data()
 
 def remove_links_from_markdown(content: str) -> str:
     """
@@ -241,13 +263,13 @@ def clean_markdown(markdown_text):
     # Remove strikethrough
     markdown_text = re.sub(r'~~(.*?)~~', r'\1', markdown_text)
     # Remove inline code
-    markdown_text = re.sub(r'`(.*?)`', r'\1', markdown_text)
+    # markdown_text = re.sub(r'`(.*?)`', r'\1', markdown_text)
     # Remove code blocks
-    markdown_text = re.sub(r'```.*?```', '', markdown_text, flags=re.DOTALL)
+    # markdown_text = re.sub(r'```.*?```', '', markdown_text, flags=re.DOTALL)
     # Remove blockquotes
     markdown_text = re.sub(r'^>\s?', '', markdown_text, flags=re.MULTILINE)
     # Remove links but keep the text
-    markdown_text = re.sub(r'\[([^\]]+)\]\([^)]+\)', r'\1', markdown_text)
+    # markdown_text = re.sub(r'\[([^\]]+)\]\([^)]+\)', r'\1', markdown_text)
     # Remove images
     markdown_text = re.sub(r'!\[([^\]]*)\]\([^)]+\)', r'\1', markdown_text)
     # Remove horizontal rules
