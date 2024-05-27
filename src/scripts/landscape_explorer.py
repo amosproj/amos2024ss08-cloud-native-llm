@@ -124,9 +124,7 @@ def generate_augmented_yml_with_urls():
                 item['repo'] = defaultdict(defaultdict)
                 for ext, url_list in urls.items():
                     item['repo']['download_urls'][ext] = url_list
-                break
-            break
-        break
+
     with open(OUTPUT_PATH, 'w+') as file:
         yaml.dump(content, file, sort_keys=False)
 
