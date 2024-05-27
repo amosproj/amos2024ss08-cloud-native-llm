@@ -2,9 +2,9 @@ import requests
 import yaml
 import os
 import threading
-import shutil
 import langid
 import time
+import shutil
 
 
 # Replace with your GitHub token to increas github API hourly rate to 5000
@@ -135,13 +135,13 @@ def download_files_from_yaml(yaml_file="../../sources/landscape_augmented_repos_
                 repo = item.get('repo', {})
                 downloader_multi_thread(
                     repo.get('download_urls', []), output_directory, tags_dict)
-                # downloader_multi_thread(
-                #    item.get('download_urls', []), output_directory, tags_dict)
+        # downloader_multi_thread(
+        #    item.get('download_urls', []), output_directory, tags_dict)
         # Adding all the files corresponding to a category to a zip file
         shutil.make_archive(
             "sources/" + tags_dict['Category'], 'zip', output_directory+"/")
         # Removing remminig raw files after archiving
-        shutil.rmtree(output_directory)
+        # shutil.rmtree(output_directory)
         # Creat dirrectory for next category
         os.makedirs(output_directory, exist_ok=True)
 

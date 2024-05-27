@@ -43,5 +43,7 @@ for date in dataset:
 
         threads.append(thread)
         thread.start()
+        break
     for thread in threads:
         thread.join()
+    break

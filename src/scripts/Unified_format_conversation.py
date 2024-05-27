@@ -84,12 +84,14 @@ def convert_files_to_json(processed_files, chunk_size, error_file_list, json_fil
                     for data in documents:
                         cleaned_data = convert_datetime_to_str(data)
                         tag_data = extract_metadata(file_name)
-                        yaml_data_list.append({"tag": tag_data, "content": cleaned_data})
+                        yaml_data_list.append(
+                            {"tag": tag_data, "content": cleaned_data})
                 processed_files.add(file_name)
                 processed_urls_count += 1
 
             except yaml.YAMLError as exc:
-                logging.error(f"Error processing YAML file: {exc}: {file_name}")
+                logging.error(
+                    f"Error processing YAML file: {exc}: {file_name}")
                 error_file_list.append(file_name)
                 processed_files.add(file_name)
                 processed_urls_count += 1
@@ -108,7 +110,8 @@ def convert_files_to_json(processed_files, chunk_size, error_file_list, json_fil
                 if len(words) <= MIN_NUMBER_OF_TOKENS:
                     processed_files.add(file_name)
                     processed_urls_count += 1
-                    print(f"File has less than {MIN_NUMBER_OF_TOKENS} words, skipping file")
+                    print(
+                        f"File has less than {MIN_NUMBER_OF_TOKENS} words, skipping file")
                     continue
 
                 data = []
@@ -121,7 +124,8 @@ def convert_files_to_json(processed_files, chunk_size, error_file_list, json_fil
                             old_index = index
                         else:
                             if old_index - start_index > MIN_NUMBER_OF_TOKENS:
-                                chunk = ' '.join(words[start_index:old_index - 1])
+                                chunk = ' '.join(
+                                    words[start_index:old_index - 1])
                                 data.append({"data": chunk})
                                 start_index = old_index
 
@@ -129,7 +133,8 @@ def convert_files_to_json(processed_files, chunk_size, error_file_list, json_fil
                     chunk = ' '.join(words[start_index:])
                     data.append({"data": chunk})
                 elif len(words) - start_index > NUMBER_OF_TOKENS:
-                    chunk = ' '.join(words[start_index:start_index + NUMBER_OF_TOKENS])
+                    chunk = ' '.join(
+                        words[start_index:start_index + NUMBER_OF_TOKENS])
                     data.append({"data": chunk})
 
                 tag_data = extract_metadata(file_name)
@@ -138,7 +143,8 @@ def convert_files_to_json(processed_files, chunk_size, error_file_list, json_fil
                 processed_urls_count += 1
 
             except Exception as e:
-                logging.error(f"Error processing Markdown file: {e}: {file_name}")
+                logging.error(
+                    f"Error processing Markdown file: {e}: {file_name}")
                 error_file_list.append(file_name)
 
         elif lower_file_name.endswith(".pdf"):
@@ -155,31 +161,43 @@ def convert_files_to_json(processed_files, chunk_size, error_file_list, json_fil
                 processed_urls_count += 1
 
             except Exception as e:
-                logging.error(f"Error converting PDF to JSON: {e}: {file_name}")
+                logging.error(
+                    f"Error converting PDF to JSON: {e}: {file_name}")
                 error_file_list.append(file_name)
 
         if processed_urls_count >= total_chunk_size:
             break
 
         # Write the accumulated data to JSON files
-    try:
-        with open(os.path.join(json_file_path, "yaml_data.json"), "w", encoding='utf-8') as json_file:
-            json.dump(yaml_data_list, json_file, indent=4, default=str)
-        with open(os.path.join(json_file_path, "md_data.json"), "w", encoding='utf-8') as json_file:
-            json.dump(md_data_list, json_file, indent=4)
-        with open(os.path.join(json_file_path, "pdf_data.json"), "w", encoding='utf-8') as json_file:
-            json.dump(pdf_data_list, json_file, indent=4)
-    except Exception as e:
-        logging.error(f"Error writing JSON data: {e}")
+        # only write if is the list is not empty
+        if yaml_data_list:
+            try:
+                with open(os.path.join(json_file_path, "yaml_data.json"), "w", encoding='utf-8') as json_file:
+                    json.dump(yaml_data_list, json_file, indent=4, default=str)
+            except Exception as e:
+                logging.error(f"Error writing YAML data: {e}")
+        if md_data_list:
+            try:
+                with open(os.path.join(json_file_path, "md_data.json"), "w", encoding='utf-8') as json_file:
+                    json.dump(md_data_list, json_file, indent=4)
+            except Exception as e:
+                logging.error(f"Error writing Markdown data: {e}")
+        if pdf_data_list:
+            try:
+                with open(os.path.join(json_file_path, "pdf_data.json"), "w", encoding='utf-8') as json_file:
+                    json.dump(pdf_data_list, json_file, indent=4)
+            except Exception as e:
+                logging.error(f"Error writing PDF data: {e}")
+        break
 
 
 def remove_links_from_markdown(content: str) -> str:
     """
     Remove all markdown links from the provided markdown content.
-    
+
     Args:
     - content (str): The markdown content as a string.
-    
+
     Returns:
     - str: The markdown content with all links removed.
     """
@@ -190,7 +208,8 @@ def remove_links_from_markdown(content: str) -> str:
     reference_link_pattern = re.compile(r'\[.*?\]\[.*?\]')
 
     # Regex pattern to match reference link definitions [id]: url "title"
-    reference_definition_pattern = re.compile(r'^\s*\[.*?\]:\s*.*', re.MULTILINE)
+    reference_definition_pattern = re.compile(
+        r'^\s*\[.*?\]:\s*.*', re.MULTILINE)
 
     # Remove inline links
     content = inline_link_pattern.sub('', content)
@@ -225,7 +244,8 @@ def process_error_yaml_file(error_file_list: list, file_paths="sources/raw_files
                 yaml_data = {"tag": tag_data, "content": documents}
                 yaml_data_list.append(yaml_data)
         except Exception as e:
-            logging.error(f"An error occurred while processing {error_file}: {e}")
+            logging.error(
+                f"An error occurred while processing {error_file}: {e}")
     try:
         with open(os.path.join(json_file_path, "error_yaml_data.json"), "w", encoding='utf-8') as json_file:
             json.dump(yaml_data_list, json_file, indent=4)
@@ -253,9 +273,11 @@ def clean_markdown(markdown_text):
     # Remove horizontal rules
     markdown_text = re.sub(r'---', '', markdown_text)
     # Remove unordered list markers
-    markdown_text = re.sub(r'^\s*[-*+]\s+', '', markdown_text, flags=re.MULTILINE)
+    markdown_text = re.sub(r'^\s*[-*+]\s+', '',
+                           markdown_text, flags=re.MULTILINE)
     # Remove ordered list markers
-    markdown_text = re.sub(r'^\s*\d+\.\s+', '', markdown_text, flags=re.MULTILINE)
+    markdown_text = re.sub(r'^\s*\d+\.\s+', '',
+                           markdown_text, flags=re.MULTILINE)
     # Remove extra spaces and newlines
     markdown_text = re.sub(r'\s+', ' ', markdown_text).strip()
     return markdown_text
