@@ -18,14 +18,9 @@ at [Technical University of Berlin](https://www.tu.berlin),[Friedrich-Alexander 
 
 Welcome to the Cloud Native LLM Project for the AMOS SS 2024! 
 
-This project is dedicated to solving the problem of overload and fragmented information of tremendous and fast-growing projects under the CNCF landscape, while the existing query tools can only provide superficial overviews.
+This project aims to simplify the Cloud Native ecosystem by resolving information overload and fragmentation within the CNCF landscape.
 
-Therefore, our primary goal focuses on developing a Cloud Native-focused fine-tuned Large Language Model (LLM) that can answer queries about Kubernetes installations.
-In the meantime, the project provides a scalable and repeatable process to automatically create a structured dataset from the [CNCF landscape](https://landscape.cncf.io/)
-
-By providing immediate, context-aware answers and guidance, this project reduces the learning curve and increases productivity in managing Kubernetes installations. 
-
-Hence, it will be further developed to create AI assistants that will aid developers in navigating and managing Kubernetes environments.
+Our vision is a future where developers and users can effortlessly obtain detailed, context-aware answers about CNCF projects, thereby boosting productivity and enhancing comprehension.
 
 The development of this project follows an open-source and open-model fashion.
 
