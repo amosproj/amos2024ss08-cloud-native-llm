@@ -13,6 +13,7 @@ class QuotesSpider(scrapy.Spider):
     def __init__(self):
         self.link_extractor = scrapy.linkextractors.LinkExtractor(
             allow=[".*docs.*", ".*\.pdf$", ".*\.md$"])
+        self.download_timeout = 5
 
     def start_requests(self):
         urls = []
@@ -30,7 +31,9 @@ class QuotesSpider(scrapy.Spider):
                     if 'homepage_url' not in item or not item.get('homepage_url'):
                         continue
                     urls.append(item.get('homepage_url'))
-
+                    break
+                break
+            break
         for url in urls:
             yield scrapy.Request(url, self.parse)
 

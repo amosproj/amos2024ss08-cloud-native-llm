@@ -124,13 +124,16 @@ def generate_augmented_yml_with_urls():
                 item['repo'] = defaultdict(defaultdict)
                 for ext, url_list in urls.items():
                     item['repo']['download_urls'][ext] = url_list
+                break
+            break
+        break
     with open(OUTPUT_PATH, 'w+') as file:
         yaml.dump(content, file, sort_keys=False)
 
 
 def make_request(url):
     print("making request to url: ", url)
-    response = requests.get(url, headers=HEADERS)
+    response = requests.get(url, headers=HEADERS, timeout=10)
     print(response)
     if 'retry_after' in response.headers:
         logging.warning(

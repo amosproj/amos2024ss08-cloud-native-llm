@@ -35,6 +35,7 @@ setup_virtual_environment() {
     log "Installing required packages from requirements.txt..."
     pip install --upgrade pip
     pip install -r requirements.txt
+    python -m spacy download en_core_web_sm
     log "Required packages installed."
 }
 
