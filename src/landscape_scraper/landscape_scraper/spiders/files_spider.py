@@ -13,7 +13,7 @@ class QuotesSpider(scrapy.Spider):
     def __init__(self):
         self.link_extractor = scrapy.linkextractors.LinkExtractor(
             allow=[".*docs.*", ".*\.pdf$", ".*\.md$"])
-        self.download_timeout = 5
+        self.download_timeout = 30
 
     def start_requests(self):
         urls = []

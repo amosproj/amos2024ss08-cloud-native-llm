@@ -131,7 +131,11 @@ def generate_augmented_yml_with_urls():
 
 def make_request(url):
     print("making request to url: ", url)
-    response = requests.get(url, headers=HEADERS, timeout=10)
+    try:
+        response = requests.get(url, headers=HEADERS, timeout=30)
+    except requests.exceptions.RequestException as e:
+        logging.error(f'Error making request to {url}: {e}')
+        return None
     print(response)
     if 'retry_after' in response.headers:
         logging.warning(

@@ -41,7 +41,7 @@ def downloader(url, output_directory, tags_dict, semaphore):
                 response = requests.get(url, headers={
                                         'Accept': 'application/vnd.github+json', 'X-GitHub-Api-Version': '2022-11-28'})
             else:
-                response = requests.get(url, headers=HEADERS, timeout=10)
+                response = requests.get(url, headers=HEADERS, timeout=30)
             # Handel 429 too many request error
             if response.status_code == 429:
                 print("Too many requests, waiting for 60 seconds")
