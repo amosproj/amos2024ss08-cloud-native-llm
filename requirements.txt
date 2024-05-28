@@ -11,3 +11,5 @@ tqdm==4.66.2
 mock==5.1.0
 numpy == 1.23.2
 langid == 1.1.6
+lmqg==0.1.1
+spacy==3.7.4

@@ -1,3 +1,4 @@
+#!/usr/bin/python3
 from yaml.representer import Representer
 from collections import defaultdict
 import requests
@@ -9,8 +10,8 @@ import logging
 import time
 import collections
 
-# Load GITHUIB_TOKEN from environment variable and if not found set it to "TEST_TOKEN"
-TOKEN = os.getenv('GITHUB_TOKEN', "TEST_TOKEN")
+# Replace with your GitHub token
+TOKEN = os.getenv('GITHUB_TOKEN', 'Replace your token')
 HEADERS = {'Authorization': f'Bearer {TOKEN}',
            'Accept': 'application/vnd.github+json', 'X-GitHub-Api-Version': '2022-11-28'}
 BASE_API_URL = 'https://api.github.com'
@@ -123,12 +124,19 @@ def generate_augmented_yml_with_urls():
                 item['repo'] = defaultdict(defaultdict)
                 for ext, url_list in urls.items():
                     item['repo']['download_urls'][ext] = url_list
+
     with open(OUTPUT_PATH, 'w+') as file:
         yaml.dump(content, file, sort_keys=False)
 
 
 def make_request(url):
-    response = requests.get(url, headers=HEADERS)
+    print("making request to url: ", url)
+    try:
+        response = requests.get(url, headers=HEADERS, timeout=30)
+    except requests.exceptions.RequestException as e:
+        logging.error(f'Error making request to {url}: {e}')
+        return None
+    print(response)
     if 'retry_after' in response.headers:
         logging.warning(
             f'Rate limit exceeded. Retrying after {response.headers["retry-after"]} seconds')
