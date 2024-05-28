@@ -188,7 +188,6 @@ def convert_files_to_json(processed_files, chunk_size, error_file_list, json_fil
                     json.dump(pdf_data_list, json_file, indent=4)
             except Exception as e:
                 logging.error(f"Error writing PDF data: {e}")
-        break
 
 
 def remove_links_from_markdown(content: str) -> str:
