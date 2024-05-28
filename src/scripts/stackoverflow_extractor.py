@@ -12,13 +12,14 @@ CACHE_FILE = 'sources/stackoverflow_cache.json'
 def fetch_with_backoff(api_url, params):
     """Fetch data from the API with exponential backoff for rate limiting."""
     while True:
-        print(f"Fetching data with params: {params}")
+        #print(f"Fetching data with params: {params}")
         response = requests.get(api_url, params=params)
         if response.status_code == 200:
             return response.json()
         elif response.status_code == 429:
             print("Rate limit exceeded. Waiting for retry...")
             retry_after = int(response.headers.get('retry-after', REQUEST_DELAY))
+            print("Retry after " + str(retry_after))
             time.sleep(retry_after)
         else:
             print(f"Failed to fetch data: {response.status_code} - {response.text}")
@@ -39,7 +40,7 @@ def fetch_stackoverflow_questions(tag, search_term, page_size=5, max_pages=2):
             #'q': search_term,
             'site': 'stackoverflow',
             'filter': 'withbody',  # Ensuring the 'body' field is included
-            'key': API_KEY
+            #'key': API_KEY
         }
         
         response_data = fetch_with_backoff(api_url, params)
