@@ -1,12 +1,13 @@
 import os
+import glob
 from concurrent.futures import ThreadPoolExecutor, as_completed
 import re
 import json
 import yaml
-from tqdm import tqdm
 import PyPDF2
 from datetime import datetime
 import logging
+from threading import Lock
 
 # Constants for processing
 MIN_NUMBER_OF_TOKENS = 50  # Example value, adjust as needed
@@ -14,7 +15,7 @@ NUMBER_OF_TOKENS = 600  # Example value, adjust as needed
 
 def convert_datetime_to_str(data):
     if isinstance(data, dict):
-        return {key: convert_datetime_to_str(value) for key, value in data.items()}
+       return {key: convert_datetime_to_str(value) for key, value in data.items()}
     elif isinstance(data, list):
         return [convert_datetime_to_str(item) for item in data]
     elif isinstance(data, datetime):
@@ -61,13 +62,17 @@ def convert_files_to_json(processed_files, chunk_size, error_file_list, json_fil
         os.makedirs(file_paths)
     if not os.path.exists(json_file_path):
         os.makedirs(json_file_path)
-
-    files = os.listdir(file_paths)
+    yaml_lock = Lock()
+    md_lock = Lock()
+    pdf_lock = Lock()
+    error_lock = Lock()
+    processed_files_lock = Lock()
     yaml_data_list = []
     md_data_list = []
     pdf_data_list = []
     processed_urls_count = len(processed_files)
-    total_chunk_size = chunk_size + processed_urls_count
+    file_names = glob.glob(file_paths + "/*/*.*", recursive=True)
+    file_names = file_names + glob.glob(file_paths + "/*.*")
 
     def process_file(file_name):
         nonlocal processed_urls_count
@@ -75,90 +80,110 @@ def convert_files_to_json(processed_files, chunk_size, error_file_list, json_fil
         if file_name in processed_files:
             return None
 
-        file_path = os.path.join(file_paths, file_name)
         lower_file_name = file_name.lower()
 
         if lower_file_name.endswith((".yaml", ".yml")):
+            data = []
             try:
-                with open(file_path, "r", encoding="utf-8") as yaml_file:
+                with open(file_name, "r", encoding="utf-8") as yaml_file:
                     documents = yaml.safe_load_all(yaml_file)
-                    for data in documents:
-                        cleaned_data = convert_datetime_to_str(data)
-                        tag_data = extract_metadata(file_name)
-                        yaml_data_list.append({"tag": tag_data, "content": cleaned_data})
-                processed_files.add(file_name)
+                    for doc in documents:
+                        cleaned_data = convert_datetime_to_str(doc)
+                        data.append({'data': cleaned_data})
+                    tag_data = extract_metadata(file_name.split('/')[-1])
+                with yaml_lock:
+                    yaml_data_list.append({"tag": tag_data, "content": data})
+                with processed_files_lock:
+                    processed_files.add(file_name)
                 processed_urls_count += 1
                 return "yaml"
             except yaml.YAMLError as exc:
                 logging.error(f"Error processing YAML file: {exc}: {file_name}")
-                error_file_list.append(file_name)
-                processed_files.add(file_name)
-                processed_urls_count += 1
+                with error_lock:
+                    error_file_list.append(file_name)
+                with processed_files_lock:
+                    processed_files.add(file_name)
+                    processed_urls_count += 1
                 return None
 
         elif lower_file_name.endswith(".md"):
             try:
-                with open(file_path, "r", encoding="utf-8") as md_file:
+                with open(file_name, "r", encoding="utf-8") as md_file:
                     md_content = md_file.read()
 
                 md_content = re.sub(r'[^\x00-\x7F]+', '', md_content)
                 md_content = remove_links_from_markdown(md_content)
                 md_content = clean_markdown(md_content)
                 words = md_content.split()
+                file_length = len(words)
 
-                if len(words) <= MIN_NUMBER_OF_TOKENS:
+                if file_length <= MIN_NUMBER_OF_TOKENS:
                     processed_files.add(file_name)
                     processed_urls_count += 1
                     print(f"File has less than {MIN_NUMBER_OF_TOKENS} words, skipping file")
                     return None
 
+                splits = int(file_length / NUMBER_OF_TOKENS + 1)
+                split_length = int(file_length / splits)
                 data = []
                 start_index = 0
-                old_index = 0
+                end_index = 0
 
-                for index, word in enumerate(words):
-                    if '#' in word:
-                        if index - start_index < NUMBER_OF_TOKENS + 1:
-                            old_index = index
-                        else:
-                            if old_index - start_index > MIN_NUMBER_OF_TOKENS:
-                                chunk = ' '.join(words[start_index:old_index - 1])
-                                data.append({"data": chunk})
-                                start_index = old_index
-
-                if NUMBER_OF_TOKENS >= len(words) - start_index >= MIN_NUMBER_OF_TOKENS:
-                    chunk = ' '.join(words[start_index:])
+                for i in range(1, splits):
+                    for j in range(split_length):
+                        if "#" in words[split_length * i - j]:
+                            end_index = split_length * i-j-1
+                            break
+                        if "." in words[split_length * i - j]:
+                            end_index = split_length * i - j
+                            break
+                    chunk = ' '.join(words[start_index:end_index])
                     data.append({"data": chunk})
-                elif len(words) - start_index > NUMBER_OF_TOKENS:
-                    chunk = ' '.join(words[start_index:start_index + NUMBER_OF_TOKENS])
-                    data.append({"data": chunk})
+                    start_index = end_index + 1
 
-                tag_data = extract_metadata(file_name)
-                md_data_list.append({"tag": tag_data, "content": data})
-                processed_files.add(file_name)
-                processed_urls_count += 1
+                chunk = ' '.join(words[start_index:start_index + NUMBER_OF_TOKENS])
+                data.append({"data": chunk})
+
+                tag_data = extract_metadata(file_name.split('/')[-1])
+                with md_lock:
+                    md_data_list.append({"tag": tag_data, "content": data})
+                with processed_files_lock:
+                    processed_files.add(file_name)
+                    processed_urls_count += 1
                 return "md"
             except Exception as e:
                 logging.error(f"Error processing Markdown file: {e}: {file_name}")
-                error_file_list.append(file_name)
+                with error_lock:
+                    error_file_list.append(file_name)
+                with processed_files_lock:
+                    processed_files.add(file_name)
+                    processed_urls_count += 1
                 return None
 
         elif lower_file_name.endswith(".pdf"):
+            data = []
             try:
                 content = ''
-                with open(file_path, 'rb') as file:
+                with open(file_name, 'rb') as file:
                     reader = PyPDF2.PdfReader(file)
                     for page in reader.pages:
                         content += page.extract_text()
-
-                tag_data = extract_metadata(file_name)
-                pdf_data_list.append({"tag": tag_data, "content": content})
-                processed_files.add(file_name)
-                processed_urls_count += 1
+                data.append({'data': content})
+                tag_data = extract_metadata(file_name.split('/')[-1])
+                if not content == "":
+                    with pdf_lock:
+                        pdf_data_list.append({"tag": tag_data, "content": data})
+                with processed_files_lock:
+                    processed_files.add(file_name)
+                    processed_urls_count += 1
                 return "pdf"
             except Exception as e:
                 logging.error(f"Error converting PDF to JSON: {e}: {file_name}")
-                error_file_list.append(file_name)
+                with error_lock:
+                    error_file_list.append(file_name)
+                with processed_files_lock:
+                    processed_files.add(file_name)
+                    processed_urls_count += 1
                 return None
 
         return None
@@ -178,8 +203,8 @@ def convert_files_to_json(processed_files, chunk_size, error_file_list, json_fil
             logging.error(f"Error writing JSON data: {e}")
 
     with ThreadPoolExecutor(max_workers=4) as executor:
-        futures = {executor.submit(process_file, file_name): file_name for file_name in files}
-        for future in tqdm(as_completed(futures)):
+        futures = {executor.submit(process_file, file_name): file_name for file_name in file_names}
+        for future in as_completed(futures):
             try:
                 result = future.result()
                 if result:
@@ -241,7 +266,7 @@ def process_error_yaml_file(error_file_list: list, file_paths="sources/raw_files
     yaml_data_list = []
     for error_file in error_file_list:
         try:
-            with open(os.path.join(file_paths, error_file), "r", encoding="utf-8") as yaml_file:
+            with open(error_file, "r", encoding="utf-8") as yaml_file:
                 documents = yaml_file.read()
                 tag_data = extract_metadata(error_file)
                 yaml_data = {"tag": tag_data, "content": documents}
