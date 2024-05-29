@@ -30,8 +30,24 @@ jobs:
           fail: "StrongCopyleft,Error"
       - name: Print copyright report
         run: echo "${{ steps.license_check_report.outputs.report }}"
-  build:
+  lint:
     needs: license
+    name: Lint check
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out repository code
+        uses: actions/checkout@v4
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          cache: "pip"
+      - name: Install Pylint
+        run: pip install pylint
+      - name: Run linter
+        run: pylint src || true
+  build:
+    needs: lint
     if: github.repository == 'amosproj/amos2024ss08-cloud-native-llm' # Don't do this in forks
     runs-on: ubuntu-latest
     steps:

@@ -32,7 +32,8 @@ with open("questions.csv", "w") as f:
 
 
 for i in range(MAX_THREADS):
-    q.append(TransformersQG(language="en", model="lmqg/t5-base-squad-qag",drop_overflow_error_text=True))
+    q.append(TransformersQG(language="en",
+             model="lmqg/t5-base-squad-qag", drop_overflow_error_text=True))
 for date in dataset:
     semaphore = threading.Semaphore(MAX_THREADS)
     threads = []

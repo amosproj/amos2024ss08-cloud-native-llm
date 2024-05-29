@@ -37,6 +37,7 @@ bin/
 
 #Temporary Database
 sources/raw_files
+sources/non_english_files
 # Conda
 .conda
 
@@ -48,3 +49,10 @@ sources/
 
 # json files
 *.json
+
+# env file used to run the entire project
+.env
+
+*.csv
+
+venv/

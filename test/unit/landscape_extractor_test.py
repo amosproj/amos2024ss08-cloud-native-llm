@@ -1,7 +1,7 @@
 import unittest
 import os
 from src.scripts import landscape_extractor
-# from landscape_extactor import download_files_from_yaml
+#from landscape_extactor import download_files_from_yaml
 import zipfile
 
 
@@ -15,6 +15,7 @@ class Testdownload_files_from_yaml(unittest.TestCase):
     def test_with_valid_input(self):
         output_directory = "sources/raw_files_test"
         os.makedirs(output_directory, exist_ok=True)
+        print("soomething")
         expected_zipFile = "sources/Test_Provisioning.zip"
         # Write downloaded content to file
         landscape_extractor.download_files_from_yaml(

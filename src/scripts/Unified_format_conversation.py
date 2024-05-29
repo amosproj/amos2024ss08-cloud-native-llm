@@ -223,10 +223,10 @@ def convert_files_to_json(processed_files, chunk_size, error_file_list, json_fil
 def remove_links_from_markdown(content: str) -> str:
     """
     Remove all markdown links from the provided markdown content.
-    
+
     Args:
     - content (str): The markdown content as a string.
-    
+
     Returns:
     - str: The markdown content with all links removed.
     """
@@ -237,7 +237,8 @@ def remove_links_from_markdown(content: str) -> str:
     reference_link_pattern = re.compile(r'\[.*?\]\[.*?\]')
 
     # Regex pattern to match reference link definitions [id]: url "title"
-    reference_definition_pattern = re.compile(r'^\s*\[.*?\]:\s*.*', re.MULTILINE)
+    reference_definition_pattern = re.compile(
+        r'^\s*\[.*?\]:\s*.*', re.MULTILINE)
 
     # Remove inline links
     content = inline_link_pattern.sub('', content)
@@ -272,7 +273,8 @@ def process_error_yaml_file(error_file_list: list, file_paths="sources/raw_files
                 yaml_data = {"tag": tag_data, "content": documents}
                 yaml_data_list.append(yaml_data)
         except Exception as e:
-            logging.error(f"An error occurred while processing {error_file}: {e}")
+            logging.error(
+                f"An error occurred while processing {error_file}: {e}")
     try:
         with open(os.path.join(json_file_path, "error_yaml_data.json"), "w", encoding='utf-8') as json_file:
             json.dump(yaml_data_list, json_file, indent=4)
@@ -300,9 +302,11 @@ def clean_markdown(markdown_text):
     # Remove horizontal rules
     markdown_text = re.sub(r'---', '', markdown_text)
     # Remove unordered list markers
-    markdown_text = re.sub(r'^\s*[-*+]\s+', '', markdown_text, flags=re.MULTILINE)
+    markdown_text = re.sub(r'^\s*[-*+]\s+', '',
+                           markdown_text, flags=re.MULTILINE)
     # Remove ordered list markers
-    markdown_text = re.sub(r'^\s*\d+\.\s+', '', markdown_text, flags=re.MULTILINE)
+    markdown_text = re.sub(r'^\s*\d+\.\s+', '',
+                           markdown_text, flags=re.MULTILINE)
     # Remove extra spaces and newlines
     markdown_text = re.sub(r'\s+', ' ', markdown_text).strip()
     return markdown_text

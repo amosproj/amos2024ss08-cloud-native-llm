@@ -1,14 +1,26 @@
 import requests
 import yaml
 import os
-from tqdm import tqdm
 import threading
+import langid
+import time
 import shutil
 
 
 # Replace with your GitHub token to increas github API hourly rate to 5000
-TOKEN = "Replace your token"
-HEADERS = {'Authorization': f'Bearer {TOKEN}'}
+TOKEN = os.getenv('GITHUB_TOKEN', 'Replace your token')
+HEADERS = {'Authorization': f'Bearer {TOKEN}',
+           'Accept': 'application/vnd.github+json', 'X-GitHub-Api-Version': '2022-11-28'}
+
+
+def isFileEnglish(content):
+    try:
+        decoded_content = content.decode('utf-8')
+        lang, _ = langid.classify(decoded_content)
+        return lang == 'en'
+    except Exception as e:
+        print("cannot undrestand the language of the file:", e)
+        return True
 
 
 def downloader(url, output_directory, tags_dict, semaphore):
@@ -23,11 +35,17 @@ def downloader(url, output_directory, tags_dict, semaphore):
     """
     with semaphore:
         try:
+            print(f"Downloading file from {url}")
             # Send HTTP GET request to download the file
             if TOKEN == "Replace your token":
-                response = requests.get(url)
+                response = requests.get(url, headers={
+                                        'Accept': 'application/vnd.github+json', 'X-GitHub-Api-Version': '2022-11-28'})
             else:
-                response = requests.get(url, headers=HEADERS)
+                response = requests.get(url, headers=HEADERS, timeout=30)
+            # Handel 429 too many request error
+            if response.status_code == 429:
+                print("Too many requests, waiting for 60 seconds")
+                time.sleep(int(response.headers["Retry-After"]))
             response.raise_for_status()  # Raise an exception for HTTP errors
             # Extract filename from URL
             filename = os.path.basename(url)
@@ -35,10 +53,20 @@ def downloader(url, output_directory, tags_dict, semaphore):
             # Seperate tags with "_"
             filename = tags_dict['Category'] + "_" + tags_dict['Subcategory'] + \
                 "_" + tags_dict['Project_name'] + "_" + filename
-
-            # Write downloaded content to file
-            with open(os.path.join(output_directory, filename), 'wb') as f:
-                f.write(response.content)
+            # if the file is in English dowload it
+            if isFileEnglish(response.content):
+                # Write downloaded content to file
+                with open(os.path.join(output_directory, filename), 'wb') as f:
+                    f.write(response.content)
+            else:
+                none_eng_dir = output_directory
+                none_eng_dir = none_eng_dir.split("/")[0]
+                none_eng_dir = none_eng_dir + "/non_english_files"
+                # Create the directory if it doesn't exist
+                if not os.path.exists(none_eng_dir):
+                    os.makedirs(none_eng_dir)
+                with open(os.path.join(none_eng_dir, filename), 'wb') as f:
+                    f.write(response.content)
 
         except Exception as e:
             print(f"Failed to download file from {url}: {e}")
@@ -84,32 +112,36 @@ def download_files_from_yaml(yaml_file="../../sources/landscape_augmented_repos_
     # Load URLs from YAML file
     with open(yaml_file, 'r') as f:
         data = yaml.safe_load(f)
-    print(data)
+
     # Create output directory if it doesn't exist
     os.makedirs(output_directory, exist_ok=True)
     # Initialize a dictionary to save tags corresponding to each file
     tags_dict = {'Category': "", 'Subcategory': "", 'Project_name': ""}
     # Process the loaded data
     for category in data['landscape']:
-        # Use below block if already downloaded a category and you don't want to downloaded it again.
-        #    if category['name'] == "Provisioning":
-        #        continue
+        # It downloads only below defined categories to avoid duplication
+        category_list = ["App Definition and Development", "Orchestration & Management", "Runtime",
+                         "Provisioning", "Observability and Analysis", "Test_Provisioning"]
+        if category['name'] not in category_list:
+            continue
         tags_dict['Category'] = category['name']
         print(f"Category: {tags_dict['Category']}")
         for subcategory in category.get('subcategories', []):
             tags_dict['Subcategory'] = subcategory['name']
             print(f"Subcategory: {tags_dict['Subcategory']}")
-            for item in tqdm(subcategory.get('items', [])):
+            for item in subcategory.get('items', []):
                 tags_dict['Project_name'] = item['name']
                 print(f"Item: {tags_dict['Project_name']}")
                 repo = item.get('repo', {})
                 downloader_multi_thread(
                     repo.get('download_urls', []), output_directory, tags_dict)
+        # downloader_multi_thread(
+        #    item.get('download_urls', []), output_directory, tags_dict)
         # Adding all the files corresponding to a category to a zip file
         shutil.make_archive(
             "sources/" + tags_dict['Category'], 'zip', output_directory+"/")
         # Removing remminig raw files after archiving
-        shutil.rmtree(output_directory)
+        # shutil.rmtree(output_directory)
         # Creat dirrectory for next category
         os.makedirs(output_directory, exist_ok=True)
 
