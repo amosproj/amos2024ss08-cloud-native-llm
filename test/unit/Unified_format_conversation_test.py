@@ -9,6 +9,10 @@ import PyPDF2
 from src.scripts.Unified_format_conversation import (
     extract_metadata, convert_files_to_json, process_error_yaml_file
 )
+import random
+import string
+from reportlab.lib.pagesizes import letter
+from reportlab.pdfgen import canvas
 
 class TestFileProcessing(unittest.TestCase):
 
@@ -18,7 +22,7 @@ class TestFileProcessing(unittest.TestCase):
         os.makedirs(self.json_dir, exist_ok=True)
         self.processed_files = set()
         self.error_file_list = []
-        self.chunk_size = 4
+        self.chunk_size = 10
 
         self.sample_yaml_file = os.path.join(self.test_dir, 'category_subcategory_project_sample.yaml')
         self.sample_md_file = os.path.join(self.test_dir, 'category_subcategory_project_sample.md')
@@ -29,15 +33,13 @@ class TestFileProcessing(unittest.TestCase):
             yaml.dump([{'step': 'first', 'description': 'This is the first step'}, {'step': 'second', 'description': 'This is the second step'}], f)
 
         with open(self.sample_md_file, 'w', encoding='utf-8') as f:
-            f.write("# Heading 1\nContent under heading 1\n## Subheading 1.1\nContent under subheading 1.1\n #More Heading\n Content Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et")
+            f.write(generate_random_text(10000))
 
-        with open(self.sample_pdf_file, 'wb') as f:
-            pdf_writer = PyPDF2.PdfWriter()
-            pdf_writer.add_blank_page(width=72, height=72)
-            pdf_writer.write(f)
+        create_random_pdf(self.sample_pdf_file)
 
         with open(self.error_yaml_file, 'w', encoding='utf-8') as f:
             f.write("This is an invalid YAML content: {missing_quotes: value\n")
+
 
     def tearDown(self):
         shutil.rmtree(self.test_dir)
@@ -76,6 +78,7 @@ class TestFileProcessing(unittest.TestCase):
 
         with open(os.path.join(self.json_dir, 'md_data.json'), 'r', encoding='utf-8') as f:
             md_data = json.load(f)
+
         self.assertEqual(len(md_data), 1)
         self.assertEqual(md_data[0]['tag']['file_name'], 'sample.md')
 
@@ -91,6 +94,28 @@ class TestFileProcessing(unittest.TestCase):
             self.assertEqual(len(pdf_data), 1)
             self.assertEqual(pdf_data[0]['tag']['file_name'], 'sample.pdf')
 
+
+# Generate random text
+def generate_random_text(num_words=100):
+    words = []
+    for _ in range(num_words):
+        word_length = random.randint(3, 10)  # Random word length between 3 and 10
+        word = ''.join(random.choices(string.ascii_lowercase, k=word_length))
+        words.append(word)
+    return ' '.join(words)
+
+# Create a PDF file with random content
+def create_random_pdf(pdf_path):
+    c = canvas.Canvas(pdf_path, pagesize=letter)
+    width, height = letter
+
+    # Add some random content
+    for i in range(10):  # Generate 10 lines of random text
+        text = generate_random_text(50)
+        c.drawString(100, height - 100 - (i * 20), text)
+
+    c.showPage()
+    c.save()
 
 if __name__ == '__main__':
     unittest.main()
