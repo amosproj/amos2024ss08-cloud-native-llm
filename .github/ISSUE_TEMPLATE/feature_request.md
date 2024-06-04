@@ -20,7 +20,7 @@ assignees: ''
 ## Definition of done (DoD)
 * Bill of Materials in the planning document has been updated
 * All the complex logics have been tested
-* All feature branches have been mergened and closed
+* All feature branches have been merged and closed
 * New feature code has been documented
 * Potential new licenses have been checked
 * All GitHub Actions are passing
