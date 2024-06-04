@@ -14,3 +14,10 @@ numpy == 1.23.2
 langid == 1.1.6
 lmqg==0.1.1
 spacy==3.7.4
+accelerate==0.30.1
+transformers==4.41.1
+torch==2.3.0+cu121
+re==2.2.1
+peft==0.11.1
+bitsandbytes==0.43.1
+trl==0.8.6
