@@ -18,9 +18,13 @@ assignees: ''
 * ...
 
 ## Definition of done (DoD)
-* Added only after week 5
-* The same for all features
-* Here goes the project specific part
+* Bill of Materials in the planning document has been updated
+* All the complex logics have been tested
+* All feature branches have been mergened and closed
+* New feature code has been documented
+* Potential new licenses have been checked
+* All GitHub Actions are passing
+* The requirement.txt is updated
 
 ## DoD general criteria
 * Feature has been fully implemented
