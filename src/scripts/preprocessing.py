@@ -27,7 +27,7 @@ def merge_data():
     merged_df = pd.concat([df1_selected, df2_selected])
 
     # Save the merged DataFrame to a new CSV file
-    merged_df.to_csv('merged_qas.csv', index=False)
+    merged_df.to_csv('sources/merged_qas.csv', index=False)
 
     print("Columns merged and saved successfully!")
 
