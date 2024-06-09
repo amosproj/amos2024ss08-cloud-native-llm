@@ -81,5 +81,4 @@ if __name__ == "__main__":
         sys.exit(1)
 
     f = get_file_paths(directory_path)
-    print(f)
     upload_files_to_huggingface(f, repo_id, directory_path)
