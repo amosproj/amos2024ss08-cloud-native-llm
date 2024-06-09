@@ -4,8 +4,26 @@ import shutil
 import requests
 from bs4 import BeautifulSoup
 import pandas as pd
-
-
+import threading
+import re
+def save_doc_to_pdf(url, output_directory, tags):
+    export_url = "https://docs.google.com/document/export?format={}&id={}".format('pdf', url.split('/')[-2])
+    # Send GET request to export URL
+    response = requests.get(export_url)
+    filename = os.path.join(
+        output_directory,
+        tags["Category"]
+        + "_"
+        + tags["Subcategory"]
+        + "_"
+        + tags["Project_name"]
+        + "_"
+        + tags["filename"]
+        + ".pdf",
+    )
+    # Write the response content (PDF data) to a file
+    with open(filename, 'wb') as f:
+        f.write(response.content)
 def save_strings_to_md(string, output_dir, tags):
     # Ensure the output directory exists
     if not os.path.exists(output_dir):
@@ -17,49 +35,78 @@ def save_strings_to_md(string, output_dir, tags):
         + tags["Subcategory"]
         + "_"
         + tags["Project_name"]
+        + "_"
+        + tags["filename"]
         + ".md",
     )
     # Write the content to the file
     with open(filename, "w", encoding="utf-8") as file:
         file.write(string)
+def downloader(url: str, output_directory: str, tags: dict, semaphore):
+    
+    with semaphore:
+        
+        try:
+            # check if it is a link to google doc
+            if url.startswith("https://docs.google.com/document/"):
+                # download the google doc in pdf format
+                save_doc_to_pdf(url, output_directory, tags)
+                # dont continue with further scraping
+                return None
+                
+            # Send a GET request to the webpage
+            response = requests.get(url)
+            response.raise_for_status()  # Raise HTTPError for bad responses
+            temp = ""
+            # Remove any characters that are invalid in filenames
+            filename = os.path.basename(url)
+            # Remove any characters that are invalid in filenames
+            tags["filename"] = re.sub(r'[<>:"/\\|?*]', '_', filename)
+            # Check if the request was successful
+            if response.status_code == 200:
+                # Parse the content of the response with BeautifulSoup
+                soup = BeautifulSoup(response.content, "lxml")
 
+                body = soup.body
+                if body:
+                    for element in body.descendants:
+                        if element.name == "p":
+                            temp += element.get_text()
+                            temp += "\n"
+                        elif element.name == "pre":
+                            temp += "```\n" + element.get_text() + "```"
+                            temp += "\n"
+                        elif element.name == "table":
+                            df = pd.read_html(str(element))[0]
+                            temp += df.to_markdown(index=False)
+                            temp += "\n"
+
+                    # print(temp)
+                    save_strings_to_md(temp, output_directory, tags)
+            else:
+                print(
+                    f"Failed to retrieve the webpage. Status code: {response.status_code}"
+                )
+        except Exception as e:
+            print(f"Failed to retrieve the webpage: {url}. Error: {e}")
 
 def extract_text(links: list, output_directory: str, tags: dict):
+    
+    max_threads = 16
+    semaphore = threading.Semaphore(max_threads)
+    threads = []
     for url in links:
-
-        # Send a GET request to the webpage
-        response = requests.get(url)
-        temp = ""
-
-        # Check if the request was successful
-        if response.status_code == 200:
-            # Parse the content of the response with BeautifulSoup
-            soup = BeautifulSoup(response.content, "lxml")
-
-            body = soup.body
-            if body:
-                for element in body.descendants:
-                    if element.name == "p":
-                        temp += element.get_text()
-                        temp += "\n"
-                    elif element.name == "pre":
-                        temp += "```\n" + element.get_text() + "```"
-                        temp += "\n"
-                    elif element.name == "table":
-                        df = pd.read_html(str(element))[0]
-                        temp += df.to_markdown(index=False)
-                        temp += "\n"
-
-                # print(temp)
-                save_strings_to_md(temp, output_directory, tags)
-        else:
-            print(
-                f"Failed to retrieve the webpage. Status code: {response.status_code}"
-            )
+        thread = threading.Thread(target=downloader, args=(
+            url, output_directory, tags, semaphore))
+        threads.append(thread)
+        thread.start()
+    for thread in threads:
+        thread.join()
+    
 
 
 def download_files_from_yaml(
-    yaml_file="../../sources/test_landscape_augmented.yml",
+    yaml_file="../../sources/landscape_augmented_repos_websites.yml",
     output_directory="sources/raw_files",
 ):
     """
@@ -77,7 +124,7 @@ def download_files_from_yaml(
     # Create output directory if it doesn't exist
     os.makedirs(output_directory, exist_ok=True)
     # Initialize a dictionary to save tags corresponding to each file
-    tags_dict = {"Category": "", "Subcategory": "", "Project_name": ""}
+    tags_dict = {"Category": "", "Subcategory": "", "Project_name": "", "filename": ""}
     # Process the loaded data
     for category in data["landscape"]:
         # It downloads only below defined categories to avoid duplication
