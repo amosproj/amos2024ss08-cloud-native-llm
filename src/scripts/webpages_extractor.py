@@ -3,6 +3,7 @@ import os
 import shutil
 import requests
 from bs4 import BeautifulSoup
+import pandas as pd
 
 
 def save_strings_to_md(string, output_dir, tags):
@@ -43,6 +44,10 @@ def extract_text(links: list, output_directory: str, tags: dict):
                         temp += "\n"
                     elif element.name == "pre":
                         temp += "```\n" + element.get_text() + "```"
+                        temp += "\n"
+                    elif element.name == "table":
+                        df = pd.read_html(str(element))[0]
+                        temp += df.to_markdown(index=False)
                         temp += "\n"
 
                 # print(temp)
@@ -97,14 +102,14 @@ def download_files_from_yaml(
                 website = item.get("website", {})
                 extract_text(website.get("docs", []), output_directory, tags_dict)
                 
-        # Adding all the files corresponding to a category to a zip file
-        shutil.make_archive(
-            "sources/" + tags_dict["Category"], "zip", output_directory + "/"
-        )
-        # Removing remminig raw files after archiving
-        # shutil.rmtree(output_directory)
-        # Creat dirrectory for next category
-        os.makedirs(output_directory, exist_ok=True)
+    # Adding all the files corresponding to a category to a zip file
+    shutil.make_archive(
+        "sources/" + "webpages_documentations", "zip", output_directory + "/"
+    )
+    # Removing remminig raw files after archiving
+    # shutil.rmtree(output_directory)
+    # Creat dirrectory for next category
+    #os.makedirs(output_directory, exist_ok=True)
 
 
 # Example usage:
