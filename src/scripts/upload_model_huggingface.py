@@ -28,7 +28,8 @@ def get_file_paths(directory_path, base_path="", res=None):
                        if base_path else element)
         else:
             get_file_paths(os.path.join(directory_path, element),
-                           os.path.join(base_path, element), res)
+                           "/".join([base_path, element])
+                           if base_path else element, res)
 
     return res
 
