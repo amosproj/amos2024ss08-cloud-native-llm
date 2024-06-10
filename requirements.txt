@@ -20,3 +20,4 @@ torch==2.3.0
 peft==0.11.1
 bitsandbytes==0.43.1
 trl==0.8.6
+peft==0.11.1
