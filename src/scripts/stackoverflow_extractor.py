@@ -15,7 +15,7 @@ CSV_FILE = 'sources/stackoverflow_Q&A/cncf_stackoverflow_qas.csv'
 PROCESSED_IDS_FILE = 'sources/stackoverflow_Q&A/processed_question_ids.json'
 TAGS_FILE = 'sources/stackoverflow_Q&A/tags.json'
 TAGS_UPDATE_INTERVAL = 7  # Number of days between tag updates
-DAILY_REQUEST_LIMIT = 9000
+DAILY_REQUEST_LIMIT = 9200
 
 
 def fetch_with_backoff(api_url, params):
