@@ -75,10 +75,10 @@ class TestStackOverflowQAScript(unittest.TestCase):
 
         mock_get.side_effect = [mock_response_questions, mock_response_answers]
 
-        with patch('stackoverflow_extractor.fetch_answers', return_value=[{"body": "<p>Answer</p>", "score": 1}]):
-            with patch('stackoverflow_extractor.load_processed_question_ids', return_value=set()):
-                with patch('stackoverflow_extractor.save_processed_question_ids'):
-                    with patch('stackoverflow_extractor.save_to_csv'):
+        with patch('src.scripts.stackoverflow_extractor.fetch_answers', return_value=[{"body": "<p>Answer</p>", "score": 1}]):
+            with patch('src.scripts.stackoverflow_extractor.load_processed_question_ids', return_value=set()):
+                with patch('src.scripts.stackoverflow_extractor.save_processed_question_ids'):
+                    with patch('src.scripts.stackoverflow_extractor.save_to_csv'):
                         request_count = 0
                         tag = "test"
                         start_page = 1
