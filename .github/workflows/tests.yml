@@ -1,4 +1,4 @@
-name: Deep CNCF CI
+name: Test Web
 on:
   push:
     paths:
