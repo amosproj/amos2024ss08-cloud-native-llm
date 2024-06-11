@@ -8,14 +8,14 @@ import os
 import sys
 from datetime import datetime, timedelta
 
-API_KEY = ''  # Replace with your actual API key of stackexchange
+API_KEY = 'UYpHRUmUXXUyBWixB4l79Q(('  # Replace with your actual API key of stackexchange 9voMDokb2mzeteewaiUXaw(( UYpHRUmUXXUyBWixB4l79Q((
 REQUEST_DELAY = 0  # Number of seconds to wait between requests
-PROGRESS_FILE = 'sources/stackoverflow_progress.json'
-CSV_FILE = 'sources/cncf_stackoverflow_qas.csv'
-PROCESSED_IDS_FILE = 'sources/processed_question_ids.json'
-TAGS_FILE = 'sources/tags.json'
+PROGRESS_FILE = 'sources/stackoverflow_Q&A/stackoverflow_progress.json'
+CSV_FILE = 'sources/stackoverflow_Q&A/cncf_stackoverflow_qas.csv'
+PROCESSED_IDS_FILE = 'sources/stackoverflow_Q&A/processed_question_ids.json'
+TAGS_FILE = 'sources/stackoverflow_Q&A/tags.json'
 TAGS_UPDATE_INTERVAL = 7  # Number of days between tag updates
-DAILY_REQUEST_LIMIT = 9000
+DAILY_REQUEST_LIMIT = 6000
 
 
 def fetch_with_backoff(api_url, params):
@@ -116,15 +116,17 @@ def qa_extractor(request_count, tag, start_page, page_size=100,):
                     
                     # Add question ID to the set of processed IDs
                     processed_question_ids.add(question_id)
+                    
+            print(f"Fetched {len(response_data['items'])} questions from page {start_page} for tag '{tag}'. Total so far: {len(questions)}")
+            save_to_csv(QA_list, CSV_FILE)
+            save_processed_question_ids(processed_question_ids)
             
             has_more = response_data.get('has_more', False)
             if not has_more:
                 save_progress(tag, "finished")
                 break
             
-            print(f"Fetched {len(response_data['items'])} questions from page {start_page} for tag '{tag}'. Total so far: {len(questions)}")
-            save_to_csv(QA_list, CSV_FILE)
-            save_processed_question_ids(processed_question_ids)
+            
             start_page += 1
             save_progress(tag, start_page)
             time.sleep(REQUEST_DELAY)  # Add delay between requests to avoid rate limiting
@@ -278,7 +280,7 @@ def load_tags():
                 return tags_data['tags']
     
     # If the JSON file doesn't exist or is older than the update interval, load from YAML
-    with open("sourcesl/andscape_augmented.yml", 'r') as f:
+    with open("sources/landscape_augmented_repos.yml", 'r') as f:
         data = yaml.safe_load(f)
     
     tags = []
@@ -308,7 +310,15 @@ def load_tags():
     return tags
 
 if __name__ == "__main__":
+    # Define the path to the folder
+    folder_path = 'sources/stackoverflow_Q&A'
+
+    # Check if the folder exists
+    if not os.path.exists(folder_path):
+        # If the folder does not exist, create it
+        os.makedirs(folder_path)
     tags = load_tags()
     request_count = 0
+    
     # Extract and save QA pairs incrementally
     extract_all_projects(tags, request_count)
