@@ -8,7 +8,7 @@ import os
 import sys
 from datetime import datetime, timedelta
 
-API_KEY = 'UYpHRUmUXXUyBWixB4l79Q(('  # Replace with your actual API key of stackexchange 9voMDokb2mzeteewaiUXaw(( UYpHRUmUXXUyBWixB4l79Q((
+API_KEY = ''  # Replace with your actual API key of stackexchange 
 REQUEST_DELAY = 0  # Number of seconds to wait between requests
 PROGRESS_FILE = 'sources/stackoverflow_Q&A/stackoverflow_progress.json'
 CSV_FILE = 'sources/stackoverflow_Q&A/cncf_stackoverflow_qas.csv'
