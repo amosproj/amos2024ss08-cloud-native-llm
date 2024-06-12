@@ -8,14 +8,14 @@ import os
 import sys
 from datetime import datetime, timedelta
 
-API_KEY = ''  # Replace with your actual API key of stackexchange 
+API_KEY = ''  # Replace with your actual API key of stackexchange 9voMDokb2mzeteewaiUXaw(( UYpHRUmUXXUyBWixB4l79Q((
 REQUEST_DELAY = 0  # Number of seconds to wait between requests
 PROGRESS_FILE = 'sources/stackoverflow_Q&A/stackoverflow_progress.json'
 CSV_FILE = 'sources/stackoverflow_Q&A/cncf_stackoverflow_qas.csv'
 PROCESSED_IDS_FILE = 'sources/stackoverflow_Q&A/processed_question_ids.json'
 TAGS_FILE = 'sources/stackoverflow_Q&A/tags.json'
 TAGS_UPDATE_INTERVAL = 7  # Number of days between tag updates
-DAILY_REQUEST_LIMIT = 9200
+DAILY_REQUEST_LIMIT = 9000
 
 
 def fetch_with_backoff(api_url, params):
@@ -238,8 +238,13 @@ def save_progress(tag, page):
     """
     progress = load_progress()
     progress[tag] = page
-    with open(PROGRESS_FILE, 'w') as f:
-        json.dump(progress, f)
+    try:
+        with open(PROGRESS_FILE, 'w') as f:
+            json.dump(progress, f)
+    except FileNotFoundError:
+        os.makedirs(os.path.dirname(PROGRESS_FILE))
+        with open(PROGRESS_FILE, 'w') as f:
+            json.dump(progress, f)
 
 def load_processed_question_ids():
     """Load processed question IDs from file.

@@ -1,5 +1,5 @@
 import unittest
-from unittest.mock import patch, mock_open, MagicMock
+from unittest.mock import patch, MagicMock, mock_open
 import requests
 import json
 import os
@@ -7,6 +7,7 @@ import pandas as pd
 from bs4 import BeautifulSoup
 from datetime import datetime, timedelta
 import yaml
+import tempfile
 
 API_KEY = 'test_api_key'
 REQUEST_DELAY = 0
@@ -22,12 +23,20 @@ from src.scripts.stackoverflow_extractor import fetch_with_backoff, qa_extractor
 class TestStackOverflowQAScript(unittest.TestCase):
 
     def setUp(self):
-        pass
+        self.temp_dir = tempfile.TemporaryDirectory()
+        self.progress_file = os.path.join(self.temp_dir.name, 'test_progress.json')
+        self.csv_file = os.path.join(self.temp_dir.name, 'test_qas.csv')
+        self.processed_ids_file = os.path.join(self.temp_dir.name, 'test_processed_question_ids.json')
+        self.tags_file = os.path.join(self.temp_dir.name, 'test_tags.json')
+
+        global PROGRESS_FILE, CSV_FILE, PROCESSED_IDS_FILE, TAGS_FILE
+        PROGRESS_FILE = self.progress_file
+        CSV_FILE = self.csv_file
+        PROCESSED_IDS_FILE = self.processed_ids_file
+        TAGS_FILE = self.tags_file
 
     def tearDown(self):
-        for file in [PROGRESS_FILE, CSV_FILE, PROCESSED_IDS_FILE, TAGS_FILE]:
-            if os.path.exists(file):
-                os.remove(file)
+        self.temp_dir.cleanup()
 
     @patch('requests.get')
     def test_fetch_with_backoff_success(self, mock_get):
@@ -75,10 +84,10 @@ class TestStackOverflowQAScript(unittest.TestCase):
 
         mock_get.side_effect = [mock_response_questions, mock_response_answers]
 
-        with patch('src.scripts.stackoverflow_extractor.fetch_answers', return_value=[{"body": "<p>Answer</p>", "score": 1}]):
-            with patch('src.scripts.stackoverflow_extractor.load_processed_question_ids', return_value=set()):
-                with patch('src.scripts.stackoverflow_extractor.save_processed_question_ids'):
-                    with patch('src.scripts.stackoverflow_extractor.save_to_csv'):
+        with patch('stackoverflow_extractor.fetch_answers', return_value=[{"body": "<p>Answer</p>", "score": 1}]):
+            with patch('stackoverflow_extractor.load_processed_question_ids', return_value=set()):
+                with patch('stackoverflow_extractor.save_processed_question_ids'):
+                    with patch('stackoverflow_extractor.save_to_csv'):
                         request_count = 0
                         tag = "test"
                         start_page = 1
