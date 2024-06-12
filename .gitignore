@@ -56,3 +56,5 @@ sources/
 *.csv
 
 venv/
+
+model/
