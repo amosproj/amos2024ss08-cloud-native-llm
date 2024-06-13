@@ -8,6 +8,12 @@ from bs4 import BeautifulSoup
 from datetime import datetime, timedelta
 import yaml
 import tempfile
+import sys
+
+# Add the root of the project to the Python path
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '../..')))
+from src.scripts import stackoverflow_extractor
+
 
 API_KEY = 'test_api_key'
 REQUEST_DELAY = 0
@@ -17,8 +23,6 @@ PROCESSED_IDS_FILE = 'test_processed_question_ids.json'
 TAGS_FILE = 'test_tags.json'
 TAGS_UPDATE_INTERVAL = 7
 DAILY_REQUEST_LIMIT = 3000
-
-from src.scripts.stackoverflow_extractor import fetch_with_backoff, qa_extractor, fetch_answers, remove_html_tags, save_to_csv, load_tags
 
 class TestStackOverflowQAScript(unittest.TestCase):
 
@@ -48,7 +52,7 @@ class TestStackOverflowQAScript(unittest.TestCase):
         api_url = "http://example.com"
         params = {}
 
-        response = fetch_with_backoff(api_url, params)
+        response = stackoverflow_extractor.fetch_with_backoff(api_url, params)
         self.assertEqual(response, {"items": []})
 
     @patch('requests.get')
@@ -62,7 +66,7 @@ class TestStackOverflowQAScript(unittest.TestCase):
         params = {}
 
         with self.assertRaises(SystemExit):
-            fetch_with_backoff(api_url, params)
+            stackoverflow_extractor.fetch_with_backoff(api_url, params)
 
     @patch('requests.get')
     def test_qa_extractor(self, mock_get):
@@ -84,24 +88,24 @@ class TestStackOverflowQAScript(unittest.TestCase):
 
         mock_get.side_effect = [mock_response_questions, mock_response_answers]
 
-        with patch('stackoverflow_extractor.fetch_answers', return_value=[{"body": "<p>Answer</p>", "score": 1}]):
-            with patch('stackoverflow_extractor.load_processed_question_ids', return_value=set()):
-                with patch('stackoverflow_extractor.save_processed_question_ids'):
-                    with patch('stackoverflow_extractor.save_to_csv'):
+        with patch('src.scripts.stackoverflow_extractor.fetch_answers', return_value=[{"body": "<p>Answer</p>", "score": 1}]):
+            with patch('src.scripts.stackoverflow_extractor.load_processed_question_ids', return_value=set()):
+                with patch('src.scripts.stackoverflow_extractor.save_processed_question_ids'):
+                    with patch('src.scripts.stackoverflow_extractor.save_to_csv'):
                         request_count = 0
                         tag = "test"
                         start_page = 1
-                        new_request_count = qa_extractor(request_count, tag, start_page)
+                        new_request_count = stackoverflow_extractor.qa_extractor(request_count, tag, start_page)
                         self.assertEqual(new_request_count, 2)
 
     def test_remove_html_tags(self):
         html = "<p>This is a <b>test</b>.</p>"
-        text = remove_html_tags(html)
+        text = stackoverflow_extractor.remove_html_tags(html)
         self.assertEqual(text, "This is a test.")
 
     def test_save_to_csv(self):
         data = [{"question": "Q1", "answer": "A1", "tag": "test"}]
-        save_to_csv(data, CSV_FILE)
+        stackoverflow_extractor.save_to_csv(data, CSV_FILE)
 
         df = pd.read_csv(CSV_FILE)
         self.assertEqual(len(df), 1)
@@ -113,7 +117,7 @@ class TestStackOverflowQAScript(unittest.TestCase):
     def test_load_tags_from_json(self, mock_file):
         with patch('os.path.exists', return_value=True):
             with patch('json.load', return_value={'tags': ['test'], 'last_update': (datetime.now() - timedelta(days=1)).strftime("%Y-%m-%d")}):
-                tags = load_tags()
+                tags = stackoverflow_extractor.load_tags()
                 self.assertEqual(tags, ['test'])
 
     @patch('yaml.safe_load')
@@ -135,7 +139,7 @@ class TestStackOverflowQAScript(unittest.TestCase):
         }
 
         with patch('os.path.exists', return_value=False):
-            tags = load_tags()
+            tags = stackoverflow_extractor.load_tags()
             self.assertEqual(tags, ['Project'])
 
 if __name__ == '__main__':
