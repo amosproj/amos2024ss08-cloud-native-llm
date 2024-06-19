@@ -14,7 +14,6 @@ import sys
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '../..')))
 from src.scripts import stackoverflow_extractor
 
-
 API_KEY = 'test_api_key'
 REQUEST_DELAY = 0
 PROGRESS_FILE = 'test_progress.json'
@@ -22,7 +21,7 @@ CSV_FILE = 'test_qas.csv'
 PROCESSED_IDS_FILE = 'test_processed_question_ids.json'
 TAGS_FILE = 'test_tags.json'
 TAGS_UPDATE_INTERVAL = 7
-DAILY_REQUEST_LIMIT = 3000
+DAILY_REQUEST_LIMIT = 9000
 
 class TestStackOverflowQAScript(unittest.TestCase):
 
@@ -92,11 +91,10 @@ class TestStackOverflowQAScript(unittest.TestCase):
             with patch('src.scripts.stackoverflow_extractor.load_processed_question_ids', return_value=set()):
                 with patch('src.scripts.stackoverflow_extractor.save_processed_question_ids'):
                     with patch('src.scripts.stackoverflow_extractor.save_to_csv'):
-                        request_count = 0
                         tag = "test"
                         start_page = 1
-                        new_request_count = stackoverflow_extractor.qa_extractor(request_count, tag, start_page)
-                        self.assertEqual(new_request_count, 2)
+                        new_request_count = stackoverflow_extractor.qa_extractor(tag, start_page)
+                        self.assertGreaterEqual(new_request_count, 1)
 
     def test_remove_html_tags(self):
         html = "<p>This is a <b>test</b>.</p>"

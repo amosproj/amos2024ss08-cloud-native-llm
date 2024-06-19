@@ -10,8 +10,8 @@ import logging
 import time
 import collections
 
-# Replace with your GitHub token
-TOKEN = os.getenv('GITHUB_TOKEN', 'Replace your token')
+
+TOKEN = os.getenv('GITHUB_TOKEN', "Replace your token")
 HEADERS = {'Authorization': f'Bearer {TOKEN}',
            'Accept': 'application/vnd.github+json', 'X-GitHub-Api-Version': '2022-11-28'}
 BASE_API_URL = 'https://api.github.com'
@@ -69,14 +69,14 @@ def get_urls(repo_url: str, default_branch: str = "", tree_sha: str = "", file_p
 
     for file in tree:
         ext = file.get('path').split('.')[-1]
-        new_file_path = file_path + "/" + \
-            file.get('path') if file_path else file.get('path')
+        new_file_path = f"{file_path}/{file['path']}" if file_path else file['path']
         if file.get('type') == 'blob' and ext in EXTENSIONS:
             res[ext].append(base_download_url + new_file_path)
 
         if truncated and file.get('type') == 'tree':
-            get_urls(repo_url, default_branch, file.get(
-                'sha'), new_file_path, res)
+            logging.debug(f'Recursively fetching URLs for path {new_file_path}')
+            get_urls(repo_url, default_branch, file.get('sha'), new_file_path, res)
+
 
     return res
 
@@ -136,7 +136,7 @@ def make_request(url):
     except requests.exceptions.RequestException as e:
         logging.error(f'Error making request to {url}: {e}')
         return None
-    print(response)
+
     if 'retry_after' in response.headers:
         logging.warning(
             f'Rate limit exceeded. Retrying after {response.headers["retry-after"]} seconds')
@@ -146,9 +146,8 @@ def make_request(url):
             f'Rate limit exceeded. Retrying after {response.headers["x-ratelimit-remaining"]} seconds')
         time.sleep(int(response.headers['x-ratelimit-reset']))
 
-    response = requests.get(url, headers=HEADERS)
-
     return response
+
 
 
 if __name__ == '__main__':

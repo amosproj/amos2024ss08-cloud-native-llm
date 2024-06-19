@@ -1,8 +1,10 @@
 import unittest
 import mock
 from unittest.mock import Mock
+import os
+import sys
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '../..')))
 from src.scripts import landscape_explorer
-
 
 def mocked_requests_get(*args, **kwargs):
     class MockResponse:

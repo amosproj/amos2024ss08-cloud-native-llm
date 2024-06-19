@@ -8,12 +8,13 @@ import PyPDF2
 from datetime import datetime
 import logging
 from threading import Lock
-
+import multiprocessing
+from typing import Any, List, Set
 # Constants for processing
 MIN_NUMBER_OF_TOKENS = 50  # Example value, adjust as needed
 NUMBER_OF_TOKENS = 600  # Example value, adjust as needed
 
-def convert_datetime_to_str(data):
+def convert_datetime_to_str(data: Any) -> Any:
     if isinstance(data, dict):
        return {key: convert_datetime_to_str(value) for key, value in data.items()}
     elif isinstance(data, list):
@@ -27,13 +28,16 @@ def extract_metadata(file_name: str) -> dict:
     """Extracts metadata from the file name.
 
     Args:
-        error_file (str): The name of the file.
-        file name is usee as Tag from where data is coming from
+        file_name (str): The full path of the file.
+        file name is used as Tag from where data is coming from
 
     Returns:
         dict: A dictionary containing metadata information.
     """
-    parts = file_name.split('_')
+    # Extract the file name from the path
+    file_name_only = os.path.basename(file_name)
+
+    parts = file_name_only.split('_')
 
     # Extract category, subcategory, project name, and filename
     category = parts[0]
@@ -48,7 +52,7 @@ def extract_metadata(file_name: str) -> dict:
         "file_name": filename,
     }
 
-def convert_files_to_json(processed_files, chunk_size, error_file_list, json_file_path="sources/unified_files", file_paths="sources/raw_files"):
+def convert_files_to_json(processed_files: Set[str], chunk_size: int, error_file_list: List[str], json_file_path: str = "sources/unified_files", file_paths: str = "sources/raw_files") -> None:
     """Converts various file types to JSON.
 
     Args:
@@ -188,21 +192,24 @@ def convert_files_to_json(processed_files, chunk_size, error_file_list, json_fil
 
         return None
 
-    def write_json_data():
+    def write_json_data() -> None:
         try:
-            with open(os.path.join(json_file_path, "yaml_data.json"), "a", encoding='utf-8') as json_file:
-                json.dump(yaml_data_list, json_file, indent=4, default=str)
-                json_file.write('\n')
-            with open(os.path.join(json_file_path, "md_data.json"), "a", encoding='utf-8') as json_file:
-                json.dump(md_data_list, json_file, indent=4)
-                json_file.write('\n')
-            with open(os.path.join(json_file_path, "pdf_data.json"), "a", encoding='utf-8') as json_file:
-                json.dump(pdf_data_list, json_file, indent=4)
-                json_file.write('\n')
+            if yaml_data_list:
+                with open(os.path.join(json_file_path, "yaml_data.json"), "a", encoding='utf-8') as json_file:
+                    json.dump(yaml_data_list, json_file, indent=4, default=str)
+                    json_file.write('\n')
+            if md_data_list:
+                with open(os.path.join(json_file_path, "md_data.json"), "a", encoding='utf-8') as json_file:
+                    json.dump(md_data_list, json_file, indent=4)
+                    json_file.write('\n')
+            if pdf_data_list:
+                with open(os.path.join(json_file_path, "pdf_data.json"), "a", encoding='utf-8') as json_file:
+                    json.dump(pdf_data_list, json_file, indent=4)
+                    json_file.write('\n')
         except Exception as e:
             logging.error(f"Error writing JSON data: {e}")
-
-    with ThreadPoolExecutor(max_workers=4) as executor:
+    max_workers = multiprocessing.cpu_count() * 2
+    with ThreadPoolExecutor(max_workers) as executor:
         futures = {executor.submit(process_file, file_name): file_name for file_name in file_names}
         for future in as_completed(futures):
             try:
@@ -252,8 +259,7 @@ def remove_links_from_markdown(content: str) -> str:
     return content
 
 
-def process_error_yaml_file(error_file_list: list, file_paths="sources/raw_files",
-                            json_file_path="sources/unified_files") -> None:
+def process_error_yaml_file(error_file_list: List[str], file_paths: str = "sources/raw_files", json_file_path: str = "sources/unified_files") -> None:
     """Processes error YAML files and stores them in JSON format.
      Some of the YAML files contain special symbols and are not formatted correctly. As a result, these files cannot be loaded properly. Therefore, the problematic files are appended 
      to the list, and their data is converted into strings and stored in the 'content' key.
@@ -282,7 +288,7 @@ def process_error_yaml_file(error_file_list: list, file_paths="sources/raw_files
         logging.error(f"An error occurred while writing JSON file: {e}")
 
 
-def clean_markdown(markdown_text):
+def clean_markdown(markdown_text: str) -> str:
     # Remove Markdown headers (lines starting with #)
     markdown_text = re.sub(r'^\s*#.*$', '', markdown_text, flags=re.MULTILINE)
     # Remove emphasis (bold and italics)
@@ -312,7 +318,7 @@ def clean_markdown(markdown_text):
     return markdown_text
 
 
-processed_files_record = 'sources/processed_files.txt'
+processed_files_record = 'sources/unified_processed_files.txt'
 processed_files = set()
 if os.path.exists(processed_files_record):
     with open(processed_files_record, 'r', encoding='utf-8') as f:

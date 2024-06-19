@@ -6,7 +6,25 @@ from bs4 import BeautifulSoup
 import pandas as pd
 import threading
 import re
-def save_doc_to_pdf(url, output_directory, tags):
+import multiprocessing
+
+CACHE_FILE = 'webpages_extractor_cache.txt'
+
+
+def load_cache():
+    """Load the cache from the cache file."""
+    if os.path.exists(CACHE_FILE):
+        with open(CACHE_FILE, 'r') as f:
+            return set(line.strip() for line in f)
+    return set()
+
+
+def save_cache(url: str):
+    """Save the cache to the cache file."""
+    with open(CACHE_FILE, 'a') as f:
+        f.write(url + '\n')
+
+def save_doc_to_pdf(url: str, output_directory: dict, tags: dict):
     export_url = "https://docs.google.com/document/export?format={}&id={}".format('pdf', url.split('/')[-2])
     # Send GET request to export URL
     response = requests.get(export_url)
@@ -42,15 +60,20 @@ def save_strings_to_md(string, output_dir, tags):
     # Write the content to the file
     with open(filename, "w", encoding="utf-8") as file:
         file.write(string)
-def downloader(url: str, output_directory: str, tags: dict, semaphore):
+def downloader(url: str, output_directory: str, tags: dict, semaphore, cache):
     
     with semaphore:
-        
+        if url in cache:
+            print(f"Skipping {url} (already downloaded)")
+            return
         try:
             # check if it is a link to google doc
             if url.startswith("https://docs.google.com/document/"):
                 # download the google doc in pdf format
                 save_doc_to_pdf(url, output_directory, tags)
+                # Update cache immediately
+                cache.add(url)
+                save_cache(url)
                 # dont continue with further scraping
                 return None
                 
@@ -83,6 +106,9 @@ def downloader(url: str, output_directory: str, tags: dict, semaphore):
 
                     # print(temp)
                     save_strings_to_md(temp, output_directory, tags)
+                    # Update cache immediately
+                    cache.add(url)
+                    save_cache(url)
             else:
                 print(
                     f"Failed to retrieve the webpage. Status code: {response.status_code}"
@@ -90,14 +116,14 @@ def downloader(url: str, output_directory: str, tags: dict, semaphore):
         except Exception as e:
             print(f"Failed to retrieve the webpage: {url}. Error: {e}")
 
-def extract_text(links: list, output_directory: str, tags: dict):
+def extract_text(links: list, output_directory: str, tags: dict, cache):
     
-    max_threads = 16
+    max_threads = multiprocessing.cpu_count() * 2  # Example: double the number of cores
     semaphore = threading.Semaphore(max_threads)
     threads = []
     for url in links:
         thread = threading.Thread(target=downloader, args=(
-            url, output_directory, tags, semaphore))
+            url, output_directory, tags, semaphore, cache))
         threads.append(thread)
         thread.start()
     for thread in threads:
@@ -123,6 +149,9 @@ def download_files_from_yaml(
 
     # Create output directory if it doesn't exist
     os.makedirs(output_directory, exist_ok=True)
+
+    # Load cache
+    cache = load_cache()
     # Initialize a dictionary to save tags corresponding to each file
     tags_dict = {"Category": "", "Subcategory": "", "Project_name": "", "filename": ""}
     # Process the loaded data
@@ -147,7 +176,7 @@ def download_files_from_yaml(
                 tags_dict["Project_name"] = item["name"]
                 print(f"Item: {tags_dict['Project_name']}")
                 website = item.get("website", {})
-                extract_text(website.get("docs", []), output_directory, tags_dict)
+                extract_text(website.get("docs", []), output_directory, tags_dict, cache)
                 
     # Adding all the files corresponding to a category to a zip file
     shutil.make_archive(
