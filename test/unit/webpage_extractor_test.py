@@ -42,8 +42,8 @@ class Testdownload_files_from_yaml(unittest.TestCase):
             os.remove("sources/webpages_documentations.zip")
         if os.path.exists(webpages_extractor.CACHE_FILE):
             os.remove(webpages_extractor.CACHE_FILE)
-        if os.path.exists("test/resources/test_landscape_augmented.yml"):
-            os.remove("test/resources/test_landscape_augmented.yml")
+        # if os.path.exists("test/resources/test_landscape_augmented.yml"):
+        #     os.remove("test/resources/test_landscape_augmented.yml")
 
     def test_google_doc_to_pdf_conversion(self):
         output_directory = "sources/raw_files_test"
