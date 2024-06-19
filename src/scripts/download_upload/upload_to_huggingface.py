@@ -1,3 +1,27 @@
+# This script automates the process of uploading JSON files from a specified directory and its subdirectories to a Hugging Face dataset repository.
+
+# Key Features:
+# 1. Sets environment variable `HF_HUB_ENABLE_HF_TRANSFER` to enable Hugging Face transfer for uploads.
+# 2. upload_to_huggingface() to discover JSON files recursively in a directory and upload them to a Hugging Face dataset.
+# 3. Authentication: Uses Hugging Face API token for authentication via `login()` function from `huggingface_hub`.
+# 4. File Discovery: Utilizes `os.walk()` to traverse the directory and identify JSON files for upload.
+# 5. File Upload: Utilizes `HfApi.upload_file()` method to transfer each discovered JSON file to the specified dataset repository.
+
+# Modules:
+# - os: Provides functionality for interacting with the operating system, specifically for file and directory operations.
+# - tqdm: Offers a customizable progress bar for tracking tasks.
+# - subprocess: Enables running subprocesses, although not directly used in this script.
+# - argparse: Facilitates parsing command-line arguments.
+# - huggingface_hub: Imports `HfApi` and `login` for interfacing with the Hugging Face Hub API.
+
+# Functions:
+# - upload_to_huggingface(directory_path, hf_token, hf_dataset_id): Implements the logic to discover JSON files, authenticate, and upload them to the specified Hugging Face dataset.
+
+# Execution:
+# - The script can be executed directly or through command-line interface (CLI) with optional arguments for `hf_token`, `hf_dataset_id`, and `directory_path`.
+# - Progress updates are shown in the tqdm progress bar, providing feedback on each JSON file upload.
+
+
 import os
 from tqdm import tqdm
 import subprocess
@@ -6,7 +30,7 @@ from huggingface_hub import HfApi, login
 
 os.environ["HF_HUB_ENABLE_HF_TRANSFER"] = "1"
 
-def upload_to_huggingface(directory_path, hf_token, hf_dataset_id):
+def upload_to_huggingface(directory_path: str, hf_token: str, hf_dataset_id: str) -> None:
     """
     Find json files in the directory and its subdirectories then upload them to the specified huggingface dataset.
 

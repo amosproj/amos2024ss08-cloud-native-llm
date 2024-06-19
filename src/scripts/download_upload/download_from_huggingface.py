@@ -1,3 +1,26 @@
+# This script loads datasets from specified files using the Hugging Face datasets library, with logging configured to track the process.
+
+# Key Features:
+# 1. Logging Configuration: Initializes logging to capture informational and error messages.
+# 2. Dataset Loading: Utilizes the Hugging Face datasets library (`load_dataset`) to load datasets from JSON files.
+# 3. Exception Handling: Catches and logs errors during dataset loading to provide detailed error messages.
+# 4. Interrupt Handling: Handles KeyboardInterrupt to gracefully stop operations when requested by the user.
+
+# Modules:
+# - logging: Provides logging capabilities to track script execution and errors.
+# - datasets: Import from Hugging Face datasets library for dataset loading.
+# - pandas: For data manipulation and handling DataFrame output.
+
+# Functions:
+# - load_dataset_from_files(dataset_name, data_files, config_name): Loads datasets from JSON files based on specified dataset name and configuration.
+# - get_dataset_config_names(dataset_name): Retrieves configuration names available for a given dataset.
+
+# Execution:
+# 1. Retrieves available configurations for the dataset "Kubermatic/cncf-raw-data-for-llm-training".
+# 2. Loads datasets from "md_data.json" and "pdf_data.json" using the 'default' configuration.
+# 3. Logs information about loaded datasets and prints them as Pandas DataFrames.
+# 4. Handles exceptions such as configuration retrieval failure, dataset loading errors, and user interruptions.
+
 import logging
 from datasets import load_dataset, get_dataset_config_names
 import pandas as pd
@@ -7,7 +30,7 @@ logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 logging.getLogger("huggingface_hub.repocard").setLevel(logging.ERROR)
 
-def load_dataset_from_files(dataset_name, data_files, config_name):
+def load_dataset_from_files(dataset_name: str, data_files: Dict[str, str], config_name: str) -> Dict[str, dict]:
     """
     Load dataset from files with the specified configuration.
 

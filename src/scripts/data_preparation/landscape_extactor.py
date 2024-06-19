@@ -1,3 +1,36 @@
+# This script downloads files from URLs specified in a YAML file, processes them to ensure they are in English,
+# and tags them with relevant metadata before storing them in an output directory.
+# It uses multi-threading to handle multiple downloads concurrently.
+
+# Key Features:
+# 1. GitHub API Token: Includes an option to set a GitHub token to increase the API rate limit.
+# 2. Language Detection: Checks if the downloaded content is in English using `langid` before saving it.
+# 3. Multi-threaded Downloading: Utilizes threading to download multiple files simultaneously.
+# 4. Metadata Tagging: Adds tags to each file based on category, subcategory, and project name extracted from the YAML file.
+# 5. Error Handling: Includes error handling for HTTP requests and language detection.
+
+# Modules:
+# - requests: For making HTTP requests.
+# - yaml: For parsing YAML files.
+# - os: For interacting with the operating system (e.g., file paths).
+# - tqdm: For displaying progress bars.
+# - threading: For concurrent downloads.
+# - shutil: For creating ZIP archives and handling file operations.
+# - langid: For language identification.
+
+# Functions:
+# - is_file_english(content): Determines if the content of a file is in English.
+# - downloader(url, output_directory, tags_dict, semaphore): Downloads a single file from a URL, tags it, and saves it if it is in English.
+# - downloader_multi_thread(download_urls, output_directory, tags_dict): Manages the multi-threaded downloading of files.
+# - download_files_from_yaml(yaml_file, output_directory): Reads the YAML file, extracts URLs, and initiates the download process.
+
+# Execution:
+# 1. Loads URLs from a specified YAML file.
+# 2. Creates the output directory if it doesn't exist.
+# 3. Iterates through categories, subcategories, and items in the YAML file.
+# 4. Downloads files concurrently, tags them, and checks for English content.
+# 5. Archives downloaded files for each category and cleans up raw files.
+
 import requests
 import yaml
 import os
@@ -11,16 +44,23 @@ import langid
 TOKEN = "Replace your token"
 HEADERS = {'Authorization': f'Bearer {TOKEN}'}
 
-def isFileEnglish(content):
+def is_file_english(content: bytes) -> bool:
+    """
+    Determines if the content of a file is in English.
+    Args:
+        content (bytes): The content of the file in bytes.
+    Returns:
+        bool: True if the file is classified as English or if an exception occurs, False otherwise.
+    """
     try:
         decoded_content = content.decode('utf-8')
         lang, _ = langid.classify(decoded_content)
         return lang == 'en'
     except Exception as e:
-        print("cannot undrestand the language of the file:", e)
+        print("cannot understand the language of the file:", e)
         return True
 
-def downloader(url, output_directory, tags_dict, semaphore):
+def downloader(url: str, output_directory: str, tags_dict: Dict[str, str], semaphore: threading.Semaphore) -> None:
     """
     This function downloads a single file from the url in the input. It is used by downloader_multi_thread() at each thread. 
     This function uses a semaphore to control the number of concurrent downloads.
@@ -48,7 +88,7 @@ def downloader(url, output_directory, tags_dict, semaphore):
             filename = tags_dict['Category'] + "_" + tags_dict['Subcategory'] + \
                 "_" + tags_dict['Project_name'] + "_" + filename
             #if the file is in English dowload it
-            if isFileEnglish(response.content):
+            if is_file_english(response.content):
                 # Write downloaded content to file
                 with open(os.path.join(output_directory, filename), 'wb') as f:
                     f.write(response.content)
@@ -66,7 +106,7 @@ def downloader(url, output_directory, tags_dict, semaphore):
             print(f"Failed to download file from {url}: {e}")
 
 
-def downloader_multi_thread(download_urls, output_directory, tags_dict):
+def downloader_multi_thread(download_urls: Dict[str, List[str]], output_directory: str, tags_dict: Dict[str, Dict[str, str]]) -> None:
     """
     Downloads the files from the URLs provided in the input download_urls in the output_directory. Also, tags each downloaded file with
     corresponding  Category, Subcategory and Project_name in each file name. It accomplishes this task in a multi thread manner and downloads 
@@ -94,7 +134,8 @@ def downloader_multi_thread(download_urls, output_directory, tags_dict):
             thread.join()
 
 
-def download_files_from_yaml(yaml_file="./sources/landscape_augmented_repos_websites.yml", output_directory="sources/raw_files"):
+def download_files_from_yaml(yaml_file: str = "./sources/landscape_augmented_repos_websites.yml",
+                             output_directory: str = "sources/raw_files") -> None:
     """
     Downloads the files with specific extensions from the URLs provided in yaml_file
 
