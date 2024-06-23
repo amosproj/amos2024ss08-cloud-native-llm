@@ -1,3 +1,36 @@
+# This script downloads files from URLs specified in a YAML file, processes them to ensure they are in English,
+# and tags them with relevant metadata before storing them in an output directory.
+# It uses multi-threading to handle multiple downloads concurrently.
+
+# Key Features:
+# 1. GitHub API Token: Includes an option to set a GitHub token to increase the API rate limit.
+# 2. Language Detection: Checks if the downloaded content is in English using `langid` before saving it.
+# 3. Multi-threaded Downloading: Utilizes threading to download multiple files simultaneously.
+# 4. Metadata Tagging: Adds tags to each file based on category, subcategory, and project name extracted from the YAML file.
+# 5. Error Handling: Includes error handling for HTTP requests and language detection.
+
+# Modules:
+# - requests: For making HTTP requests.
+# - yaml: For parsing YAML files.
+# - os: For interacting with the operating system (e.g., file paths).
+# - tqdm: For displaying progress bars.
+# - threading: For concurrent downloads.
+# - shutil: For creating ZIP archives and handling file operations.
+# - langid: For language identification.
+
+# Functions:
+# - is_file_english(content): Determines if the content of a file is in English.
+# - downloader(url, output_directory, tags_dict, semaphore): Downloads a single file from a URL, tags it, and saves it if it is in English.
+# - downloader_multi_thread(download_urls, output_directory, tags_dict): Manages the multi-threaded downloading of files.
+# - download_files_from_yaml(yaml_file, output_directory): Reads the YAML file, extracts URLs, and initiates the download process.
+
+# Execution:
+# 1. Loads URLs from a specified YAML file.
+# 2. Creates the output directory if it doesn't exist.
+# 3. Iterates through categories, subcategories, and items in the YAML file.
+# 4. Downloads files concurrently, tags them, and checks for English content.
+# 5. Archives downloaded files for each category and cleans up raw files.
+
 import requests
 import yaml
 import os
@@ -31,7 +64,7 @@ def save_cache(url):
         f.write(url + '\n')
 
 
-def isFileEnglish(content):
+def is_file_english(content: bytes) -> bool:
     try:
         decoded_content = content.decode('utf-8')
         lang, _ = langid.classify(decoded_content)
@@ -122,7 +155,7 @@ def downloader_multi_thread(download_urls, output_directory, tags_dict, cache):
             thread.join()
 
 
-def download_files_from_yaml(yaml_file="../../sources/landscape_augmented_repos_websites.yml", output_directory="sources/raw_files"):
+def download_files_from_yaml(yaml_file="../../../sources/landscape_augmented_repos_websites.yml", output_directory="sources/raw_files"):
     """
     Downloads the files with specific extensions from the URLs provided in yaml_file
 
