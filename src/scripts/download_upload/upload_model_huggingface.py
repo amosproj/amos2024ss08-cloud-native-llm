@@ -1,3 +1,28 @@
+"""
+This script facilitates uploading files to a Hugging Face model repository using the Hugging Face Hub API.
+
+Dependencies:
+- huggingface_hub (imported as HfApi and login)
+- os
+- sys
+- tqdm
+
+Functions:
+- `get_file_paths(directory_path, base_path="", res=None)`: Recursively retrieves file paths within a directory.
+- `upload_files_to_huggingface(files, repo_id, directory_path)`: Uploads files to a specified Hugging Face model repository.
+
+Usage Example:
+- The script expects two command-line arguments: the path to a directory containing files to upload (`directory_path`) and the ID of the Hugging Face model repository (`repo_id`).
+- It recursively retrieves all file paths within the directory using `get_file_paths`.
+- Files are uploaded to the specified repository using `upload_files_to_huggingface`.
+- Progress is displayed using tqdm during file upload.
+
+Note:
+- Ensure the environment variable `HF_TOKEN` is set to your Hugging Face API token or provide it directly in the script.
+- The script checks if the provided `repo_id` corresponds to a model repository before proceeding with file upload.
+
+"""
+
 from huggingface_hub import HfApi, login
 import os
 import sys
@@ -7,17 +32,17 @@ os.environ["HF_HUB_ENABLE_HF_TRANSFER"] = "1"
 HF_TOKEN = os.getenv("HF_TOKEN", "upload_your_hf_token_here")
 
 
-def get_file_paths(directory_path, base_path="", res=None):
+def get_file_paths(directory_path: str, base_path: str = "", res: Optional[List[str]] = None) -> List[str]:
     """
     Recursively retrieves the file paths within a directory.
 
     Args:
-      directory_path (str): The path to the directory.
-      base_path (str, optional): The base path to prepend to the file paths. Defaults to "".
-      res (list, optional): The list to store the file paths. Defaults to None.
+        directory_path (str): The path to the directory.
+        base_path (str, optional): The base path to prepend to the file paths. Defaults to "".
+        res (list, optional): The list to store the file paths. Defaults to None.
 
     Returns:
-      list: A list of file paths within the directory.
+        list: A list of file paths within the directory.    
     """
     if res is None:
         res = []
@@ -39,12 +64,12 @@ def upload_files_to_huggingface(files, repo_id, directory_path):
     Uploads files to a Hugging Face model repository.
 
     Args:
-      files (list): A list of file names to be uploaded.
-      repo_id (str): The ID of the Hugging Face model repository.
-      directory_path (str): The directory path where the files are located.
+        files (list): A list of file names to be uploaded.
+        repo_id (str): The ID of the Hugging Face model repository.
+        directory_path (str): The directory path where the files are located.
 
     Returns:
-      None
+        None
     """
 
     api = HfApi()
