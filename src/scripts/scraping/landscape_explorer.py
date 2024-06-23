@@ -1,3 +1,27 @@
+"""
+This script retrieves files with specified extensions from GitHub repositories,
+augments a YAML file with download URLs, and caches requests for efficient retrieval.
+It handles rate limits and logging errors during API requests.
+
+Dependencies:
+- requests
+- os
+- yaml
+- tqdm
+- requests_cache
+- logging
+- collections
+
+Environment Variables:
+- GITHUB_TOKEN: GitHub token for authentication (optional)
+
+Usage:
+Ensure correct configuration of 'BASE_REPO_YAML' and 'OUTPUT_PATH' for input and output file paths respectively. Adjust 'EXTENSIONS' for desired file types to retrieve.
+
+Note:
+Ensure 'repo_url' attributes in the YAML file correspond to valid GitHub repository URLs. Cached requests expire after 7 days ('landscape_cache').
+"""
+
 #!/usr/bin/python3
 from yaml.representer import Representer
 from collections import defaultdict
@@ -102,7 +126,7 @@ def get_default_branch(repo_url: str) -> str:
     return response.json().get('default_branch')
 
 
-def generate_augmented_yml_with_urls():
+def generate_augmented_yml_with_urls() -> None:
     """
     Retrieves the YAML content from BASE_REPO_YAML, augments it with download URLs,
     and saves the augmented content to 'sources/landscape_augmented.yml'.
@@ -130,6 +154,15 @@ def generate_augmented_yml_with_urls():
 
 
 def make_request(url):
+    """
+    Makes an HTTP GET request to the provided URL with error handling and rate limit handling.
+
+    Args:
+        url (str): The URL to make the request to.
+
+    Returns:
+        requests.Response or None: The response object if the request was successful, None otherwise.
+    """
     print("making request to url: ", url)
     try:
         response = requests.get(url, headers=HEADERS, timeout=30)
