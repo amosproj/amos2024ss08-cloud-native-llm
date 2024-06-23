@@ -50,7 +50,7 @@ HEADERS = {'Authorization': f'Bearer {TOKEN}',
 CACHE_FILE = 'landscape_extractor_cache.txt'
 
 
-def load_cache():
+def load_cache() -> None:
     """Load the cache from the cache file."""
     if os.path.exists(CACHE_FILE):
         with open(CACHE_FILE, 'r') as f:
@@ -58,8 +58,16 @@ def load_cache():
     return set()
 
 
-def save_cache(url):
-    """Save the cache to the cache file."""
+def save_cache(url: str) -> None:
+    """
+    Save the given URL to the cache file.
+
+    Args:
+        url (str): The URL to save in the cache file.
+
+    Returns:
+        None
+    """
     with open(CACHE_FILE, 'a') as f:
         f.write(url + '\n')
 
@@ -77,16 +85,20 @@ def is_file_english(content: bytes) -> bool:
         return True
 
 
-def downloader(url, output_directory, tags_dict, semaphore, cache):
+def downloader(url: str, output_directory: str, tags_dict: Dict[str, str], semaphore: threading.Semaphore, cache: Set[str]) -> None:
     """
-    This function downloads a single file from the url in the input. It is used by downloader_multi_thread() at each thread.
+    Downloads a single file from the URL in the input. It is used by downloader_multi_thread() at each thread.
     This function uses a semaphore to control the number of concurrent downloads.
+
     Args:
-        url (str): A single url string.
+        url (str): A single URL string.
         output_directory (str): The path where the downloaded files will be stored.
-        tags_dict(dict): A dictionary containing the tags for each file. For example: Category, Subcategory, Project_name
+        tags_dict (Dict[str, str]): A dictionary containing the tags for each file. For example: Category, Subcategory, Project_name.
         semaphore (threading.Semaphore): A semaphore object used to limit the number of concurrent downloads.
-        cache (set): A set to track downloaded files.
+        cache (Set[str]): A set to track downloaded files.
+
+    Returns:
+        None
     """
     with semaphore:
         if url in cache:
@@ -126,16 +138,20 @@ def downloader(url, output_directory, tags_dict, semaphore, cache):
             print(f"Unexpected error while downloading file from {url}: {e}")
 
 
-def downloader_multi_thread(download_urls, output_directory, tags_dict, cache):
+def downloader_multi_thread(download_urls: Dict[str, List[str]], output_directory: str, tags_dict: Dict[str, str], cache: Set[str]) -> None:
     """
-    Downloads the files from the URLs provided in the input download_urls in the output_directory. Also, tags each downloaded file with
-    corresponding Category, Subcategory, and Project_name in each file name. It accomplishes this task in a multi-thread manner and downloads 
-    multiple files at the same time.
-    Args:
-        download_urls (dict): A dictionary which contains a list of URLs for each file extension.
-        output_directory (str): The path where the downloaded files will be stored.
-        tags_dict(dict): A dictionary containing the tags for each file. For example: Category, Subcategory, Project_name
+    Downloads the files from the URLs provided in the input download_urls to the output_directory.
+    Tags each downloaded file with corresponding Category, Subcategory, and Project_name in each file name.
+    This task is accomplished in a multi-thread manner, downloading multiple files at the same time.
 
+    Args:
+        download_urls (Dict[str, List[str]]): A dictionary which contains a list of URLs for each file extension.
+        output_directory (str): The path where the downloaded files will be stored.
+        tags_dict (Dict[str, str]): A dictionary containing the tags for each file. For example: Category, Subcategory, Project_name.
+        cache (Set[str]): A set to track downloaded files and avoid duplicate downloads.
+
+    Returns:
+        None
     """
     # Calculate a reasonable max_threads based on system capabilities
     max_threads = multiprocessing.cpu_count() * 2  # Example: twice the number of CPU cores
@@ -155,7 +171,7 @@ def downloader_multi_thread(download_urls, output_directory, tags_dict, cache):
             thread.join()
 
 
-def download_files_from_yaml(yaml_file="../../../sources/landscape_augmented_repos_websites.yml", output_directory="sources/raw_files"):
+def download_files_from_yaml(yaml_file: str = "../../../sources/landscape_augmented_repos_websites.yml", output_directory: str = "sources/raw_files") -> None:
     """
     Downloads the files with specific extensions from the URLs provided in yaml_file
 
@@ -163,6 +179,8 @@ def download_files_from_yaml(yaml_file="../../../sources/landscape_augmented_rep
         yaml_file (str, optional): The path to the URLs yaml file (default: sources/landscape_augmented.yml).
         output_directory (str, optional): The path where the downloaded files will be stored (default: sources/raw_files).
 
+    Returns:
+        None
     """
     # Load URLs from YAML file
     with open(yaml_file, 'r') as f:
