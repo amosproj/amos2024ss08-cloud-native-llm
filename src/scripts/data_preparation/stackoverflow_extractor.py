@@ -1,3 +1,47 @@
+# This script collects question and answer data from StackOverflow for a list of specified tags. The script uses several 
+# libraries to manage API requests, parse HTML, handle JSON and CSV files, and manage threading and multiprocessing. 
+# It maintains the progress of processed tags and question IDs, and ensures data consistency with thread-safe operations.
+
+# Key functionalities
+# 1. Fetching data from the StackOverflow API with exponential backoff to handle rate limiting.
+# 2. Extracting questions and answers for specific tags, ensuring unique processing of question IDs.
+# 3. Removing HTML tags from the text for better readability.
+# 4. Saving the extracted data to CSV files and maintaining progress in JSON files to resume operations efficiently.
+# 5. Concurrently processing multiple tags using a thread pool executor to speed up data collection.
+
+# Dependencies:
+# - yaml
+# - requests
+# - pandas
+# - BeautifulSoup
+# - time
+# - json
+# - os
+# - sys
+# - datetime
+# - dotenv
+# - concurrent.futures
+# - threading
+# - multiprocessing
+
+# Modules:
+# - `fetch_with_backoff(api_url, params)`: Fetches data from the API with retry logic.
+# - `qa_extractor(tag, start_page, page_size)`: Extracts questions for a given tag.
+# - `fetch_answers(question_id)`: Fetches answers for a specific question.
+# - `remove_html_tags(text)`: Removes HTML tags from the text.
+# - `extract_all_projects(tags)`: Manages the extraction process for multiple tags concurrently.
+# - `save_to_csv(data, filename)`: Saves data to a CSV file.
+# - `load_progress()`: Loads progress from a JSON file.
+# - `save_progress(tag, page)`: Saves progress to a JSON file.
+# - `load_processed_question_ids()`: Loads processed question IDs from a JSON file.
+# - `save_processed_question_ids(processed_ids)`: Saves processed question IDs to a JSON file.
+# - `load_tags()`: Loads tags from a YAML file or a cached JSON file, updating as necessary.
+
+# Usage:
+# - Set the required API key in an .env file.
+# - Ensure the necessary directories and files exist or will be created.
+# - Run the script to start collecting StackOverflow Q&A data for specified tags.
+
 import yaml
 import requests
 import pandas as pd
@@ -172,12 +216,14 @@ def remove_html_tags(text: str) -> str:
     soup = BeautifulSoup(text, "html.parser")
     return soup.get_text()
 
-def extract_all_projects(tags: list):
+def extract_all_projects(tags: List[str]) -> None:
     """Extract QA pairs for multiple tags.
 
     Args:
-        tags (list): List of tags to process.
-        request_count (int): Initial count of API requests made.
+        tags (List[str]): List of tags to process.
+
+    Returns:
+        None
     """
     progress = load_progress()
     all_tags_done = True
@@ -201,7 +247,17 @@ def extract_all_projects(tags: list):
     if all_tags_done:
         print("We have reached all question-answer data from StackOverflow.")
 
-def save_to_csv(data: list, filename: str):
+def save_to_csv(data: List[dict], filename: str) -> None:
+    """
+    Save a list of dictionaries to a CSV file.
+
+    Args:
+        data (List[dict]): The data to be saved.
+        filename (str): The name of the CSV file.
+
+    Returns:
+        None
+    """
     with lock:  # Ensure only one thread writes to the file at a time
         if os.path.exists(filename) and os.path.getsize(filename) > 0:
             try:
@@ -228,7 +284,17 @@ def load_progress() -> dict:
     except json.JSONDecodeError:
         return {}
 
-def save_progress(tag: str, page: str):
+def save_progress(tag: str, page: str) -> None:
+    """
+    Save the progress of processing a specific tag.
+
+    Args:
+        tag (str): The tag being processed.
+        page (str): The current page number.
+
+    Returns:
+        None
+    """
     with lock:  # Ensure only one thread writes to the file at a time
         progress = load_progress()
         progress[tag] = page
