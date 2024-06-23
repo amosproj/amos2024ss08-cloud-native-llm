@@ -10,7 +10,7 @@ import sys
 # Add the root of the project to the Python path
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '../..')))
 
-from src.scripts.Unified_format_conversation import (
+from src.scripts.convert.Unified_format_conversation import (
     extract_metadata, convert_files_to_json, process_error_yaml_file
 )
 import random

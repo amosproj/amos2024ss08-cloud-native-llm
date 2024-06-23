@@ -4,7 +4,7 @@ import shutil
 import sys
 # Add the root of the project to the Python path
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '../..')))
-from src.scripts import webpages_extractor
+from src.scripts.data_preparation import webpages_extractor
 
 class Testdownload_files_from_yaml(unittest.TestCase):
 

@@ -4,9 +4,9 @@ import zipfile
 import sys
 import shutil
 
-# Assuming landscape_extractor.py is located in the src/scripts directory
+# Assuming landscape_extractor.py is located in the src/scripts/data_preparation directory
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '../..')))
-from src.scripts import landscape_extractor
+from src.scripts.data_preparation import landscape_extractor
 
 class Testdownload_files_from_yaml(unittest.TestCase):
     """

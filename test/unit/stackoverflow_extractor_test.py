@@ -12,7 +12,7 @@ import sys
 
 # Add the root of the project to the Python path
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '../..')))
-from src.scripts import stackoverflow_extractor
+from src.scripts.data_preparation import stackoverflow_extractor
 
 API_KEY = 'test_api_key'
 REQUEST_DELAY = 0

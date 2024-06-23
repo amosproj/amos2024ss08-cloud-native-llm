@@ -1,7 +1,7 @@
 import unittest
 import os
 import mock
-from src.scripts import upload_model_huggingface
+from src.scripts.download_upload import upload_model_huggingface
 
 dirs = ['dir', 'sub_dir', 'sub_sub_dir', 'sub_sub_sub_dir']
 
