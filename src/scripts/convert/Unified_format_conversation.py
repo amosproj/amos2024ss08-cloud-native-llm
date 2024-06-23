@@ -1,3 +1,36 @@
+# This script processes various file types (YAML, Markdown, and PDF) from a specified directory,
+# converts them into JSON format, and stores the JSON files in a designated directory. 
+
+# Key Features:
+# 1. Extracts metadata from file names.
+# 2. Converts files to JSON format, handling YAML, Markdown, and PDF files.
+# 3. Removes links and cleans Markdown content.
+# 4. Logs errors encountered during processing.
+# 5. Handles problematic YAML files by storing their raw content.
+
+# The script uses several helper functions to ensure clean data and efficient processing. Processed files are tracked to avoid reprocessing in subsequent runs.
+
+# Modules:
+# - os, re, json, yaml, tqdm, PyPDF2, datetime, logging
+
+# Constants:
+# - NUMBER_OF_TOKENS: The number of tokens used to split Markdown content.
+# - MIN_NUMBER_OF_TOKENS: The minimum number of tokens required for a Markdown chunk.
+
+# Functions:
+# - extract_metadata(file_name: str) -> dict: Extracts and returns metadata from the file name.
+# - convert_files_to_json(processed_files, chunk_size, error_file_list, json_file_path="sources/unified_files", file_paths="sources/raw_files"): Converts files in the specified directory to JSON format.
+# - remove_links_from_markdown(content: str) -> str: Removes all markdown links from the provided content.
+# - process_error_yaml_file(error_file_list: list, file_paths="sources/raw_files", json_file_path="sources/unified_files") -> None: Processes YAML files that encountered errors and stores their raw content in JSON format.
+# - clean_markdown(markdown_text): Cleans the markdown content by removing headers, emphasis, links, images, and other formatting.
+
+# Execution:
+# - Initializes the set of processed files from a record file if it exists.
+# - Calls convert_files_to_json to process files.
+# - Calls process_error_yaml_file to handle error files.
+# - Updates the record of processed files.
+
+
 import os
 import glob
 from concurrent.futures import ThreadPoolExecutor, as_completed
