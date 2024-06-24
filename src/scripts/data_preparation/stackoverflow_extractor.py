@@ -66,7 +66,7 @@ TAGS_FILE =  'sources/stackoverflow_Q&A/tags.json'
 PROGRESS_FILE =  'sources/stackoverflow_Q&A/stackoverflow_progress.json' 
 TAGS_UPDATE_INTERVAL = 7  # Number of days between tag updates
 DAILY_REQUEST_LIMIT = 9000
-MAX_THREADS = multiprocessing.cpu_count() * 2 
+MAX_THREADS = 4
 # MAX_THREADS = 10
 
 lock = threading.Lock()  # Initialize a threading lock

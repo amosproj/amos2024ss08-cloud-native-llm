@@ -7,16 +7,14 @@ import shutil
 from datetime import datetime
 import PyPDF2
 import sys
-# Add the root of the project to the Python path
-sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '../..')))
-
-from src.scripts.convert.Unified_format_conversation import (
-    extract_metadata, convert_files_to_json, process_error_yaml_file
-)
 import random
 import string
 from reportlab.lib.pagesizes import letter
 from reportlab.pdfgen import canvas
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '../..')))
+from src.scripts.convert.Unified_format_conversation import (
+    extract_metadata, convert_files_to_json, process_error_yaml_file
+)
 
 class TestFileProcessing(unittest.TestCase):
 
