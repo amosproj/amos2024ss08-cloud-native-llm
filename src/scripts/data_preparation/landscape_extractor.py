@@ -47,11 +47,18 @@ TOKEN = os.getenv('GITHUB_TOKEN', 'Replace your token')
 HEADERS = {'Authorization': f'Bearer {TOKEN}',
            'Accept': 'application/vnd.github+json', 'X-GitHub-Api-Version': '2022-11-28'}
 
+# Define the cache file path
 CACHE_FILE = 'landscape_extractor_cache.txt'
 
 
-def load_cache() -> None:
-    """Load the cache from the cache file."""
+
+def load_cache() -> set[str]:
+    """
+    Load the cache from the cache file.
+
+    Returns:
+        Set[str]: A set containing cached items as strings.
+    """
     if os.path.exists(CACHE_FILE):
         with open(CACHE_FILE, 'r') as f:
             return set(line.strip() for line in f)
@@ -60,10 +67,10 @@ def load_cache() -> None:
 
 def save_cache(url: str) -> None:
     """
-    Save the given URL to the cache file.
+    Save the cache to the cache file.
 
     Args:
-        url (str): The URL to save in the cache file.
+        url (str): The URL to be saved in the cache file.
 
     Returns:
         None
@@ -72,7 +79,7 @@ def save_cache(url: str) -> None:
         f.write(url + '\n')
 
 
-def is_file_english(content: bytes) -> bool:
+def isFileEnglish(content: bytes) -> bool:
     try:
         decoded_content = content.decode('utf-8')
         lang, _ = langid.classify(decoded_content)

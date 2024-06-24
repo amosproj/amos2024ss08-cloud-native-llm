@@ -59,10 +59,11 @@ import multiprocessing
 load_dotenv()
 API_KEY = os.getenv('API_KEY', 'Replace your api key')
 REQUEST_DELAY = 0  # Number of seconds to wait between requests
-PROGRESS_FILE = 'sources/stackoverflow_Q&A/stackoverflow_progress.json'
+
 CSV_FILE = 'sources/stackoverflow_Q&A/cncf_stackoverflow_qas.csv'
 PROCESSED_IDS_FILE = 'sources/stackoverflow_Q&A/processed_question_ids.json'
-TAGS_FILE = 'sources/stackoverflow_Q&A/tags.json'
+TAGS_FILE =  'sources/stackoverflow_Q&A/tags.json'
+PROGRESS_FILE =  'sources/stackoverflow_Q&A/stackoverflow_progress.json' 
 TAGS_UPDATE_INTERVAL = 7  # Number of days between tag updates
 DAILY_REQUEST_LIMIT = 9000
 MAX_THREADS = multiprocessing.cpu_count() * 2 
@@ -341,7 +342,7 @@ def load_tags() -> list:
             if datetime.now() - last_update < timedelta(days=TAGS_UPDATE_INTERVAL):
                 return tags_data['tags']
     
-    with open("amos2024ss08-cloud-native-llm/landscape_augmented_repos_websites.yml", 'r') as f:
+    with open("sources/landscape_augmented_repos_websites.yml", 'r') as f:
         data = yaml.safe_load(f)
     
     tags = []
@@ -372,6 +373,7 @@ if __name__ == "__main__":
 
     if not os.path.exists(folder_path):
         os.makedirs(folder_path)
+        print("directory is created")
     tags = load_tags()
     
     extract_all_projects(tags)

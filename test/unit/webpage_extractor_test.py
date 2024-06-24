@@ -14,7 +14,7 @@ class Testdownload_files_from_yaml(unittest.TestCase):
 
         # Write downloaded content to file
         webpages_extractor.download_files_from_yaml(
-            yaml_file="amos2024ss08-cloud-native-llm/test/resources/test_landscape_augmented.yml", output_directory=output_directory)
+            yaml_file=os.path.join(os.path.dirname(__file__), '../resources/test_landscape_augmented.yml'), output_directory=output_directory)
 
         # Assert the file exists
         file_path_1 = "sources/raw_files_test/Test_Provisioning_Automation & Configuration_Airship_get_started_inventory.html.md"
@@ -27,7 +27,7 @@ class Testdownload_files_from_yaml(unittest.TestCase):
 
         # Test cache functionality: download again and check if skipped
         webpages_extractor.download_files_from_yaml(
-            yaml_file="amos2024ss08-cloud-native-llm/test/resources/test_landscape_augmented.yml", output_directory=output_directory)
+            yaml_file=os.path.join(os.path.dirname(__file__), '../resources/test_landscape_augmented.yml'), output_directory=output_directory)
 
         # Assert nothing new was downloaded (since it should be cached)
         new_file_path = "sources/raw_files_test/New_Test_File.html.md"

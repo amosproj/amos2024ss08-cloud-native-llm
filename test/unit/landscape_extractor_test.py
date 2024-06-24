@@ -25,7 +25,7 @@ class Testdownload_files_from_yaml(unittest.TestCase):
         expected_zipFile = "sources/Test_Provisioning.zip"
         # Write downloaded content to file
         landscape_extractor.download_files_from_yaml(
-            yaml_file="amos2024ss08-cloud-native-llm/test/resources/test_landscape_augmented.yml", output_directory=self.output_directory)
+            yaml_file=os.path.join(os.path.dirname(__file__), '../resources/test_landscape_augmented.yml'), output_directory=self.output_directory)
 
         # Create the extract output_directory if it doesn't exist
         os.makedirs(self.output_directory, exist_ok=True)
@@ -45,7 +45,7 @@ class Testdownload_files_from_yaml(unittest.TestCase):
     def test_cache_functionality(self):
         # Download files first time
         landscape_extractor.download_files_from_yaml(
-            yaml_file="amos2024ss08-cloud-native-llm/test/resources/test_landscape_augmented.yml", output_directory=self.output_directory)
+            yaml_file=os.path.join(os.path.dirname(__file__), '../resources/test_landscape_augmented.yml'), output_directory=self.output_directory)
         
         # Capture the cache contents after the first download
         with open(self.cache_file, 'r') as f:
@@ -53,7 +53,7 @@ class Testdownload_files_from_yaml(unittest.TestCase):
 
         # Download files second time and capture cache contents again
         landscape_extractor.download_files_from_yaml(
-            yaml_file="amos2024ss08-cloud-native-llm/test/resources/test_landscape_augmented.yml", output_directory=self.output_directory)
+            yaml_file=os.path.join(os.path.dirname(__file__), '../resources/test_landscape_augmented.yml'), output_directory=self.output_directory)
 
         with open(self.cache_file, 'r') as f:
             subsequent_cache_contents = f.readlines()
