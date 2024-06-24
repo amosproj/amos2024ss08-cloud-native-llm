@@ -71,7 +71,7 @@ def paraphrase_question(question: str, model: PreTrainedModel, amount: int, max_
 
 
 # Function to paraphrase a batch of questions
-def paraphrase_questions(questions: List[str], model: PreTrainedModel, tokenizer: PreTrainedTokenizer) -> List[str]:
+def paraphrase_questions(questions: list[str], model: PreTrainedModel, tokenizer: PreTrainedTokenizer) -> List[str]:
   """
   Paraphrases a list of questions using a language model.
 

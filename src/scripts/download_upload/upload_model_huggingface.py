@@ -32,7 +32,7 @@ os.environ["HF_HUB_ENABLE_HF_TRANSFER"] = "1"
 HF_TOKEN = os.getenv("HF_TOKEN", "upload_your_hf_token_here")
 
 
-def get_file_paths(directory_path: str, base_path: str = "", res: Optional[List[str]] = None) -> List[str]:
+def get_file_paths(directory_path: str, base_path: str = "", res: optional[list[str]] = None) -> list[str]:
     """
     Recursively retrieves the file paths within a directory.
 

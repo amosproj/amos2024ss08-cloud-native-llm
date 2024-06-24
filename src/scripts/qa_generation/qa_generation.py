@@ -42,7 +42,7 @@ MAX_THREADS = 4
 q = deque()
 
 
-def process_chunk(date: Dict[str, Dict[str, str]], chunk: Dict[str, str], semaphore: Semaphore) -> None:
+def process_chunk(date: dict[str, dict[str, str]], chunk: dict[str, str], semaphore: Semaphore) -> None:
     """
     Process a chunk of data to generate questions and answers using a model.
 

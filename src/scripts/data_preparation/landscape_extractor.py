@@ -85,7 +85,7 @@ def is_file_english(content: bytes) -> bool:
         return True
 
 
-def downloader(url: str, output_directory: str, tags_dict: Dict[str, str], semaphore: threading.Semaphore, cache: Set[str]) -> None:
+def downloader(url: str, output_directory: str, tags_dict: dict[str, str], semaphore: threading.Semaphore, cache: set[str]) -> None:
     """
     Downloads a single file from the URL in the input. It is used by downloader_multi_thread() at each thread.
     This function uses a semaphore to control the number of concurrent downloads.
@@ -138,7 +138,7 @@ def downloader(url: str, output_directory: str, tags_dict: Dict[str, str], semap
             print(f"Unexpected error while downloading file from {url}: {e}")
 
 
-def downloader_multi_thread(download_urls: Dict[str, List[str]], output_directory: str, tags_dict: Dict[str, str], cache: Set[str]) -> None:
+def downloader_multi_thread(download_urls: dict[str, list[str]], output_directory: str, tags_dict: dict[str, str], cache: set[str]) -> None:
     """
     Downloads the files from the URLs provided in the input download_urls to the output_directory.
     Tags each downloaded file with corresponding Category, Subcategory, and Project_name in each file name.

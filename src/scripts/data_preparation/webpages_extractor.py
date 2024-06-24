@@ -40,7 +40,7 @@ import multiprocessing
 CACHE_FILE = 'webpages_extractor_cache.txt'
 
 
-def load_cache() -> Set[str]:
+def load_cache() -> set[str]:
     """
     Load the cache from the cache file.
 
@@ -66,7 +66,7 @@ def save_cache(url: str) -> None:
     with open(CACHE_FILE, 'a') as f:
         f.write(url + '\n')
 
-def save_doc_to_pdf(url: str, output_directory: str, tags: Dict[str, str]) -> None:
+def save_doc_to_pdf(url: str, output_directory: str, tags: dict[str, str]) -> None:
     """
     Save a Google Document as PDF.
 
@@ -98,7 +98,7 @@ def save_doc_to_pdf(url: str, output_directory: str, tags: Dict[str, str]) -> No
     with open(filename, 'wb') as f:
         f.write(response.content)
 
-def save_strings_to_md(string: str, output_dir: str, tags: Dict[str, str]) -> None:
+def save_strings_to_md(string: str, output_dir: str, tags: dict[str, str]) -> None:
     """
     Save a string to a Markdown (.md) file.
 
@@ -130,7 +130,7 @@ def save_strings_to_md(string: str, output_dir: str, tags: Dict[str, str]) -> No
     with open(filename, "w", encoding="utf-8") as file:
         file.write(string)
         
-def downloader(url: str, output_directory: str, tags: Dict[str, str], semaphore: Any, cache: set) -> None:
+def downloader(url: str, output_directory: str, tags: dict[str, str], semaphore: Any, cache: set) -> None:
     """
     Download content from a URL and save it based on its type.
 
@@ -200,7 +200,7 @@ def downloader(url: str, output_directory: str, tags: Dict[str, str], semaphore:
         except Exception as e:
             print(f"Failed to retrieve the webpage: {url}. Error: {e}")
 
-def extract_text(links: List[str], output_directory: str, tags: Dict[str, str], cache: set) -> None:
+def extract_text(links: list[str], output_directory: str, tags: dict[str, str], cache: set) -> None:
     """
     Extract text content from a list of URLs concurrently.
 
@@ -242,7 +242,7 @@ def download_files_from_yaml(
     Returns:
         None
     """
-    
+
     # Load URLs from YAML file
     with open(yaml_file, "r") as f:
         data = yaml.safe_load(f)

@@ -85,7 +85,7 @@ def extract_metadata(file_name: str) -> dict:
         "file_name": filename,
     }
 
-def convert_files_to_json(processed_files: Set[str], chunk_size: int, error_file_list: List[str], json_file_path: str = "sources/unified_files", file_paths: str = "sources/raw_files") -> None:
+def convert_files_to_json(processed_files: set[str], chunk_size: int, error_file_list: list[str], json_file_path: str = "sources/unified_files", file_paths: str = "sources/raw_files") -> None:
     """Converts various file types to JSON.
 
     Args:
@@ -292,7 +292,7 @@ def remove_links_from_markdown(content: str) -> str:
     return content
 
 
-def process_error_yaml_file(error_file_list: List[str], file_paths: str = "sources/raw_files", json_file_path: str = "sources/unified_files") -> None:
+def process_error_yaml_file(error_file_list: list[str], file_paths: str = "sources/raw_files", json_file_path: str = "sources/unified_files") -> None:
     """Processes error YAML files and stores them in JSON format.
      Some of the YAML files contain special symbols and are not formatted correctly. As a result, these files cannot be loaded properly. Therefore, the problematic files are appended 
      to the list, and their data is converted into strings and stored in the 'content' key.

@@ -216,7 +216,7 @@ def remove_html_tags(text: str) -> str:
     soup = BeautifulSoup(text, "html.parser")
     return soup.get_text()
 
-def extract_all_projects(tags: List[str]) -> None:
+def extract_all_projects(tags: list[str]) -> None:
     """Extract QA pairs for multiple tags.
 
     Args:
@@ -247,7 +247,7 @@ def extract_all_projects(tags: List[str]) -> None:
     if all_tags_done:
         print("We have reached all question-answer data from StackOverflow.")
 
-def save_to_csv(data: List[dict], filename: str) -> None:
+def save_to_csv(data: list[dict], filename: str) -> None:
     """
     Save a list of dictionaries to a CSV file.
 
