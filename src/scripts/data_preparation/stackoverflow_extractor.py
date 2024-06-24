@@ -297,6 +297,9 @@ def save_progress(tag: str, page: str) -> None:
         None
     """
     with lock:  # Ensure only one thread writes to the file at a time
+        folder_path = 'sources/stackoverflow_Q&A'
+        if not os.path.exists(folder_path):
+            os.makedirs(folder_path)
         progress = load_progress()
         progress[tag] = page
         with open(PROGRESS_FILE, 'w') as f:
