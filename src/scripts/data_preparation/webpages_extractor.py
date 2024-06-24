@@ -36,6 +36,7 @@ import pandas as pd
 import threading
 import re
 import multiprocessing
+from typing import Any
 
 CACHE_FILE = 'webpages_extractor_cache.txt'
 

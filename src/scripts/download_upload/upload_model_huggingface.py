@@ -6,6 +6,7 @@ Dependencies:
 - os
 - sys
 - tqdm
+- typing
 
 Functions:
 - `get_file_paths(directory_path, base_path="", res=None)`: Recursively retrieves file paths within a directory.
@@ -27,12 +28,13 @@ from huggingface_hub import HfApi, login
 import os
 import sys
 from tqdm import tqdm
+from typing import Optional
 
 os.environ["HF_HUB_ENABLE_HF_TRANSFER"] = "1"
 HF_TOKEN = os.getenv("HF_TOKEN", "upload_your_hf_token_here")
 
 
-def get_file_paths(directory_path: str, base_path: str = "", res: optional[list[str]] = None) -> list[str]:
+def get_file_paths(directory_path: str, base_path: str = "", res: Optional[list[str]] = None) -> list[str]:
     """
     Recursively retrieves the file paths within a directory.
 
