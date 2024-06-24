@@ -1,3 +1,17 @@
+"""
+This script integrates scraped website URLs into an augmented YAML file representing categorized data.
+It utilizes ijson for efficient JSON parsing, and defaultdict to manage nested dictionaries.
+
+Dependencies:
+- yaml
+- collections
+- ijson
+
+Usage:
+Ensure paths to input and output files are correctly specified.
+'generate_augmented_yml_with_scraped_urls' triggers the augmentation process, updating 'landscape_augmented_repos.yml' with scraped URLs categorized by origin and type.
+"""
+
 from yaml.representer import Representer
 from collections import defaultdict
 import yaml
@@ -11,7 +25,7 @@ WEBSITE_URLS_PATH = '../landscape_scraper/output.json'
 OUTPUT_PATH = '../../sources/landscape_augmented_repos_websites.yml'
 
 
-def get_website_urls():
+def get_website_urls() -> defaultdict:
     """
     Retrieves website URLs from a JSON file.
 
@@ -28,7 +42,7 @@ def get_website_urls():
         return urls
 
 
-def generate_augmented_yml_with_scraped_urls():
+def generate_augmented_yml_with_scraped_urls() -> None:
     """
     Generates an augmented YAML file with scraped website URLs.
 
@@ -45,35 +59,33 @@ def generate_augmented_yml_with_scraped_urls():
         yaml.dump(content, file, sort_keys=False)
 
 
-def process_category(category, website_urls):
+def process_category(category: dict, website_urls: defaultdict) -> None:
     """
     Processes a category in the augmented YAML file.
 
     Args:
         category (dict): The category dictionary.
         website_urls (defaultdict): The nested dictionary of website URLs.
-
-    This function processes each subcategory in the category.
     """
+
     for subcategory in category.get('subcategories'):
         process_subcategory(subcategory, website_urls)
 
 
-def process_subcategory(subcategory, website_urls):
+def process_subcategory(subcategory: dict, website_urls: defaultdict) -> None:
     """
     Processes a subcategory in the augmented YAML file.
 
     Args:
         subcategory (dict): The subcategory dictionary.
         website_urls (defaultdict): The nested dictionary of website URLs.
-
-    This function processes each item in the subcategory.
     """
+
     for item in subcategory.get('items'):
         process_item(item, website_urls)
 
 
-def process_item(item, website_urls):
+def process_item(item: dict, website_urls: defaultdict) -> None:
     """
     Processes an item in the augmented YAML file.
 
@@ -83,6 +95,7 @@ def process_item(item, website_urls):
 
     This function checks if the item has a homepage URL and if it exists in the website URLs.
     If so, it adds the corresponding website URLs to the item's 'website' attribute.
+    
     """
     if 'homepage_url' not in item or not item.get('homepage_url'):
         return

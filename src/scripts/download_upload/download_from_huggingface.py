@@ -1,3 +1,23 @@
+"""
+This script loads datasets from specified files using the Hugging Face datasets library. It handles logging 
+configurations, retrieves dataset configurations, and loads datasets for processing.
+
+Dependencies:
+- logging
+- datasets (from Hugging Face)
+- pandas
+
+Functions:
+- `load_dataset_from_files(dataset_name, data_files, config_name)`: Loads dataset splits from files based on the specified configuration.
+
+Usage:
+- Set the dataset name (`dataset_name`), configuration name (`config_name`), and data files (`data_files`) to load.
+- Run the script to load and print datasets from the specified files.
+
+Example:
+- The script retrieves available configurations for a specific dataset, selects the 'default' configuration, and loads datasets from JSON files ('md_data.json' and 'pdf_data.json') for further processing.
+"""
+
 import logging
 from datasets import load_dataset, get_dataset_config_names
 import pandas as pd
@@ -7,7 +27,7 @@ logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 logging.getLogger("huggingface_hub.repocard").setLevel(logging.ERROR)
 
-def load_dataset_from_files(dataset_name, data_files, config_name):
+def load_dataset_from_files(dataset_name: str, data_files: dict, config_name: str) -> dict:
     """
     Load dataset from files with the specified configuration.
 

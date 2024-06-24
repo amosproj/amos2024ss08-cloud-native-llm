@@ -1,3 +1,29 @@
+"""
+This script facilitates uploading a CSV file to a Hugging Face dataset repository using the Hugging Face Hub API.
+
+Dependencies:
+- os
+- tqdm
+- huggingface_hub (imported as HfApi and login)
+
+Functions:
+- `upload_QandA_to_huggingface(file_path, hf_dataset_id)`: Uploads a CSV file to a specified Hugging Face dataset repository.
+
+Usage Example:
+- The script expects two arguments when executed:
+  - `file_path`: The path to the CSV file to upload.
+  - `hf_dataset_id`: The ID of the Hugging Face dataset repository where the file will be uploaded.
+- It logs into Hugging Face using the `HF_TOKEN` environment variable (or a default token if not set).
+- It uploads the specified CSV file to the specified dataset repository.
+- Progress of the upload is displayed using a tqdm progress bar.
+
+Notes:
+- Ensure the environment variable `HF_TOKEN` is set to your Hugging Face API token or provide it directly in the script.
+- The script uses `os.path.basename(file_path)` to determine the file name in the repository.
+- The repository type is specified as "dataset" during the upload.
+
+"""
+
 import os
 from tqdm import tqdm
 from huggingface_hub import HfApi, login
@@ -6,7 +32,7 @@ os.environ["HF_HUB_ENABLE_HF_TRANSFER"] = "1"
 HF_TOKEN = os.getenv("HF_TOKEN", "upload_your_hf_token_here")
 
 
-def upload_QandA_to_huggingface(file_path, hf_dataset_id):
+def upload_QandA_to_huggingface(file_path: str, hf_dataset_id: str) -> None:
     """
     Uploads a CSV file to a Hugging Face dataset repository.
 
