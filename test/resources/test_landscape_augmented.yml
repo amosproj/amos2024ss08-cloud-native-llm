@@ -17,3 +17,9 @@ landscape:
                 md:
                   - https://raw.githubusercontent.com/airshipit/treasuremap/master/.github/ISSUE_TEMPLATE/bug_report.md
                   - https://raw.githubusercontent.com/airshipit/treasuremap/master/.github/ISSUE_TEMPLATE/feature_request.md
+            website:
+              docs:
+              #- https://docs.airshipit.org/airship2/release-notes.html
+              - https://docs.ansible.com/ansible/latest/getting_started/get_started_inventory.html
+              - https://docs.ansible.com/ansible/latest/reference_appendices/release_and_maintenance.html
+              #- https://docs.google.com/document/d/1iFlVl7R97Lze4RDykzElJGDjjWYDlkI8Rhf8g4dQ5Rk/edit?usp=sharing

@@ -1,6 +1,6 @@
 from huggingface_hub import HfApi, login
 import os
-HF_TOKEN = os.getenv('HF_TOKEN', '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')
+HF_TOKEN = os.getenv('HF_TOKEN', 'add_token')
 api = HfApi()
 login(HF_TOKEN, add_to_git_credential=True)
 
