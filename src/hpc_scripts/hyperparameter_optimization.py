@@ -14,7 +14,6 @@ from transformers.trainer import *
 import optuna
 import gc
 
-
 import os
 HF_TOKEN = os.getenv('HF_TOKEN', 'add_hf_token')
 api = HfApi()
@@ -63,32 +62,13 @@ def hyperparameter_search(
     hp_space,
     n_trials,
     direction,
+    compute_objective=default_compute_objective,
 ) -> Union[BestRun, List[BestRun]]:
-
-    # if backend is None:
-    #     backend = default_hp_search_backend()
-    # backend = HPSearchBackend(backend)
-    # backend_obj = ALL_HYPERPARAMETER_SEARCH_BACKENDS[backend]()
-    # backend_obj.ensure_available()
-    # self.hp_search_backend = backend
-    # if self.model_init is None:
-    #     raise RuntimeError(
-    #         "To use hyperparameter search, you need to pass your model through a model_init function."
-    #     )
-
-    # self.hp_space = backend_obj.default_hp_space if hp_space is None else hp_space
-    # self.hp_name = hp_name
-    # self.compute_objective = default_compute_objective if compute_objective is None else compute_objective
-
-    # best_run = backend_obj.run(self, n_trials, direction, **kwargs)
-
-    # self.hp_search_backend = None
-    # return best_run
 
     trainer.hp_search_backend = HPSearchBackend.OPTUNA
     self.hp_space = hp_space
     trainer.hp_name = None
-    trainer.compute_objective = default_compute_objective
+    trainer.compute_objective = compute_objective
     best_run = run_hp_search_optuna(trainer, n_trials, direction)
     self.hp_search_backend = None
     return best_run
@@ -97,35 +77,29 @@ def hyperparameter_search(
 transformers.trainer.Trainer.hyperparameter_search = hyperparameter_search
 
 
-# we need accelerate to use the trainer with torch
-
-# notebook login to access gemma
-# notebook_login()
-
 # defining hyperparameter search space for optuna
 
 
 def optuna_hp_space(trial):
     return {
         "learning_rate": trial.suggest_float("learning_rate", 1e-6, 1e-4, log=True),
-        "per_device_train_batch_size": trial.suggest_categorical("per_device_train_batch_size", [2, 4]),
+        "per_device_train_batch_size": trial.suggest_categorical("per_device_train_batch_size", [16, 32, 64]),
+        "num_train_epochs": trial.suggest_int("num_train_epochs", 3, 15),
+        "weight_decay": trial.suggest_loguniform("weight_decay", 1e-6, 1e-2),
+        "gradient_clipping": trial.suggest_float("gradient_clipping", 0.1, 0.5),
     }
+
+# Define a function to calculate BLEU score
 
 
 # configuration arguments
-model_id = "google/gemma-1.1-2b-it"
-
-# cannot use this for hyperparameter search
-# bnb_config = BitsAndBytesConfig(
-#     load_in_4bit=True,
-#     bnb_4bit_quant_type="nf4",
-#     bnb_4bit_compute_dtype=torch.bfloat16
-# )
+model_id = "google/gemma-2-27b-it"
 
 # model init function for the trainer
 
 
 def model_init(trial):
+
     return AutoModelForCausalLM.from_pretrained(model_id, device_map="auto")
 
 
@@ -134,9 +108,9 @@ tokenizer = AutoTokenizer.from_pretrained(model_id, padding_side='right')
 
 # Loading training and evaluation data
 training_dataset = load_dataset(
-    "Kubermatic/cncf-question-and-answer-dataset-for-llm-training", split="train[:50]")
+    "Kubermatic/cncf-question-and-answer-dataset-for-llm-training", split="train[:7500]")
 eval_dataset = load_dataset(
-    "Kubermatic/cncf-question-and-answer-dataset-for-llm-training", split="train[50:55]")
+    "Kubermatic/cncf-question-and-answer-dataset-for-llm-training", split="train[7500:8000]")
 
 max_seq_length = 1024
 
@@ -169,9 +143,9 @@ training_arguments = TrainingArguments(
 )
 
 lora_config = LoraConfig(
-    lora_alpha=16,
-    lora_dropout=0,
-    r=64,
+    lora_alpha=64,
+    lora_dropout=0.1,
+    r=32,
     bias="none",
     target_modules=["q_proj", "o_proj", "k_proj",
                     "v_proj", "gate_proj", "up_proj", "down_proj"],
@@ -205,9 +179,9 @@ trainer = SFTTrainer(
 )
 
 best_trial = trainer.hyperparameter_search(
-    direction="maximize",
+    direction="minimize",
     hp_space=optuna_hp_space,
-    n_trials=2,
+    n_trials=20,
 )
 
 print(best_trial)
