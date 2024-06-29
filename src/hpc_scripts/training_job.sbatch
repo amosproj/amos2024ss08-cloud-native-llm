@@ -33,6 +33,13 @@ mkdir ${WORK}/$SLURM_JOB_ID
 cp -r ${SLURM_SUBMIT_DIR}/model_training.py .
 mkdir -p output/
 
+(
+  while true; do
+    nvidia-smi > ${SLURM_SUBMIT_DIR}/gpu_usage_${SLURM_JOB_ID}.log
+    sleep 60
+  done
+) &
+
 # Run training script (with data copied to node)
 python model_training.py 
 
