@@ -1,3 +1,7 @@
+from datasets import load_dataset
+import torch
+from peft import LoraConfig
+from trl import SFTTrainer
 from transformers import (AutoModelForCausalLM,
                           AutoTokenizer,
                           BitsAndBytesConfig,
@@ -102,7 +106,7 @@ trainer = SFTTrainer(
     formatting_func=formatting_func,
     tokenizer=tokenizer,
     max_seq_length=max_seq_length,
-    callbacks=[EarlyStoppingCallback(early_stopping_patience=3)],
+    callbacks=[EarlyStoppingCallback(early_stopping_patience=15)],
 )
 trainer.train()
 print("Model is trained")
