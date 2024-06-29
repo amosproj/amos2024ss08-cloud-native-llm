@@ -102,7 +102,7 @@ trainer = SFTTrainer(
     formatting_func=formatting_func,
     tokenizer=tokenizer,
     max_seq_length=max_seq_length,
-    callbacks=[EarlyStoppingCallback(early_stopping_patience=3)],
+    callbacks=[EarlyStoppingCallback(early_stopping_patience=15)],
 )
 trainer.train()
 print("Model is trained")
