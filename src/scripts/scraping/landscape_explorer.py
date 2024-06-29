@@ -1,3 +1,27 @@
+"""
+This script retrieves files with specified extensions from GitHub repositories,
+augments a YAML file with download URLs, and caches requests for efficient retrieval.
+It handles rate limits and logging errors during API requests.
+
+Dependencies:
+- requests
+- os
+- yaml
+- tqdm
+- requests_cache
+- logging
+- collections
+
+Environment Variables:
+- GITHUB_TOKEN: GitHub token for authentication (optional)
+
+Usage:
+Ensure correct configuration of 'BASE_REPO_YAML' and 'OUTPUT_PATH' for input and output file paths respectively. Adjust 'EXTENSIONS' for desired file types to retrieve.
+
+Note:
+Ensure 'repo_url' attributes in the YAML file correspond to valid GitHub repository URLs. Cached requests expire after 7 days ('landscape_cache').
+"""
+
 #!/usr/bin/python3
 from yaml.representer import Representer
 from collections import defaultdict
@@ -10,8 +34,8 @@ import logging
 import time
 import collections
 
-# Replace with your GitHub token
-TOKEN = os.getenv('GITHUB_TOKEN', 'Replace your token')
+
+TOKEN = os.getenv('GITHUB_TOKEN', "Replace your token")
 HEADERS = {'Authorization': f'Bearer {TOKEN}',
            'Accept': 'application/vnd.github+json', 'X-GitHub-Api-Version': '2022-11-28'}
 BASE_API_URL = 'https://api.github.com'
@@ -69,14 +93,14 @@ def get_urls(repo_url: str, default_branch: str = "", tree_sha: str = "", file_p
 
     for file in tree:
         ext = file.get('path').split('.')[-1]
-        new_file_path = file_path + "/" + \
-            file.get('path') if file_path else file.get('path')
+        new_file_path = f"{file_path}/{file['path']}" if file_path else file['path']
         if file.get('type') == 'blob' and ext in EXTENSIONS:
             res[ext].append(base_download_url + new_file_path)
 
         if truncated and file.get('type') == 'tree':
-            get_urls(repo_url, default_branch, file.get(
-                'sha'), new_file_path, res)
+            logging.debug(f'Recursively fetching URLs for path {new_file_path}')
+            get_urls(repo_url, default_branch, file.get('sha'), new_file_path, res)
+
 
     return res
 
@@ -102,7 +126,7 @@ def get_default_branch(repo_url: str) -> str:
     return response.json().get('default_branch')
 
 
-def generate_augmented_yml_with_urls():
+def generate_augmented_yml_with_urls() -> None:
     """
     Retrieves the YAML content from BASE_REPO_YAML, augments it with download URLs,
     and saves the augmented content to 'sources/landscape_augmented.yml'.
@@ -130,13 +154,22 @@ def generate_augmented_yml_with_urls():
 
 
 def make_request(url):
+    """
+    Makes an HTTP GET request to the provided URL with error handling and rate limit handling.
+
+    Args:
+        url (str): The URL to make the request to.
+
+    Returns:
+        requests.Response or None: The response object if the request was successful, None otherwise.
+    """
     print("making request to url: ", url)
     try:
         response = requests.get(url, headers=HEADERS, timeout=30)
     except requests.exceptions.RequestException as e:
         logging.error(f'Error making request to {url}: {e}')
         return None
-    print(response)
+
     if 'retry_after' in response.headers:
         logging.warning(
             f'Rate limit exceeded. Retrying after {response.headers["retry-after"]} seconds')
@@ -146,9 +179,8 @@ def make_request(url):
             f'Rate limit exceeded. Retrying after {response.headers["x-ratelimit-remaining"]} seconds')
         time.sleep(int(response.headers['x-ratelimit-reset']))
 
-    response = requests.get(url, headers=HEADERS)
-
     return response
+
 
 
 if __name__ == '__main__':
