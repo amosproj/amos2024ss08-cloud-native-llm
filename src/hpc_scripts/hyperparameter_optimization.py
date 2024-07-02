@@ -22,7 +22,6 @@ login(HF_TOKEN, add_to_git_credential=True)
 def optuna_hp_space(trial):
     return {
         "learning_rate": trial.suggest_float("learning_rate", 1e-6, 1e-4, log=True),
-        "per_device_train_batch_size": trial.suggest_categorical("per_device_train_batch_size", [16, 32, 64]),
         "num_train_epochs": trial.suggest_int("num_train_epochs", 3, 15),
         "weight_decay": trial.suggest_loguniform("weight_decay", 1e-6, 1e-2),
     }
@@ -62,7 +61,7 @@ training_arguments = TrainingArguments(
     output_dir=output_dir,
     num_train_epochs=3,
     gradient_checkpointing=True,
-    per_device_train_batch_size=1,
+    per_device_train_batch_size=8,
     gradient_accumulation_steps=8,
     optim="adafactor",
     save_steps=0,
