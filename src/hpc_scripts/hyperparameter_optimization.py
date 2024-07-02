@@ -31,7 +31,7 @@ def optuna_hp_space(trial):
 
 
 # configuration arguments
-model_id = "google/gemma-2-27b-it"
+model_id = "google/gemma-2-9b-it"
 
 # bits and bytes config
 bnb_config = BitsAndBytesConfig(
@@ -60,7 +60,7 @@ max_seq_length = 1024
 output_dir = "trained_model"
 training_arguments = TrainingArguments(
     output_dir=output_dir,
-    num_train_epochs=1,
+    num_train_epochs=3,
     gradient_checkpointing=True,
     per_device_train_batch_size=1,
     gradient_accumulation_steps=8,
@@ -105,11 +105,14 @@ def formatting_func(example):
         output_texts.append(text)
     return output_texts
 
+
+# Passing model
+model = model_init(None)
+
+
 # instantiation of the trainer
-
-
 trainer = SFTTrainer(
-    model=model_id,
+    model=model,
     train_dataset=training_dataset,
     eval_dataset=eval_dataset,
     args=training_arguments,
