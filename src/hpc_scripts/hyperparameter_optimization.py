@@ -1,80 +1,19 @@
 # imports
-import transformers
 from transformers import (AutoModelForCausalLM,
                           AutoTokenizer,
                           TrainingArguments,
+                          BitsAndBytesConfig
                           )
 from trl import SFTTrainer
 from peft import LoraConfig
 from datasets import load_dataset
-from transformers import AutoTokenizer, AutoModelForCausalLM
 from huggingface_hub import HfApi, login
-from transformers.hyperparameter_search import HPSearchBackend
-from transformers.trainer import *
-import optuna
-import gc
+import torch
 
 import os
 HF_TOKEN = os.getenv('HF_TOKEN', 'add_hf_token')
 api = HfApi()
 login(HF_TOKEN, add_to_git_credential=True)
-
-
-gc.collect()
-torch.cuda.empty_cache()
-
-
-def run_hp_search_optuna(trainer, n_trials, direction, **kwargs):
-
-    def _objective(trial, checkpoint_dir=None):
-        checkpoint = None
-        if checkpoint_dir:
-            for subdir in os.listdir(checkpoint_dir):
-                if subdir.startswith(PREFIX_CHECKPOINT_DIR):
-                    checkpoint = os.path.join(checkpoint_dir, subdir)
-        #################
-        # UPDATES START
-        #################
-        if not checkpoint:
-            # free GPU memory
-            del trainer.model
-            gc.collect()
-            torch.cuda.empty_cache()
-        trainer.objective = None
-        trainer.train(resume_from_checkpoint=checkpoint, trial=trial)
-        # If there hasn't been any evaluation during the training loop.
-        if getattr(trainer, "objective", None) is None:
-            metrics = trainer.evaluate()
-            trainer.objective = trainer.compute_objective(metrics)
-        return trainer.objective
-
-    timeout = kwargs.pop("timeout", None)
-    n_jobs = kwargs.pop("n_jobs", 1)
-    study = optuna.create_study(direction=direction, **kwargs)
-    study.optimize(_objective, n_trials=n_trials,
-                   timeout=timeout, n_jobs=n_jobs)
-    best_trial = study.best_trial
-    return BestRun(str(best_trial.number), best_trial.value, best_trial.params)
-
-
-def hyperparameter_search(
-    self,
-    hp_space,
-    n_trials,
-    direction,
-    compute_objective=default_compute_objective,
-) -> Union[BestRun, List[BestRun]]:
-
-    trainer.hp_search_backend = HPSearchBackend.OPTUNA
-    self.hp_space = hp_space
-    trainer.hp_name = None
-    trainer.compute_objective = compute_objective
-    best_run = run_hp_search_optuna(trainer, n_trials, direction)
-    self.hp_search_backend = None
-    return best_run
-
-
-transformers.trainer.Trainer.hyperparameter_search = hyperparameter_search
 
 
 # defining hyperparameter search space for optuna
@@ -86,7 +25,6 @@ def optuna_hp_space(trial):
         "per_device_train_batch_size": trial.suggest_categorical("per_device_train_batch_size", [16, 32, 64]),
         "num_train_epochs": trial.suggest_int("num_train_epochs", 3, 15),
         "weight_decay": trial.suggest_loguniform("weight_decay", 1e-6, 1e-2),
-        "gradient_clipping": trial.suggest_float("gradient_clipping", 0.1, 0.5),
     }
 
 # Define a function to calculate BLEU score
@@ -95,12 +33,16 @@ def optuna_hp_space(trial):
 # configuration arguments
 model_id = "google/gemma-2-27b-it"
 
-# model init function for the trainer
+# bits and bytes config
+bnb_config = BitsAndBytesConfig(
+    load_in_4bit=True,
+    bnb_4bit_quant_type="nf4",
+    bnb_4bit_compute_dtype=torch.bfloat16
+)
 
 
 def model_init(trial):
-
-    return AutoModelForCausalLM.from_pretrained(model_id, device_map="auto")
+    return AutoModelForCausalLM.from_pretrained(model_id, quantization_config=bnb_config, device_map="auto",)
 
 
 # tokenizer load
@@ -177,6 +119,9 @@ trainer = SFTTrainer(
     max_seq_length=max_seq_length,
     model_init=model_init,
 )
+
+# avoid placing model on device as it is already placed on device in model_init
+trainer.place_model_on_device = False
 
 best_trial = trainer.hyperparameter_search(
     direction="minimize",
