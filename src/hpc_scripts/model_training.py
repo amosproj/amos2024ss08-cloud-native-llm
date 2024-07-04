@@ -1,3 +1,4 @@
+import random
 from transformers import (AutoModelForCausalLM,
                           AutoTokenizer,
                           BitsAndBytesConfig,
@@ -17,12 +18,12 @@ login(HF_TOKEN, add_to_git_credential=True)
 
 
 # training pipeline taken from https://huggingface.co/blog/gemma-peft
-model_id = "google/gemma-2-27b-it"
+model_id = "google/gemma-2-9b-it"
 
 bnb_config = BitsAndBytesConfig(
-    load_in_8bit=True,
-    bnb_8bit_quant_type="nf4",
-    bnb_8bit_compute_dtype=torch.bfloat16
+    load_in_4bit=True,
+    bnb_4bit_quant_type="nf4",
+    bnb_4bit_compute_dtype=torch.bfloat16
 )
 
 tokenizer = AutoTokenizer.from_pretrained(model_id, padding_side='right')
@@ -33,6 +34,16 @@ model = AutoModelForCausalLM.from_pretrained(
 # Training Data
 dataset = load_dataset(
     "Kubermatic/cncf-question-and-answer-dataset-for-llm-training", split="train")
+
+random.seed(42)
+random_indices = random.sample(range(len(dataset)), k=len(dataset))
+
+training_indices = random_indices[:-len(dataset)//5]
+eval_indices = random_indices[-len(dataset)//5:]
+training_dataset = dataset.filter(
+    lambda _, idx: idx in training_indices, with_indices=True)
+eval_dataset = dataset.filter(
+    lambda _, idx: idx in eval_indices, with_indices=True)
 
 
 # Training (hyper)parameters (initial config taken from: https://medium.com/@lucamassaron/sherlock-holmes-q-a-enhanced-with-gemma-2b-it-fine-tuning-2907b06d2645)
@@ -46,7 +57,7 @@ training_arguments = TrainingArguments(
     output_dir=output_dir,
     num_train_epochs=3,
     gradient_checkpointing=True,
-    per_device_train_batch_size=16,
+    per_device_train_batch_size=1,
     gradient_accumulation_steps=8,
     optim="paged_adamw_32bit",
     save_steps=0,
@@ -102,7 +113,8 @@ trainer = SFTTrainer(
     formatting_func=formatting_func,
     tokenizer=tokenizer,
     max_seq_length=max_seq_length,
-    callbacks=[EarlyStoppingCallback(early_stopping_patience=15)],
+    callbacks=[EarlyStoppingCallback(early_stopping_patience=5)],
+    eval_dataset=eval_dataset
 )
 trainer.train()
 print("Model is trained")
