@@ -1,21 +1,23 @@
 # imports
+import gc
 from transformers import (AutoModelForCausalLM,
                           AutoTokenizer,
                           TrainingArguments,
                           BitsAndBytesConfig
                           )
-from trl import SFTTrainer
-from peft import LoraConfig
+from peft import LoraConfig, prepare_model_for_kbit_training, get_peft_model
 from datasets import load_dataset
 from huggingface_hub import HfApi, login
 import torch
-
+import CustomSFTTrainer
+import random
 import os
 HF_TOKEN = os.getenv('HF_TOKEN', 'add_hf_token')
 api = HfApi()
 login(HF_TOKEN, add_to_git_credential=True)
 
-
+gc.collect()
+torch.cuda.empty_cache()
 # defining hyperparameter search space for optuna
 
 
@@ -41,17 +43,28 @@ bnb_config = BitsAndBytesConfig(
 
 
 def model_init(trial):
-    return AutoModelForCausalLM.from_pretrained(model_id, quantization_config=bnb_config, device_map="auto",)
+    model = AutoModelForCausalLM.from_pretrained(
+        model_id, quantization_config=bnb_config, device_map="auto")
+    model = prepare_model_for_kbit_training(model)
+    model = get_peft_model(model, lora_config)
+    return model
 
 
 # tokenizer load
 tokenizer = AutoTokenizer.from_pretrained(model_id, padding_side='right')
 
-# Loading training and evaluation data
-training_dataset = load_dataset(
-    "Kubermatic/cncf-question-and-answer-dataset-for-llm-training", split="train[:7500]")
-eval_dataset = load_dataset(
-    "Kubermatic/cncf-question-and-answer-dataset-for-llm-training", split="train[7500:8000]")
+dataset = load_dataset(
+    "Kubermatic/cncf-question-and-answer-dataset-for-llm-training", split="train")
+
+random.seed(42)
+random_indices = random.sample(range(len(dataset)), k=500)
+
+training_indices = random_indices[:400]
+eval_indices = random_indices[400:500]
+training_dataset = dataset.filter(
+    lambda _, idx: idx in training_indices, with_indices=True)
+eval_dataset = dataset.filter(
+    lambda _, idx: idx in eval_indices, with_indices=True)
 
 max_seq_length = 1024
 
@@ -61,9 +74,9 @@ training_arguments = TrainingArguments(
     output_dir=output_dir,
     num_train_epochs=3,
     gradient_checkpointing=True,
-    per_device_train_batch_size=8,
+    per_device_train_batch_size=1,
     gradient_accumulation_steps=8,
-    optim="adafactor",
+    optim="paged_adamw_32bit",
     save_steps=0,
     logging_steps=10,
     learning_rate=5e-4,
@@ -110,7 +123,7 @@ model = model_init(None)
 
 
 # instantiation of the trainer
-trainer = SFTTrainer(
+trainer = CustomSFTTrainer(
     model=model,
     train_dataset=training_dataset,
     eval_dataset=eval_dataset,

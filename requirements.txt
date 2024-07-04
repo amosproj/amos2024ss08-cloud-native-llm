@@ -28,4 +28,5 @@ datetime==5.5
 optuna==3.6.1
 python-dotenv==1.0.1
 typing==3.7.4.3
+random==1.0.1
 
