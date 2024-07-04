@@ -74,6 +74,7 @@ training_arguments = TrainingArguments(
     report_to="tensorboard",
     disable_tqdm=False,
     load_best_model_at_end=True,
+    evaluation_strategy='steps',
     # debug="underflow_overflow"
 )
 
