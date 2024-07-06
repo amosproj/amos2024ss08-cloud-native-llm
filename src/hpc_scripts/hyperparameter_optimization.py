@@ -54,7 +54,7 @@ def model_init(trial):
 tokenizer = AutoTokenizer.from_pretrained(model_id, padding_side='right')
 
 dataset = load_dataset(
-    "Kubermatic/cncf-question-and-answer-dataset-for-llm-training", split="train")
+    "Kubermatic/Merged_QAs", split="train")
 
 random.seed(42)
 random_indices = random.sample(range(len(dataset)), k=500)
@@ -141,7 +141,7 @@ trainer.place_model_on_device = False
 best_trial = trainer.hyperparameter_search(
     direction="minimize",
     hp_space=optuna_hp_space,
-    n_trials=20,
+    n_trials=5,
 )
 
 print(best_trial)

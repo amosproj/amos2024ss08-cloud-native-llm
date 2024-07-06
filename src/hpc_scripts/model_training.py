@@ -33,13 +33,14 @@ model = AutoModelForCausalLM.from_pretrained(
 
 # Training Data
 dataset = load_dataset(
-    "Kubermatic/cncf-question-and-answer-dataset-for-llm-training", split="train")
+    "Kubermatic/Merged_QAs", split="train")
 
 random.seed(42)
-random_indices = random.sample(range(len(dataset)), k=len(dataset))
+l = len(dataset) // 25
+random_indices = random.sample(range(len(dataset)), k=l)
 
-training_indices = random_indices[:-len(dataset)//5]
-eval_indices = random_indices[-len(dataset)//5:]
+training_indices = random_indices[:-l//25]
+eval_indices = random_indices[-l//25:]
 training_dataset = dataset.filter(
     lambda _, idx: idx in training_indices, with_indices=True)
 eval_dataset = dataset.filter(
@@ -55,15 +56,15 @@ output_dir = "output"
 
 training_arguments = TrainingArguments(
     output_dir=output_dir,
-    num_train_epochs=11,
+    num_train_epochs=5,
     gradient_checkpointing=True,
-    per_device_train_batch_size=1,
+    per_device_train_batch_size=4,
     gradient_accumulation_steps=8,
     optim="paged_adamw_32bit",
     save_steps=0,
     logging_steps=10,
-    learning_rate=6.295127877143855e-06,
-    weight_decay=0.00021573996504024309,
+    learning_rate=1.344609154868106e-05,
+    weight_decay=0.00019307024914471071,
     fp16=True,
     bf16=False,
     max_grad_norm=0.3,
