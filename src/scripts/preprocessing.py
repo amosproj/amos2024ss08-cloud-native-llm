@@ -49,7 +49,8 @@ def merge_data() -> None:
         'answer': 'Answer',
         'tag': 'Project'
     })
-
+    # Drop additional columns
+    df2 = df2.drop(['question_id', 'score'], axis=1)
     # Concatenate the selected and renamed columns
     merged_df = pd.concat([df1_selected, df2_selected])
 
