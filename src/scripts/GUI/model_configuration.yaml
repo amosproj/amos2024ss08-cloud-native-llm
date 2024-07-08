@@ -7,7 +7,8 @@ mmap: true
 parameters:
   # Reference any HF model or a local file here
   #model: huggingface://TheBloke/phi-2-GGUF/phi-2.Q8_0.gguf
-  model: huggingface://google/gemma-2b-it/gemma-2b-it.gguf
+  #model: huggingface://google/gemma-2b-it/gemma-2b-it.gguf
+  model: huggingface://Kubermatic/DeepCNCFQuantized/ggml-model-Q4_K_M.gguf
   temperature: 0.7
   top_k: 50
   top_p: 0.95
