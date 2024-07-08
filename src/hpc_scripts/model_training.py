@@ -36,11 +36,12 @@ dataset = load_dataset(
     "Kubermatic/Merged_QAs", split="train")
 
 random.seed(42)
-l = len(dataset) // 200
+division_factor = 200
+l = len(dataset) // division_factor
 random_indices = random.sample(range(len(dataset)), k=l)
 
-training_indices = random_indices[:-l//160]
-eval_indices = random_indices[-l//160:]
+training_indices = random_indices[:-l//5]
+eval_indices = random_indices[-l//5:]
 training_dataset = dataset.filter(
     lambda _, idx: idx in training_indices, with_indices=True)
 eval_dataset = dataset.filter(
