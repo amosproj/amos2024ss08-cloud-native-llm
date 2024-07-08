@@ -13,7 +13,7 @@ parameters:
   top_k: 50
   top_p: 0.95
 
-backend: langchain-huggingface
+#backend: langchain-huggingface
 
 template:
 
