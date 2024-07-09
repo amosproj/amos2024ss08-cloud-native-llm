@@ -77,6 +77,7 @@ training_arguments = TrainingArguments(
     disable_tqdm=False,
     load_best_model_at_end=True,
     eval_accumulation_steps=1,
+    evaluation_strategy='steps',
     eval_steps=500,
     # debug="underflow_overflow"
 )
