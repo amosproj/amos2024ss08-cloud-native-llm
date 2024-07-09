@@ -1,4 +1,3 @@
-import random
 from transformers import (AutoModelForCausalLM,
                           AutoTokenizer,
                           BitsAndBytesConfig,
@@ -26,26 +25,18 @@ bnb_config = BitsAndBytesConfig(
     bnb_4bit_compute_dtype=torch.bfloat16
 )
 
+dataset = load_dataset(
+    "Kubermatic/Merged_QAs", split="train")
+dataset.shuffle(42)
+dataset = dataset.train_test_split(test_size=0.2)
+
+print(dataset["train"])
+print(dataset["test"])
+
 tokenizer = AutoTokenizer.from_pretrained(model_id, padding_side='right')
 # TODO: Check if this can be changed to AutoModelForQuestionAnswering with GEMMA
 model = AutoModelForCausalLM.from_pretrained(
-    model_id, quantization_config=bnb_config, device_map="auto")
-
-# Training Data
-dataset = load_dataset(
-    "Kubermatic/Merged_QAs", split="train")
-
-random.seed(42)
-division_factor = 50
-l = len(dataset) // division_factor
-random_indices = random.sample(range(len(dataset)), k=l)
-
-training_indices = random_indices[:-l//5]
-eval_indices = random_indices[-l//5:]
-training_dataset = dataset.filter(
-    lambda _, idx: idx in training_indices, with_indices=True)
-eval_dataset = dataset.filter(
-    lambda _, idx: idx in eval_indices, with_indices=True)
+    model_id, quantization_config=bnb_config, device_map="auto", attn_implementation='eager')
 
 
 # Training (hyper)parameters (initial config taken from: https://medium.com/@lucamassaron/sherlock-holmes-q-a-enhanced-with-gemma-2b-it-fine-tuning-2907b06d2645)
@@ -113,14 +104,14 @@ lora_config = LoraConfig(
 
 trainer = SFTTrainer(
     model=model,
-    train_dataset=training_dataset,
+    train_dataset=dataset,
     args=training_arguments,
     peft_config=lora_config,
     formatting_func=formatting_func,
     tokenizer=tokenizer,
     max_seq_length=max_seq_length,
-    callbacks=[EarlyStoppingCallback(early_stopping_patience=10)],
-    eval_dataset=eval_dataset
+    callbacks=[EarlyStoppingCallback(early_stopping_patience=15)],
+    eval_dataset=dataset,
 )
 trainer.train()
 print("Model is trained")
