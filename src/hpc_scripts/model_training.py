@@ -36,7 +36,7 @@ dataset = load_dataset(
     "Kubermatic/Merged_QAs", split="train")
 
 random.seed(42)
-division_factor = 200
+division_factor = 50
 l = len(dataset) // division_factor
 random_indices = random.sample(range(len(dataset)), k=l)
 
@@ -76,7 +76,8 @@ training_arguments = TrainingArguments(
     report_to="tensorboard",
     disable_tqdm=False,
     load_best_model_at_end=True,
-    evaluation_strategy='steps',
+    eval_accumulation_steps=1,
+    eval_steps=500,
     # debug="underflow_overflow"
 )
 
@@ -116,7 +117,7 @@ trainer = SFTTrainer(
     formatting_func=formatting_func,
     tokenizer=tokenizer,
     max_seq_length=max_seq_length,
-    callbacks=[EarlyStoppingCallback(early_stopping_patience=5)],
+    callbacks=[EarlyStoppingCallback(early_stopping_patience=10)],
     eval_dataset=eval_dataset
 )
 trainer.train()
