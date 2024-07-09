@@ -28,10 +28,7 @@ bnb_config = BitsAndBytesConfig(
 dataset = load_dataset(
     "Kubermatic/Merged_QAs", split="train")
 dataset.shuffle(42)
-dataset = dataset.train_test_split(test_size=0.2)
-
-print(dataset["train"])
-print(dataset["test"])
+dataset = dataset.train_test_split(train_size=0.20, test_size=0.04)
 
 tokenizer = AutoTokenizer.from_pretrained(model_id, padding_side='right')
 # TODO: Check if this can be changed to AutoModelForQuestionAnswering with GEMMA
@@ -104,14 +101,14 @@ lora_config = LoraConfig(
 
 trainer = SFTTrainer(
     model=model,
-    train_dataset=dataset,
+    train_dataset=dataset["train"],
     args=training_arguments,
     peft_config=lora_config,
     formatting_func=formatting_func,
     tokenizer=tokenizer,
     max_seq_length=max_seq_length,
     callbacks=[EarlyStoppingCallback(early_stopping_patience=15)],
-    eval_dataset=dataset,
+    eval_dataset=dataset["test"],
 )
 trainer.train()
 print("Model is trained")
