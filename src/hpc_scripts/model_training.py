@@ -79,6 +79,7 @@ training_arguments = TrainingArguments(
     eval_accumulation_steps=1,
     evaluation_strategy='steps',
     eval_steps=500,
+    per_device_eval_batch_size=4
     # debug="underflow_overflow"
 )
 
@@ -112,7 +113,7 @@ lora_config = LoraConfig(
 
 trainer = SFTTrainer(
     model=model,
-    train_dataset=dataset,
+    train_dataset=training_dataset,
     args=training_arguments,
     peft_config=lora_config,
     formatting_func=formatting_func,
