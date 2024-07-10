@@ -17,22 +17,23 @@ login(HF_TOKEN, add_to_git_credential=True)
 
 
 # training pipeline taken from https://huggingface.co/blog/gemma-peft
-model_id = "google/gemma-2-27b-it"
+model_id = "google/gemma-2-9b-it"
 
 bnb_config = BitsAndBytesConfig(
-    load_in_8bit=True,
-    bnb_8bit_quant_type="nf4",
-    bnb_8bit_compute_dtype=torch.bfloat16
+    load_in_4bit=True,
+    bnb_4bit_quant_type="nf4",
+    bnb_4bit_compute_dtype=torch.bfloat16
 )
+
+dataset = load_dataset(
+    "Kubermatic/Merged_QAs", split="train")
+dataset.shuffle(42)
+dataset = dataset.train_test_split(train_size=0.20, test_size=0.04)
 
 tokenizer = AutoTokenizer.from_pretrained(model_id, padding_side='right')
 # TODO: Check if this can be changed to AutoModelForQuestionAnswering with GEMMA
 model = AutoModelForCausalLM.from_pretrained(
-    model_id, quantization_config=bnb_config, device_map="auto")
-
-# Training Data
-dataset = load_dataset(
-    "Kubermatic/cncf-question-and-answer-dataset-for-llm-training", split="train")
+    model_id, quantization_config=bnb_config, device_map="auto", attn_implementation='eager')
 
 
 # Training (hyper)parameters (initial config taken from: https://medium.com/@lucamassaron/sherlock-holmes-q-a-enhanced-with-gemma-2b-it-fine-tuning-2907b06d2645)
@@ -44,15 +45,15 @@ output_dir = "output"
 
 training_arguments = TrainingArguments(
     output_dir=output_dir,
-    num_train_epochs=3,
+    num_train_epochs=5,
     gradient_checkpointing=True,
-    per_device_train_batch_size=16,
+    per_device_train_batch_size=4,
     gradient_accumulation_steps=8,
     optim="paged_adamw_32bit",
     save_steps=0,
     logging_steps=10,
-    learning_rate=5e-4,
-    weight_decay=0.001,
+    learning_rate=1.344609154868106e-05,
+    weight_decay=0.00019307024914471071,
     fp16=True,
     bf16=False,
     max_grad_norm=0.3,
@@ -63,6 +64,10 @@ training_arguments = TrainingArguments(
     report_to="tensorboard",
     disable_tqdm=False,
     load_best_model_at_end=True,
+    eval_accumulation_steps=1,
+    evaluation_strategy='steps',
+    eval_steps=500,
+    per_device_eval_batch_size=4
     # debug="underflow_overflow"
 )
 
@@ -96,13 +101,14 @@ lora_config = LoraConfig(
 
 trainer = SFTTrainer(
     model=model,
-    train_dataset=dataset,
+    train_dataset=dataset["train"],
     args=training_arguments,
     peft_config=lora_config,
     formatting_func=formatting_func,
     tokenizer=tokenizer,
     max_seq_length=max_seq_length,
     callbacks=[EarlyStoppingCallback(early_stopping_patience=15)],
+    eval_dataset=dataset["test"],
 )
 trainer.train()
 print("Model is trained")
