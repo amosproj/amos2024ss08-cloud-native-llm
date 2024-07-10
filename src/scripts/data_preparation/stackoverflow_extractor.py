@@ -57,7 +57,7 @@ import threading
 import multiprocessing
 
 load_dotenv()
-API_KEY = os.getenv('API_KEY', '9voMDokb2mzeteewaiUXaw((')
+API_KEY = os.getenv('API_KEY', 'Replace your api key')
 REQUEST_DELAY = 0  # Number of seconds to wait between requests
 
 CSV_FILE = 'sources/stackoverflow_Q&A/cncf_stackoverflow_qas.csv'
@@ -115,11 +115,6 @@ def qa_extractor(tag: str, start_page: int, page_size: int = 100) -> int:
     request_count = 0
     
     while True:
-        if start_page > 3:
-            # only extract 3 page per tag(project)
-            # with page size 300 is equal to 300 Q&As per project
-            save_progress(tag, "finished")
-            break
         if request_count >= DAILY_REQUEST_LIMIT:
             break
         
@@ -127,9 +122,7 @@ def qa_extractor(tag: str, start_page: int, page_size: int = 100) -> int:
             'page': start_page,
             'pagesize': page_size,
             'order': 'desc',
-            'sort': 'votes',
-            'min': 5,  # Minimum score greater than 10
-            'accepted': 'True',
+            'sort': 'activity',
             'answers': 1,
             'tagged': tag,
             'site': 'stackoverflow',
@@ -157,8 +150,7 @@ def qa_extractor(tag: str, start_page: int, page_size: int = 100) -> int:
                     answers = fetch_answers(question_id)
                     
                     for count, answer in enumerate(answers, start=1):
-                        #only one anwer per question too reduce number of answers
-                        if count > 1:
+                        if count > 3:
                             break
                         if answer['score'] < 0:
                             continue
@@ -168,8 +160,6 @@ def qa_extractor(tag: str, start_page: int, page_size: int = 100) -> int:
                             "question": question_text,
                             "answer": answer_text,
                             "tag": tag,
-                            "question_id": question_id,
-                            "score": question['score']
                         })
                     
                     processed_question_ids.add(question_id)
