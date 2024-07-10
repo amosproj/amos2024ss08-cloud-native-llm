@@ -1,0 +1,73 @@
+Title	URL	Assignees	Status	Labels
+Preliminary investigation of deployment with localai	https://github.com/amosproj/amos2024ss08-cloud-native-llm/issues/103	christianwielenberg, dnsch	Feature Archive	Actual SP 03, SP 03, User Story
+Combine latest changes of the Q&A dataset and Stackoverflow dataset to the Merged Q&A dataset	https://github.com/amosproj/amos2024ss08-cloud-native-llm/issues/101	anosh-ar	Feature Archive	Actual SP 03, SP 03, User Story
+Utilise Hetzner for LLM Fine-tuning 	https://github.com/amosproj/amos2024ss08-cloud-native-llm/issues/97	anosh-ar	Feature Archive	Actual SP 05, SP 05, User Story
+Document our Datasets	https://github.com/amosproj/amos2024ss08-cloud-native-llm/issues/102	YashodharPansuriya	Feature Archive	Actual SP 03, SP 03, User Story
+Run Stackoverflow extraction to get more data	https://github.com/amosproj/amos2024ss08-cloud-native-llm/issues/78	YashodharPansuriya	Feature Archive	Actual SP 01, SP 01, User Story
+Refactor the ETL and Data Transformation Scripts	https://github.com/amosproj/amos2024ss08-cloud-native-llm/issues/94	dnsch, YashodharPansuriya	Feature Archive	Actual SP 05, SP 03, User Story
+Run Q&A Generator with the Latest Collected Data	https://github.com/amosproj/amos2024ss08-cloud-native-llm/issues/93	christianwielenberg	Feature Archive	Actual SP 02, SP 03, User Story
+Prepare a small test set for evaluation	https://github.com/amosproj/amos2024ss08-cloud-native-llm/issues/82	anosh-ar, christianwielenberg, dnsch	Feature Archive	Actual SP 02, SP 02, User Story
+Collect previous research work in our Wiki	https://github.com/amosproj/amos2024ss08-cloud-native-llm/issues/95	YashodharPansuriya	Feature Archive	Actual SP 02, SP 03, User Story
+Study and Research on LLM Hyper-parameters	https://github.com/amosproj/amos2024ss08-cloud-native-llm/issues/92	anosh-ar, julioc-p	Feature Archive	Actual SP 05, SP 05, User Story
+Select Suitable Benchmark Metrics	https://github.com/amosproj/amos2024ss08-cloud-native-llm/issues/80	christianwielenberg, dnsch	Feature Archive	Actual SP 05, SP 05, User Story
+Extract And Store Text Data From CNCF Project Webpages	https://github.com/amosproj/amos2024ss08-cloud-native-llm/issues/56	anosh-ar	Feature Archive	Actual SP 08, SP 08, User Story
+Train LLM on FAUs HPC	https://github.com/amosproj/amos2024ss08-cloud-native-llm/issues/64	christianwielenberg, dnsch	Feature Archive	Actual SP 03, SP 03, User Story
+Deploy the trained model to Huggingface	https://github.com/amosproj/amos2024ss08-cloud-native-llm/issues/66	julioc-p	Feature Archive	Actual SP 05, SP 05, User Story
+Utilise HPC for Data Generation Scripts	https://github.com/amosproj/amos2024ss08-cloud-native-llm/issues/71	christianwielenberg	Feature Archive	Actual SP 05, SP 05, User Story
+Preprocessing of the data of the Q&A dataset	https://github.com/amosproj/amos2024ss08-cloud-native-llm/issues/61	anosh-ar	Feature Archive	Actual SP 05, SP 05, User Story
+Implementation of the Retraining to get a CNCF LLM	https://github.com/amosproj/amos2024ss08-cloud-native-llm/issues/63	christianwielenberg, dnsch	Feature Archive	Actual SP 05, SP 05, User Story
+Create build/deploy documentation	https://github.com/amosproj/amos2024ss08-cloud-native-llm/issues/52	YashodharPansuriya	Feature Archive	Actual SP 02, amos-homework, SP 03, User Story
+Create design documentation	https://github.com/amosproj/amos2024ss08-cloud-native-llm/issues/51	julioc-p	Feature Archive	Actual SP 03, amos-homework, SP 03, User Story
+Create User documentation	https://github.com/amosproj/amos2024ss08-cloud-native-llm/issues/50	julioc-p	Feature Archive	Actual SP 02, amos-homework, SP 03, User Story
+Learn How to Utilise the HPC 	https://github.com/amosproj/amos2024ss08-cloud-native-llm/issues/32	anosh-ar, christianwielenberg, dnsch, julioc-p, YashodharPansuriya	Feature Archive	Actual SP 03, SP 05, User Story
+Research and Select a Suitable NER Tool or Library	https://github.com/amosproj/amos2024ss08-cloud-native-llm/issues/44	dnsch	Feature Archive	Actual SP 03, SP 05, User Story
+Include Stackoverflow Q&As related to CNCF into our Q&A dataset	https://github.com/amosproj/amos2024ss08-cloud-native-llm/issues/34	anosh-ar, YashodharPansuriya	Feature Archive	Actual SP 05, SP 08, User Story
+Improve the Performance of Data Unifying Script	https://github.com/amosproj/amos2024ss08-cloud-native-llm/issues/35	christianwielenberg	Feature Archive	Actual SP 03, SP 03, User Story
+Make whole project able to be build with a build tool	https://github.com/amosproj/amos2024ss08-cloud-native-llm/issues/49	julioc-p	Feature Archive	Actual SP 08, amos-homework, SP 08, User Story
+Improve the Q&A Pairs Transformation Pipeline	https://github.com/amosproj/amos2024ss08-cloud-native-llm/issues/42	christianwielenberg, dnsch	Feature Archive	Actual SP 05, SP 05, User Story
+Implement an Initial Generator for enriching Q&A Pairs	https://github.com/amosproj/amos2024ss08-cloud-native-llm/issues/31	anosh-ar, dnsch	Feature Archive	Actual SP 05, SP 05, User Story
+Exclude Non-English Content from Raw Dataset	https://github.com/amosproj/amos2024ss08-cloud-native-llm/issues/38	anosh-ar	Feature Archive	Actual SP 02, SP 02, User Story
+Implement an Initial Answer Matching Function	https://github.com/amosproj/amos2024ss08-cloud-native-llm/issues/30	christianwielenberg, julioc-p	Feature Archive	Actual SP 02, SP 05, User Story
+Implement an Initial Question Extraction Function	https://github.com/amosproj/amos2024ss08-cloud-native-llm/issues/29	christianwielenberg, julioc-p	Feature Archive	Actual SP 05, SP 05, User Story
+Extract the dataset from Hugging Face	https://github.com/amosproj/amos2024ss08-cloud-native-llm/issues/16	YashodharPansuriya	Feature Archive	Actual SP 03, SP 03, User Story
+Store Q&As in Hugging Face	https://github.com/amosproj/amos2024ss08-cloud-native-llm/issues/33	YashodharPansuriya	Feature Archive	Actual SP 02, SP 05, User Story
+Identify Webpages for the Kubernetes LLM dataset	https://github.com/amosproj/amos2024ss08-cloud-native-llm/issues/6	julioc-p	Feature Archive	Actual SP 03, SP 05, User Story
+Research Q&A Pairs Pipeline	https://github.com/amosproj/amos2024ss08-cloud-native-llm/issues/27	dnsch	Feature Archive	Actual SP 05, SP 03, User Story
+Enhance Software Architecture Draft - Detail Machine Learning Pipeline	https://github.com/amosproj/amos2024ss08-cloud-native-llm/issues/17	dnsch	Feature Archive	Actual SP 05, SP 05, User Story
+Create a Report on LLM Research Findings	https://github.com/amosproj/amos2024ss08-cloud-native-llm/issues/21	christianwielenberg	Feature Archive	Actual SP 03, SP 03, User Story
+Extract Content from CNCF sources	https://github.com/amosproj/amos2024ss08-cloud-native-llm/issues/7	anosh-ar	Feature Archive	Actual SP 05, SP 01, User Story
+Conduct Largue Langage Base Model Selection Process	https://github.com/amosproj/amos2024ss08-cloud-native-llm/issues/19	anosh-ar	Feature Archive	Actual SP 05, SP 05, User Story
+Research Open-Source LLMs	https://github.com/amosproj/amos2024ss08-cloud-native-llm/issues/18	julioc-p	Feature Archive	Actual SP 03, SP 03, User Story
+Set Up Team Logo and request Team T-shirt	https://github.com/amosproj/amos2024ss08-cloud-native-llm/issues/4	dnsch	Feature Archive	amos-homework
+Identify Repositories for the Kubernetes LLM dataset	https://github.com/amosproj/amos2024ss08-cloud-native-llm/issues/11	julioc-p	Feature Archive	Actual SP 05, SP 05, User Story
+CI/CD pipeline for project	https://github.com/amosproj/amos2024ss08-cloud-native-llm/issues/23	julioc-p	Feature Archive	Actual SP 03, SP 03
+Create Software architecture draft	https://github.com/amosproj/amos2024ss08-cloud-native-llm/issues/12	dnsch	Feature Archive	Actual SP 05, amos-homework, SP 05, User Story
+Transform extracted data into a unified Format	https://github.com/amosproj/amos2024ss08-cloud-native-llm/issues/8	YashodharPansuriya	Feature Archive	Actual SP 05, SP 05, User Story
+Load data to Hugging Face	https://github.com/amosproj/amos2024ss08-cloud-native-llm/issues/9	christianwielenberg	Feature Archive	Actual SP 02, SP 02, User Story
+Monitoring of the ETL process by Logging	https://github.com/amosproj/amos2024ss08-cloud-native-llm/issues/10	julioc-p	Feature Archive	Actual SP 02, SP 03, User Story
+Create a Chatbot on HuggingFace	https://github.com/amosproj/amos2024ss08-cloud-native-llm/issues/79	julioc-p	Feature Archive	Actual SP 03, SP 05, User Story
+Implement a Script for LLM fine-tuning	https://github.com/amosproj/amos2024ss08-cloud-native-llm/issues/98	christianwielenberg, julioc-p	In progress	SP 02, User Story
+Deploy the Fine-tuned Model	https://github.com/amosproj/amos2024ss08-cloud-native-llm/issues/108	anosh-ar	Awaiting review	SP 05, User Story
+[PO] Create the Demo-day Slide	https://github.com/amosproj/amos2024ss08-cloud-native-llm/issues/109		Awaiting review	amos-homework
+Fine-tune LLM on Hetzner	https://github.com/amosproj/amos2024ss08-cloud-native-llm/issues/99	dnsch, julioc-p, YashodharPansuriya	In progress	SP 05, User Story
+Create Demo video	https://github.com/amosproj/amos2024ss08-cloud-native-llm/issues/107	julioc-p	In progress	amos-homework, SP 02
+Implement the Chat-bot User Interface	https://github.com/amosproj/amos2024ss08-cloud-native-llm/issues/110	anosh-ar, christianwielenberg	In progress	SP 05, User Story
+Implement Quantitative Evaluation Script	https://github.com/amosproj/amos2024ss08-cloud-native-llm/issues/81	christianwielenberg, dnsch	Sprint Backlog	SP 01, User Story
+Benchmark the trained model against the base models and a competitor	https://github.com/amosproj/amos2024ss08-cloud-native-llm/issues/91		Product Backlog	User Story
+Set Suitable Hyperparemeters for the LLM	https://github.com/amosproj/amos2024ss08-cloud-native-llm/issues/114		Product Backlog	User Story
+Test the UI and Deployment of Our Model	https://github.com/amosproj/amos2024ss08-cloud-native-llm/issues/115		Product Backlog	User Story
+Prepare 2-3 Test Scenarios and Questions for the Demo Day	https://github.com/amosproj/amos2024ss08-cloud-native-llm/issues/116		Product Backlog	User Story
+[Epic] Named Entity Recognition (NER) on Training Data			Product Backlog	
+Annotate a Dataset for NER Trainning	https://github.com/amosproj/amos2024ss08-cloud-native-llm/issues/67		Product Backlog	User Story
+Develop and Train the NER Model	https://github.com/amosproj/amos2024ss08-cloud-native-llm/issues/62		Product Backlog	User Story
+Integrate NER Module with the Q&A Transformation Pipeline	https://github.com/amosproj/amos2024ss08-cloud-native-llm/issues/46		Product Backlog	User Story
+[Epic] Fine-Tune our LLM on Hetzner Environment			Product Backlog	
+[Epic] Implement Data Collection Automation Pipeline			Feature Archive	
+[Epic] Research and Select an Open LLM for CNCF-related knowledge			Feature Archive	
+[Epic] Develop Q&A Pairs Transforming Pipeline			Feature Archive	
+[Epic] Implement the Quantitative Evaluation			Feature Archive	
+[Epic] Tidy up our datasets			Feature Archive	
+[Epic] Implement Named Entity Recognition (NER) on training data			Feature Archive	
+Define CNCF-related Entities and their Relationships	https://github.com/amosproj/amos2024ss08-cloud-native-llm/issues/45		Feature Archive	User Story
+Contact Kubernetes to verify the training data	https://github.com/amosproj/amos2024ss08-cloud-native-llm/issues/43		Product Backlog	User Story
+-- FOR LATER IN THE FUTURE --			Product Backlog	
