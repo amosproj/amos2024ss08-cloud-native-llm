@@ -1,0 +1,27 @@
+name: DeepCNCFQuantized
+context_size: 2048
+f16: true
+threads: 14
+gpu_layers: 90
+mmap: true
+parameters:
+  # Reference any HF model or a local file here
+  #model: huggingface://TheBloke/phi-2-GGUF/phi-2.Q8_0.gguf
+  #model: huggingface://google/gemma-2b-it/gemma-2b-it.gguf
+  model: huggingface://Kubermatic/DeepCNCFQuantized/ggml-model-Q4_K_M.gguf
+  temperature: 0.7
+  top_k: 50
+  top_p: 0.95
+  #repetition_penalty: 1.0
+  #max_new_tokens: 1024
+  #stop: ["<|im_end|>"]
+
+#backend: langchain-huggingface
+
+template:
+
+  chat: &template |
+    Question: {{.Input}}
+    Answer:
+  # Modify the prompt template here ^^^ as per your requirements
+  completion: *template
