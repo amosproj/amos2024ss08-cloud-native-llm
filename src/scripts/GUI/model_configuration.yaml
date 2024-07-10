@@ -1,5 +1,5 @@
-name: gemma
-context_size: 512
+name: DeepCNCFQuantized
+context_size: 2048
 f16: true
 threads: 14
 gpu_layers: 90
@@ -12,13 +12,16 @@ parameters:
   temperature: 0.7
   top_k: 50
   top_p: 0.95
+  #repetition_penalty: 1.0
+  #max_new_tokens: 1024
+  #stop: ["<|im_end|>"]
 
 #backend: langchain-huggingface
 
 template:
 
   chat: &template |
-    Instruct: {{.Input}}
-    Output:
+    Question: {{.Input}}
+    Answer:
   # Modify the prompt template here ^^^ as per your requirements
   completion: *template
