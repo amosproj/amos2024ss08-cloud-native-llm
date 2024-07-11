@@ -16,12 +16,12 @@ login(HF_TOKEN, add_to_git_credential=True)
 
 
 # training pipeline taken from https://huggingface.co/blog/gemma-peft
-model_id = "google/gemma-7b-it"
+model_id = "google/gemma-2-9b-it"
 
 bnb_config = BitsAndBytesConfig(
-    load_in_8bit=True,
-    bnb_8bit_quant_type="nf4",
-    bnb_8bit_compute_dtype=torch.bfloat16
+    load_in_4bit=True,
+    bnb_4bit_quant_type="nf4",
+    bnb_4bit_compute_dtype=torch.bfloat16
 )
 
 dataset = load_dataset(
@@ -31,7 +31,7 @@ dataset.shuffle(42)
 tokenizer = AutoTokenizer.from_pretrained(model_id, padding_side='right')
 # TODO: Check if this can be changed to AutoModelForQuestionAnswering with GEMMA
 model = AutoModelForCausalLM.from_pretrained(
-    model_id, quantization_config=bnb_config, device_map="auto")
+    model_id, quantization_config=bnb_config, device_map="auto", torch_dtype=torch.bfloat16)
 
 
 # Training (hyper)parameters (initial config taken from: https://medium.com/@lucamassaron/sherlock-holmes-q-a-enhanced-with-gemma-2b-it-fine-tuning-2907b06d2645)
@@ -52,8 +52,8 @@ training_arguments = TrainingArguments(
     logging_steps=10,
     learning_rate=1.344609154868106e-05,
     weight_decay=0.00019307024914471071,
-    fp16=True,
-    bf16=False,
+    fp16=False,
+    bf16=True,
     max_grad_norm=0.3,
     max_steps=-1,
     warmup_ratio=0.03,
@@ -61,7 +61,6 @@ training_arguments = TrainingArguments(
     lr_scheduler_type="cosine",
     report_to="tensorboard",
     disable_tqdm=False,
-    load_best_model_at_end=True,
     eval_accumulation_steps=1,
     evaluation_strategy='steps',
     eval_steps=10,
@@ -98,7 +97,7 @@ lora_config = LoraConfig(
 
 trainer = SFTTrainer(
     model=model,
-    train_dataset=dataset["train"],
+    train_dataset=dataset,
     args=training_arguments,
     peft_config=lora_config,
     formatting_func=formatting_func,
