@@ -61,9 +61,6 @@ training_arguments = TrainingArguments(
     lr_scheduler_type="cosine",
     report_to="tensorboard",
     disable_tqdm=False,
-    eval_accumulation_steps=1,
-    evaluation_strategy='steps',
-    eval_steps=10,
     # debug="underflow_overflow"
 )
 
