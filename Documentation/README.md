@@ -77,3 +77,43 @@ This command executes the ETL process, uploading the output to the specified dat
 ```bash
 ./script.sh SuperOrganization/WorldDataset
 ```
+
+## Training
+
+You can find a jupyter notebook that you can use to train using Google Colab or, if you have the resources, locally, in 
+```src/scripts/training/initial_colab_training.ipynb```.
+Additionally, if you want to train on a server, you can find necessary scripts in
+```src/hpc_scripts```. Copy this directory and then follow the instructions below.
+
+To execute an example training script, run
+```bash
+./training_job.sbatch
+```
+in
+```
+src/hpc_scripts/training
+```
+This will start
+```
+src/hpc_scripts/training/model_training.py.
+```
+The hyperparameters were found using hyperparameter tuning, they might need to get changed to your specific use case.
+
+## Local-ai support
+
+If you want to use the model with [Local-ai](https://github.com/mudler/LocalAI), run local-ai in a docker container, using a docker image provided by local-ai from docker hub.
+You also need to pass a model configuration file to the docker container to tell local-ai which model to implement.
+All necessary commands are provided in
+```bash
+src/scripts/GUI/preparation_scripts.sh
+```
+
+Note: if you want to use a GPU with local-ai, you need to
+1. Install Nvidia driver and cuda toolkit.
+2. Install Nvidia container toolkit.
+3. Pull and run local-ai image from docker hub.
+You can find all necessary commands in
+```bash
+src/scripts/GUI/preparation_scripts.sh
+```
+aswell.
