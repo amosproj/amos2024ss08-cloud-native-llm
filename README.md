@@ -26,13 +26,13 @@ The development of this project follows an open-source and open-model fashion.
 
 The folder structure is as follows:
 
-- **Deliverables** 1. Contains all AMOS specific homeworks referenced with the sprint number they were due to.
-- **Documentation** 2. Contains the documentation on how to run the project
-- **src** 3. Contains all the sourcecode of the project.
-  - **hpc_scripts** 1. Contains sricpts that were specifically tailored to run on the HPC ([High Performance Cluster](https://hpc.fau.de/)) of the FAU. This is mostly for interacting with LLM's
-  - **scripts** 2. Contains all general purpose scripts (i.e. scraping data from CNCF Landscape and Stackoverflow, data formatting, deploying the model)
-  - **landscape_scripts** 3. Contains scripts for scraping the webpages of the CNCF landscape.
-- **test:** 4. Contains all unit tests and integration tests.
+- **Deliverables** Contains all AMOS specific homeworks referenced with the sprint number they were due to.
+- **Documentation** Contains the documentation on how to run the project
+- **src** Contains all the sourcecode of the project.
+  - **hpc_scripts** Contains sricpts that were specifically tailored to run on the HPC ([High Performance Cluster](https://hpc.fau.de/)) of the FAU. This is mostly for interacting with LLM's
+  - **scripts** Contains all general purpose scripts (i.e. scraping data from CNCF Landscape and Stackoverflow, data formatting, deploying the model)
+  - **landscape_scripts** Contains scripts for scraping the webpages of the CNCF landscape.
+- **test:** Contains all unit tests and integration tests.
 
 ## Objectives
 
