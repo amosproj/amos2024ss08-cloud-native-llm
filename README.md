@@ -43,6 +43,24 @@ The folder structure is as follows:
 Potentially work in tandem with the AMOS project on knowledge graph extraction to synergize both projects’ outcomes.
 - **Benchmark Development:** Construct a manual benchmark to serve as ground truth for quantitatively evaluating the LLM's performance.
 
+## Features
+
+### Dataset Preparation
+
+- **Data Sources:** Collect documentation from CNCF landscape project documentation, white papers, blog posts, and technical documents.
+- **Preprocessing:** Normalize and structure the collected data.
+- 
+### LLM Fine-Tuning
+
+- **Fine-tuning Procedure:** Use the structured dataset for model training in a repeatable and reproducible manner.
+
+### Model
+
+Our [model](
+- **Enhanced Domain Knowledge:** The fine-tuned model is optimized for understanding and generating text related to cloud-native technologies, CNCF projects, and the broader CNCF landscape.
+Context-Aware Responses: Provides more accurate and contextually relevant answers to queries about CNCF projects and cloud-native computing.
+Open Source: Built using open-source tools and datasets, making it easy for the community to contribute and improve the model.
+    
 ## Methodology
 
 ### Dataset Preparation
@@ -65,6 +83,10 @@ Potentially work in tandem with the AMOS project on knowledge graph extraction t
 ## Potential Impact
 
 This project aims to become a definitive knowledge base for cloud computing, enriching the knowledge of engineers in cloud-native development and supporting the maintenance and growth of open-source projects.
+
+## License
+
+This project is licensed under the MIT License. See the LICENSE file for details.
 
 ## Get Involved!
 
