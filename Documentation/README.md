@@ -108,7 +108,9 @@ All necessary commands are provided in
 src/scripts/GUI/preparation_scripts.sh
 ```
 
-Note: if you want to use a GPU with local-ai, you need to
+--- 
+> [!NOTE]
+> If you want to use a GPU with local-ai, you need to:
 1. Install Nvidia driver and cuda toolkit.
 2. Install Nvidia container toolkit.
 3. Pull and run local-ai image from docker hub.

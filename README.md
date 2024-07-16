@@ -1,72 +1,67 @@
-<h1 align="center">
-  <img src="/Deliverables/sprint-01/team-logo.png" alt="ChatCNCF team-logo" height="500"/>
-</h1>
+<div align="center">
+  <img src="Deliverables/sprint-01/team-logo.svg" height="256" />
+  <p>Open-source LLM for simplifying and understanding the CNCF ecosystem.</p>
+</div>
 
-# Cloud Native LLM Project (AMOS SS 2024)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 ![Kubernetes Version](https://img.shields.io/badge/kubernetes-v1.21-blue.svg)
 ![GitHub language count](https://img.shields.io/github/languages/count/amosproj/amos2024ss08-cloud-native-llm)
 ![GitHub last commit](https://img.shields.io/github/last-commit/amosproj/amos2024ss08-cloud-native-llm)
 ![GitHub issues](https://img.shields.io/github/issues/amosproj/amos2024ss08-cloud-native-llm)
 
+## 📖 About 
 
-## AMOS Project
-This project is a student project for the [AMOS SS 2024](https://github.com/amosproj) course with the industry partner [Kubermatic](https://www.kubermatic.com)
-at [Technical University of Berlin](https://www.tu.berlin),[Friedrich-Alexander University of Erlangen-Nuremberg](https://www.fau.de) and [Free University of Berlin](https://www.fu-berlin.de), under the supervision of [Prof. Riehle](https://oss.cs.fau.de/person/riehle-dirk/) and contact persons are Mario Fahlandt and Sebastian Scheele of Kubermatic.
+Deep Cloud Native Computing Foundation, or DeepCNCF for short, is an open-source LLM aimed to simplify the Cloud Native ecosystem by resolving information overload and fragmentation within the CNCF landscape. The aim is to effortlessly provide users with detailed, context-related answers to any CNCF project.
 
-## Overview
+It was developed as part of the [AMOS project](https://github.com/amosproj) and consists of a pipeline to gather necessary information (including documentation, pdfs, yaml files, jsons, readmes,  and corresponding StackOverflow question/answer pairs) about [CNCF Landscape](https://landscape.cncf.io/) projects, create a question/answer pair dataset from the collected data using [Google Gemma](https://huggingface.co/google/gemma-2b-it), merge it with gathered StackOverflow question/answer pairs, and finetune the [Google Gemma 2B IT model](https://huggingface.co/google/gemma-2b-it), [Google Gemma 7B IT model](https://huggingface.co/google/gemma-7b-it), and [Google Gemma-2 9B IT](https://huggingface.co/google/gemma-2-9b-it) using the gathered data.
 
-Welcome to the Cloud Native LLM Project for the AMOS SS 2024! 
+## 🚀 Features
+- Full data gathering and processing pipeline
 
-This project aims to simplify the Cloud Native ecosystem by resolving information overload and fragmentation within the CNCF landscape.
+  - **[src/landscape_scraper](src/landscape_scraper)**
 
-Our vision is a future where developers and users can effortlessly obtain detailed, context-aware answers about CNCF projects, thereby boosting productivity and enhancing comprehension.
+  - **[src/scripts/scraping](src/scripts/scraping)**
 
-The development of this project follows an open-source and open-model fashion.
+  - **[src/scripts/data_preparation](src/scripts/data_preparation)**
 
-The folder structure is as follows:
+  - **[src/scripts/qa_generation](src/scripts/qa_generation)**
 
-- **Deliverables** Contains all AMOS specific homeworks referenced with the sprint number they were due to.
-- **Documentation** Contains the documentation on how to run the project
-- **src** Contains all the sourcecode of the project.
-  - **hpc_scripts** Contains sricpts that were specifically tailored to run on the HPC ([High Performance Cluster](https://hpc.fau.de/)) of the FAU. This is mostly for interacting with LLM's
-  - **scripts** Contains all general purpose scripts (i.e. scraping data from CNCF Landscape and Stackoverflow, data formatting, deploying the model)
-  - **landscape_scripts** Contains scripts for scraping the webpages of the CNCF landscape.
-- **test:** Contains all unit tests and integration tests.
+- Training pipeline in 
 
-## Objectives
+  - **[src/scripts/training](src/scripts/training)**
 
-- **Select and Train an Open Source LLM:** Identify a suitable open source LLM for training with specific Kubernetes-related data.
-- **Automate Data Extraction:** Develop tools to automatically gather training data from publicly available [Kubernetes resources](https://www.kubermatic.com/company/community/) such as white papers, documentation, and forums.
-- **Incorporate Advanced Data Techniques:** Use concepts and relationship extraction to enrich the training dataset, enhancing the LLM's understanding of Kubernetes.
-- **Open Source Contribution:** Release the fine-tuned model and dataset preparation tools.
-Potentially work in tandem with the AMOS project on knowledge graph extraction to synergize both projects’ outcomes.
-- **Benchmark Development:** Construct a manual benchmark to serve as ground truth for quantitatively evaluating the LLM's performance.
+  - **[src/hpc_scripts](src/hpc_scripts)**
 
-## Methodology
+  - **[src/hpc_scripts/training](src/hpc_scripts/training)**
 
-### Dataset Preparation
+## 📊 Datasets
 
-- **Data Sources:** Collect documentation from CNCF landscape project documentation, white papers, blog posts, and technical documents.
-- **Preprocessing:** Normalize and structure the collected data.
-- **Knowledge Extraction:** Use Named Entity Recognition (NER) to extract key entities and create relationships between them.
+- **[cncf-raw-data-for-llm-training](https://huggingface.co/datasets/Kubermatic/cncf-raw-data-for-llm-training)**: raw scraped pdf, readme, json, documentation and yaml data
+- **[cncf-question-and-answer-dataset-for-llm-training](https://huggingface.co/datasets/Kubermatic/cncf-question-and-answer-dataset-for-llm-training)**: artifical question/answer pair dataset generated from the raw data using [Google Gemma](https://huggingface.co/google/gemma-2b-it)
+- **[stackoverflow_QAs](https://huggingface.co/datasets/Kubermatic/stackoverflow_QAs)**: real question/answer pair dataset gathered from StackOverflow. Only a subset of the questions with the highest rated numbers are included.
+- **[Merged_QAs](https://huggingface.co/datasets/Kubermatic/Merged_QAs)**: merged artifical and real question/answer pair dataset
+- **[Benchmark-Questions](https://huggingface.co/datasets/Kubermatic/Benchmark-Questions)**: multiple choice question/answer pair dataset used to benchmark the finetuned model.
 
-### LLM Fine-Tuning
+## 🤖 Models
 
-- **LLM Selection:** Evaluate and select an appropriate open-source/open-model LLM based on performance, computational requirements, and licensing.
-- **Fine-tuning Procedure:** Use the structured dataset for model training in a repeatable and reproducible manner, ideally using Cloud Native tools like KubeFlow and Kubernetes.
+- **[DeepCNCF](https://huggingface.co/Kubermatic/DeepCNCF)**: initial model trained on [Google Gemma 2B IT model](https://huggingface.co/google/gemma-2b-it)
+- **[DeepCNCFQuantized](https://huggingface.co/Kubermatic/DeepCNCFQuantized)**: quantized version of [DeepCNCF](https://huggingface.co/Kubermatic/DeepCNCF/tree/main)
+- **[DeepCNCF2BAdapter](https://huggingface.co/Kubermatic/DeepCNCF2BAdapter)**: finetuned [Google Gemma 2B IT model](https://huggingface.co/google/gemma-2b-it), trained on whole dataset
+- **[DeepCNCF7BAdapter](https://huggingface.co/Kubermatic/DeepCNCF7BAdapter)**: finetuned [Google Gemma 7B IT model](https://huggingface.co/google/gemma-7b-it), trained on whole dataset
+- **[DeepCNCF9BAdapter](https://huggingface.co/Kubermatic/DeepCNCF2BAdapter)**: finetuned [Google Gemma-2 9B IT model](https://huggingface.co/google/gemma-2-9b-it), trained on whole dataset
 
-## Evaluation
+## 📁 Folder Structure
 
-- **Quantitative Metrics:** Use specific benchmarks such as BLEU score and Factual Question Accuracy to assess model performance.
-- **Qualitative Evaluation:** Domain experts and project maintainers will evaluate the LLM’s comprehensiveness, accuracy, and clarity.
+- **[Deliverables](Deliverables)** Contains all AMOS specific homeworks referenced with the sprint number they were due to.
+- **[Documentation](Documentation)** Contains the documentation on how to run the project
+- **[src](src)** Contains all the sourcecode of the project.
+  - **[src/hpc_scripts](src/hpc_scripts)** Contains sricpts that were specifically tailored to run on the HPC ([High Performance Cluster](https://hpc.fau.de/)) of the FAU. This is mostly for interacting with LLM's
+  - **[src/scripts](src/scripts)** Contains all general purpose scripts (i.e. scraping data from CNCF Landscape and Stackoverflow, data formatting, deploying the model)
+  - **[src/landscape_scraper](src/landscape_scraper)** Contains scripts for scraping the webpages of the CNCF landscape.
+- **[test](test)** Contains all unit tests and integration tests.
 
+## 🤔 Getting Started
 
-## Potential Impact
+If you want to run the data gathering and training pipelines yourself or if you want to use them to gather your own data, follow the steps provided in the **[Documentation](Documentation)**
 
-This project aims to become a definitive knowledge base for cloud computing, enriching the knowledge of engineers in cloud-native development and supporting the maintenance and growth of open-source projects.
-
-## Get Involved!
-
-To get started:
-[TBD]
+Additional information can be found in the **[Wiki](../../wiki)**
