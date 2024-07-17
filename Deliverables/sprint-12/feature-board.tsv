@@ -1,11 +1,6 @@
 Title	URL	Assignees	Status	Labels
-Set Suitable Hyperparemeters for the LLM	https://github.com/amosproj/amos2024ss08-cloud-native-llm/issues/114	anosh-ar	Feature Archive	Actual SP 05, SP 03, User Story
-Test the UI and Deployment of Our Model	https://github.com/amosproj/amos2024ss08-cloud-native-llm/issues/115	anosh-ar, julioc-p	Feature Archive	Actual SP 05, SP 08, User Story
-Prepare 1 - 2 Test Scenarios for the Demo Day	https://github.com/amosproj/amos2024ss08-cloud-native-llm/issues/116	christianwielenberg, YashodharPansuriya	Feature Archive	Actual SP 02, SP 03, User Story
-Benchmark the trained model against the base models and a competitor	https://github.com/amosproj/amos2024ss08-cloud-native-llm/issues/91	christianwielenberg	Feature Archive	Actual SP 05, SP 05, User Story
 [PO] Create the Demo-day Slide	https://github.com/amosproj/amos2024ss08-cloud-native-llm/issues/109		Feature Archive	amos-homework
 Implement the Chat-bot User Interface	https://github.com/amosproj/amos2024ss08-cloud-native-llm/issues/110	anosh-ar, christianwielenberg	Feature Archive	Actual SP 05, SP 05, User Story
-Fine-tune LLM on Hetzner	https://github.com/amosproj/amos2024ss08-cloud-native-llm/issues/99	christianwielenberg, dnsch, julioc-p, YashodharPansuriya	Feature Archive	Actual SP 05, SP 05, User Story
 Deploy the Fine-tuned Model	https://github.com/amosproj/amos2024ss08-cloud-native-llm/issues/108	anosh-ar	Feature Archive	Actual SP 03, SP 05, User Story
 Implement a Script for LLM fine-tuning	https://github.com/amosproj/amos2024ss08-cloud-native-llm/issues/98	christianwielenberg, julioc-p	Feature Archive	Actual SP 02, SP 02, User Story
 Implement Quantitative Evaluation Script	https://github.com/amosproj/amos2024ss08-cloud-native-llm/issues/81	christianwielenberg, dnsch	Feature Archive	Actual SP 01, SP 01, User Story
@@ -58,6 +53,11 @@ Monitoring of the ETL process by Logging	https://github.com/amosproj/amos2024ss0
 Create a Chatbot on HuggingFace	https://github.com/amosproj/amos2024ss08-cloud-native-llm/issues/79	julioc-p	Feature Archive	Actual SP 03, SP 05, User Story
 Create Demo video	https://github.com/amosproj/amos2024ss08-cloud-native-llm/issues/107	julioc-p	In progress	amos-homework, SP 02
 Finalize the documentation	https://github.com/amosproj/amos2024ss08-cloud-native-llm/issues/120	christianwielenberg, dnsch	Awaiting review	SP 05, User Story
+Test the UI and Deployment of Our Model	https://github.com/amosproj/amos2024ss08-cloud-native-llm/issues/115	anosh-ar, julioc-p	Awaiting review	SP 08, User Story
+Set Suitable Hyperparemeters for the LLM	https://github.com/amosproj/amos2024ss08-cloud-native-llm/issues/114	anosh-ar	Awaiting review	SP 03, User Story
+Prepare 1 - 2 Test Scenarios for the Demo Day	https://github.com/amosproj/amos2024ss08-cloud-native-llm/issues/116	christianwielenberg, YashodharPansuriya	Awaiting review	SP 03, User Story
+Benchmark the trained model against the base models and a competitor	https://github.com/amosproj/amos2024ss08-cloud-native-llm/issues/91	christianwielenberg	Awaiting review	SP 05, User Story
+Fine-tune LLM on Hetzner	https://github.com/amosproj/amos2024ss08-cloud-native-llm/issues/99	christianwielenberg, dnsch, julioc-p, YashodharPansuriya	Awaiting review	SP 05, User Story
 [Epic] Named Entity Recognition (NER) on Training Data			Product Backlog	
 Annotate a Dataset for NER Trainning	https://github.com/amosproj/amos2024ss08-cloud-native-llm/issues/67		Product Backlog	User Story
 Develop and Train the NER Model	https://github.com/amosproj/amos2024ss08-cloud-native-llm/issues/62		Product Backlog	User Story
