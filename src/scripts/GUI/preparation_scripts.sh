@@ -1,9 +1,10 @@
 # pull the local-ai image from docker hub and run it
 # model configuration is stored in github gist file. It can be edited with your needs 
 # deploying DeepCNCF using CPU
-docker run -p 8080:8080 localai/localai:v2.18.1-ffmpeg-core https://gist.githubusercontent.com/anosh-ar/91658012cccb8f74abb72ddc78bb71c8/raw/5124bde0f59b4c499f9fc0ecdf8ed4ecae7f797a/model_config.yaml
+docker run -p 8080:8080 localai/localai:v2.18.1-ffmpeg-core https://raw.githubusercontent.com/amosproj/amos2024ss08-cloud-native-llm/main/src/scripts/GUI/model_configuration.yaml
 
 #optional: deploying DeepCNCF using GPU
+# May face some erros in some GPUs
 ## install NVIDIA Container Toolkit in case you want to use GPU to inference
 # source: https://www.server-world.info/en/note?os=Ubuntu_22.04&p=nvidia&f=2
 curl -s -L https://nvidia.github.io/nvidia-docker/gpgkey | apt-key add -
