@@ -1,3 +1,6 @@
+These script were deigned to be run 
+
+
 # Executing the qa generation:
 
 To execute the qa generation you need to be logged in to the HPC and need to setup a Python environment with the name amos_env. This should include all libraries from the requirements.txt.
