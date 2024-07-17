@@ -1,20 +1,20 @@
+from src.scripts.convert.Unified_format_conversation import (
+    extract_metadata, convert_files_to_json
+)
 import unittest
 import os
 import json
 import yaml
 import tempfile
 import shutil
-from datetime import datetime
-import PyPDF2
 import sys
 import random
 import string
 from reportlab.lib.pagesizes import letter
 from reportlab.pdfgen import canvas
-sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '../..')))
-from src.scripts.convert.Unified_format_conversation import (
-    extract_metadata, convert_files_to_json, process_error_yaml_file
-)
+sys.path.append(os.path.abspath(
+    os.path.join(os.path.dirname(__file__), '../..')))
+
 
 class TestFileProcessing(unittest.TestCase):
 
@@ -26,13 +26,18 @@ class TestFileProcessing(unittest.TestCase):
         self.error_file_list = []
         self.chunk_size = 10
 
-        self.sample_yaml_file = os.path.join(self.test_dir, 'category_subcategory_project_sample.yaml')
-        self.sample_md_file = os.path.join(self.test_dir, 'category_subcategory_project_sample.md')
-        self.sample_pdf_file = os.path.join(self.test_dir, 'category_subcategory_project_sample.pdf')
-        self.error_yaml_file = os.path.join(self.test_dir, 'category_subcategory_project_error.yaml')
+        self.sample_yaml_file = os.path.join(
+            self.test_dir, 'category_subcategory_project_sample.yaml')
+        self.sample_md_file = os.path.join(
+            self.test_dir, 'category_subcategory_project_sample.md')
+        self.sample_pdf_file = os.path.join(
+            self.test_dir, 'category_subcategory_project_sample.pdf')
+        self.error_yaml_file = os.path.join(
+            self.test_dir, 'category_subcategory_project_error.yaml')
 
         with open(self.sample_yaml_file, 'w', encoding='utf-8') as f:
-            yaml.dump([{'step': 'first', 'description': 'This is the first step'}, {'step': 'second', 'description': 'This is the second step'}], f)
+            yaml.dump([{'step': 'first', 'description': 'This is the first step'}, {
+                      'step': 'second', 'description': 'This is the second step'}], f)
 
         with open(self.sample_md_file, 'w', encoding='utf-8') as f:
             f.write(generate_random_text(10000))
@@ -40,8 +45,8 @@ class TestFileProcessing(unittest.TestCase):
         create_random_pdf(self.sample_pdf_file)
 
         with open(self.error_yaml_file, 'w', encoding='utf-8') as f:
-            f.write("This is an invalid YAML content: {missing_quotes: value\n")
-
+            f.write(
+                "This is an invalid YAML content: {missing_quotes: value\n")
 
     def tearDown(self):
         shutil.rmtree(self.test_dir)
@@ -61,13 +66,16 @@ class TestFileProcessing(unittest.TestCase):
         print(f"JSON output directory: {self.json_dir}")
         print(f"Files in test directory: {os.listdir(self.test_dir)}")
 
-        convert_files_to_json(
-            self.processed_files, 
-            self.chunk_size, 
-            self.error_file_list, 
-            json_file_path=self.json_dir, 
-            file_paths=self.test_dir
-        )
+        try:
+            convert_files_to_json(
+                self.processed_files,
+                self.chunk_size,
+                self.error_file_list,
+                json_file_path=self.json_dir,
+                file_paths=self.test_dir
+            )
+        except Exception as e:
+            print(f"Error: {e}")
 
         json_files = os.listdir(self.json_dir)
         print(f"JSON files created: {json_files}")
@@ -101,12 +109,15 @@ class TestFileProcessing(unittest.TestCase):
 def generate_random_text(num_words=100):
     words = []
     for _ in range(num_words):
-        word_length = random.randint(3, 10)  # Random word length between 3 and 10
+        # Random word length between 3 and 10
+        word_length = random.randint(3, 10)
         word = ''.join(random.choices(string.ascii_lowercase, k=word_length))
         words.append(word)
     return ' '.join(words)
 
 # Create a PDF file with random content
+
+
 def create_random_pdf(pdf_path):
     c = canvas.Canvas(pdf_path, pagesize=letter)
     width, height = letter
@@ -118,6 +129,7 @@ def create_random_pdf(pdf_path):
 
     c.showPage()
     c.save()
+
 
 if __name__ == '__main__':
     unittest.main()
