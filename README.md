@@ -48,7 +48,7 @@ It was developed as part of the [AMOS project](https://github.com/amosproj). Our
 - **[DeepCNCFQuantized](https://huggingface.co/Kubermatic/DeepCNCFQuantized)**: quantized version of [DeepCNCF](https://huggingface.co/Kubermatic/DeepCNCF/tree/main)
 - **[DeepCNCF2BAdapter](https://huggingface.co/Kubermatic/DeepCNCF2BAdapter)**: finetuned [Google Gemma 2B IT model](https://huggingface.co/google/gemma-2b-it), trained on whole dataset
 - **[DeepCNCF7BAdapter](https://huggingface.co/Kubermatic/DeepCNCF7BAdapter)**: finetuned [Google Gemma 7B IT model](https://huggingface.co/google/gemma-7b-it), trained on whole dataset
-- **[DeepCNCF9BAdapter](https://huggingface.co/Kubermatic/DeepCNCF2BAdapter)**: finetuned [Google Gemma-2 9B IT model](https://huggingface.co/google/gemma-2-9b-it), trained on whole dataset
+- **[DeepCNCF9BAdapter](https://huggingface.co/Kubermatic/DeepCNCF9BAdapter)**: finetuned [Google Gemma-2 9B IT model](https://huggingface.co/google/gemma-2-9b-it), trained on whole dataset
 
 ## 📁 Folder Structure
 
