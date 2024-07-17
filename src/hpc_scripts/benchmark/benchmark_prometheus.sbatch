@@ -33,6 +33,7 @@ mkdir ${WORK}/$SLURM_JOB_ID
 cp -r ${SLURM_SUBMIT_DIR}/benchmark_prometheus.py .
 cp -r ${SLURM_SUBMIT_DIR}/cncf_results.csv .
 cp -r ${SLURM_SUBMIT_DIR}/gemma_results.csv .
+cp -r ${SLURM_SUBMIT_DIR}/llama_results.csv .
 mkdir -p output/
 
 (

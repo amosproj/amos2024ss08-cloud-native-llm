@@ -20,49 +20,17 @@ import csv
 import gc
 import traceback
 NUM_GPUS = 1
-dataset = load_dataset("Kubermatic/cncf-question-and-answer-dataset-for-llm-training", split="train[:50]")
-
-# Helper function to extract JSON values
-def extract_json(text, word):
-    pattern = fr'"{word}": "(.*?)"'
-    match = re.search(pattern, text)
-    if match:
-        return match.group(1)
-    else:
-        return ""
-
-# Function to generate results using the model
-def gemma_result(question, model, tokenizer, rank, temperature=0.0, max_new_tokens=256, return_answer=False):
-    input_ids = tokenizer(question, return_tensors="pt").to(f"cuda:{rank}")
-    
-    if temperature > 0:
-        do_sample = True
-        outputs = model.generate(**input_ids,
-                                 max_new_tokens=max_new_tokens,
-                                 do_sample=do_sample,
-                                 temperature=temperature)
-    else:
-        do_sample = False
-        outputs = model.generate(**input_ids,
-                                 max_new_tokens=max_new_tokens)
-    result = str(tokenizer.decode(outputs[0])).replace("<bos>", "").replace("<eos>", "").strip()
-    del outputs
-    del input_ids
-    torch.cuda.empty_cache()
-    if return_answer:
-        return result
-    else:
-        print(result)
+dataset = load_dataset("Kubermatic/Merged_QAs", split="train[-50:]")
 
 # Function to run inference
 def run_inference(rank, world_size, data_length):
     dist.init_process_group("gloo", rank=rank, world_size=world_size)
 
-    config = PeftConfig.from_pretrained("Kubermatic/DeepCNCF")
-    base_model = AutoModelForCausalLM.from_pretrained("google/gemma-1.1-7b-it", device_map=f"cuda:{rank}")
+    config = PeftConfig.from_pretrained("Kubermatic/DeepCNCF9BAdapter")
+    base_model = AutoModelForCausalLM.from_pretrained("google/gemma-2-9b-it", device_map=f"cuda:{rank}")
         
-    model = PeftModel.from_pretrained(base_model, "Kubermatic/DeepCNCF", device_map=f"cuda:{rank}")
-    tokenizer = AutoTokenizer.from_pretrained("google/gemma-1.1-7b-it")
+    model = PeftModel.from_pretrained(base_model, "Kubermatic/DeepCNCF9BAdapter", device_map=f"cuda:{rank}")
+    tokenizer = AutoTokenizer.from_pretrained("google/gemma-2-9b-it")
     model.eval()
 
     start_index = int(rank * data_length / world_size) 
@@ -70,10 +38,19 @@ def run_inference(rank, world_size, data_length):
 
     with torch.no_grad():
         for i in tqdm(range(start_index, end_index)):
-            chunks = dataset['Question'][i]
+            question = dataset['Question'][i]
 
             try:
-                result = gemma_result(chunks, model=model, tokenizer=tokenizer, rank=rank, temperature=0, return_answer=True)
+                chat = [
+                    { "role": "user", "content": question},
+                ]
+                prompt = tokenizer.apply_chat_template(chat, tokenize=False, add_generation_prompt=True)
+                input_ids = tokenizer(prompt, add_special_tokens=False, return_tensors="pt").to("cuda")
+
+                outputs = model.generate(**inputs,
+                                 max_new_tokens=512,
+                                 do_sample=True)
+                result = tokenizer.decode(outputs[0])
                 print(result)
 
                 with open(f"output/benchmark_results{rank}.csv", 'a+', newline='') as file:
